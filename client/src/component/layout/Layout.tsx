@@ -1,14 +1,14 @@
 import { Outlet, Navigate } from 'react-router-dom';
 
 import Navbar from './Nabbar';
-import Sidebar from './SideBar';
+import Sidebar from './Sidebar';
 import { useAppSelector } from '../../Hooks/hook';
 
 export default function Layout() {
     const { token: isAuthenticated } = useAppSelector((state => state.auth.user));
 
     if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/" replace />;
     }
 
     return (

@@ -4,9 +4,9 @@ export type globalResponse = {
 }
 
 export type user = {
-    username: string | null;
-    email: string | null;
-    token: string | null;
+    username: string;
+    email: string;
+    token: string;
 }
 
 export type userFormData = {

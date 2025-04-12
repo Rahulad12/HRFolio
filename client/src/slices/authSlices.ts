@@ -13,9 +13,9 @@ const email = localStorage.getItem("email") ? localStorage.getItem("email") : ""
 
 const initialState: userResponse = {
     user: {
-        username: username,
-        email: email,
-        token: token
+        username: username || "",
+        email: email || "",
+        token: token || ""
     },
     success: false,
     message: ""
@@ -30,6 +30,12 @@ export const auth = createSlice({
             state.success = action.payload.success;
             state.message = action.payload.message
 
+            const { username, email, token } = action.payload.user;
+
+            localStorage.setItem("token", token);
+            localStorage.setItem("username", username);
+            localStorage.setItem("email", email);
+
         },
         logout: (state) => {
             state.user = {
@@ -40,10 +46,12 @@ export const auth = createSlice({
             state.success = false;
             state.message = ""
             localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("email");
         }
     }
 });
 
-export const { setCredentials,logout } = auth.actions;
+export const { setCredentials, logout } = auth.actions;
 
 export default auth.reducer;

@@ -46,6 +46,8 @@ export const auth = createSlice({
             state.success = false;
             state.message = ""
             localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("email");
         }
     }
 });

@@ -2,21 +2,24 @@ import React, { useEffect } from 'react';
 import AuthForm from "../component/common/AuthForm";
 import { useAppDispatch } from '../Hooks/hook';
 import { setCredentials } from '../slices/authSlices';
+import { useLocation } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = React.useState(false);
 
+  const location = useLocation();
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const email = params.get('email');
-    const username = params.get('username');
-    console.log(username, email, token);
+    const queryParams = new URLSearchParams(location.search);
+    const token = queryParams.get('token');
+    const email = queryParams.get('email');
+    const name = queryParams.get('name');
 
-    if (token && email && username) {
+    console.log(token, email, name);
+
+    if (token && email && name) {
       dispatch(setCredentials({
-        user: { username, email, token },
+        user: { username: name, email, token },
         success: true,
         message: "Login success"
       }));
@@ -25,7 +28,7 @@ const Login: React.FC = () => {
 
   const submitHandler = () => {
     setIsLoading(true);
-    window.location.href = "http://localhost:5000/api/auth/google"; // Adjust if needed
+    window.location.href = "http://localhost:5000/api/auth/google";
   };
 
   return (

@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
 
                     <div className="flex items-center">
                         <div className="flex items-center">
-                            <span className="text-gray-700 mr-4">{user?.name}</span>
+                            <span className="text-gray-700 mr-4">{user?.username}</span>
                             <button
                                 onClick={handleLogout}
                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-600 hover:to-blue-300 focus:outline-none transition cursor-pointer"

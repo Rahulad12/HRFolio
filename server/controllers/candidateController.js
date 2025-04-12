@@ -72,25 +72,68 @@ const getCandidateById = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 }
+// const getAllCandidates = async (req, res) => {
+//     try {
+//         const candidates = await Candidate.find().select("-createdAt -updatedAt -__v").populate({
+//             path: "references",
+//             select: "-createdAt -updatedAt -__v -candidate"
+//         })
+//         if (candidates.length === 0) {
+//             return res.status(404).json({ success: false, message: "No candidates found" });
+//         }
+//         res.status(200).json({
+//             success: true,
+//             message: "Candidates fetched successfully",
+//             data: candidates
+//         });
+
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: error.message });
+//     }
+// }
 const getAllCandidates = async (req, res) => {
+    const { name, technology, level, status } = req.query;
+
     try {
-        const candidates = await Candidate.find().select("-createdAt -updatedAt -__v").populate({
-            path: "references",
-            select: "-createdAt -updatedAt -__v -candidate"
-        })
-        if (candidates.length === 0) {
-            return res.status(404).json({ success: false, message: "No candidates found" });
+        // If no filter is passed, you can return an error or return all
+        const query = {};
+
+        if (name) {
+            query.name = { $regex: name, $options: "i" };
         }
-        res.status(200).json({
+        if (technology) {
+            query.technology = { $regex: technology, $options: "i" };
+        }
+        if (level) {
+            query.level = { $regex: level, $options: "i" };
+        }
+        if (status) {
+            query.status = { $regex: status, $options: "i" };
+        }
+
+        const candidates = await Candidate.find(query).select(
+            "-createdAt -updatedAt -__v -references"
+        );
+
+        if (!candidates.length) {
+            return res
+                .status(404)
+                .json({ success: false, message: "No candidates found" });
+        }
+
+        return res.status(200).json({
             success: true,
             message: "Candidates fetched successfully",
-            data: candidates
+            data: candidates,
         });
 
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error",
+        });
     }
-}
+};
 
 const deleteCandidate = async (req, res) => {
     try {
@@ -104,5 +147,60 @@ const deleteCandidate = async (req, res) => {
     }
 }
 
+const updateCandidate = async (req, res) => {
+    try {
+        const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!candidate) {
+            return res.status(404).json({ success: false, message: "Candidate not found" });
+        }
+        return res.status(200).json({ success: true, message: "Candidate updated successfully", data: candidate });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+const filterCandidate = async (req, res) => {
+    const { name, technology, level, status } = req.query;
 
-export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate };
+    try {
+        // If no filter is passed, you can return an error or return all
+        const query = {};
+
+        if (name) {
+            query.name = { $regex: name, $options: "i" };
+        }
+        if (technology) {
+            query.technology = { $regex: technology, $options: "i" };
+        }
+        if (level) {
+            query.level = { $regex: level, $options: "i" };
+        }
+        if (status) {
+            query.status = { $regex: status, $options: "i" };
+        }
+
+        const candidates = await Candidate.find(query).select(
+            "-createdAt -updatedAt -__v -references"
+        );
+
+        if (!candidates.length) {
+            return res
+                .status(404)
+                .json({ success: false, message: "No candidates found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Candidates fetched successfully",
+            data: candidates,
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error",
+        });
+    }
+};
+
+
+export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, filterCandidate, updateCandidate };

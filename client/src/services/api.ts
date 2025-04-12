@@ -43,12 +43,11 @@ const baseQueryWithLogout: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
         return result;
     } catch (error: any) {
         const errorResponse: string = error.response;
-        console.error('Unexpected Error:', error);
         return {
             error: {
-                status: 'FETCH_ERROR',
-                data: undefined,
-                error: errorResponse,
+                status: error?.status || 500,
+                data: error?.data || error?.message || 'Unknown error',
+                error: errorResponse
             } as FetchBaseQueryError,
         };
     }
@@ -58,5 +57,6 @@ const baseQueryWithLogout: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const api = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithLogout,
+    tagTypes: ['Candidate'],
     endpoints: () => ({}),
 });

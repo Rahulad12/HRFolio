@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { Typography, Divider, Modal } from "antd";
-import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Divider, Modal, Card } from "antd";
+import { UserPlus } from "lucide-react";
 import { candidateFormData } from "../types/index";
 import CandidateForm from "../component/Form/CandidateForm";
 import { useCreateCandidateMutation, useGetCandidateQuery } from "../services/candidateServiceApi";
-import { useAppDispatch } from "../Hooks/hook";
+import { useAppDispatch, useAppSelector } from "../Hooks/hook";
 import { storeCandidate } from "../action/SoreCandidate";
 import CandidateTable from "../component/common/CandidateTable";
 import { toast } from "react-toastify";
+import TableSearch from "../component/common/TableSearch";
 
-const { Title } = Typography;
-
-const CvUploader: React.FC = () => {
-    const { isLoading, data: candidate, isError } = useGetCandidateQuery();
+const CvUploader = () => {
+    const filters = useAppSelector((state) => state.search);
+    const { isLoading, data: candidate, isError, refetch } = useGetCandidateQuery({
+        name: filters.name,
+        technology: filters.technology,
+        status: filters.status,
+        level: filters.level
+    });
     const [createCandidate, { isLoading: createCandidateLoading }] = useCreateCandidateMutation();
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
-
 
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => setIsModalOpen(false);
@@ -24,11 +28,12 @@ const CvUploader: React.FC = () => {
     useEffect(() => {
         if (candidate?.data) {
             dispatch(storeCandidate(candidate.data));
+            refetch();
         }
         return () => {
             dispatch(storeCandidate([]));
         };
-    }, [candidate]);
+    }, [candidate, dispatch, refetch]);
 
     const submitHandler = async (formData: candidateFormData) => {
         try {
@@ -46,23 +51,23 @@ const CvUploader: React.FC = () => {
 
     return (
         <div className="p-4 space-y-4">
-            {isError && <p className="text-red-500">Failed to fetch candidate data.</p>}
             <div className="flex items-center justify-between">
-                <Title level={3} className="!m-0">CV Uploader</Title>
+                <h1 className="text-2xl font-bold">Candidates</h1>
                 <button
                     className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded-md cursor-pointer"
                     onClick={showModal}
                 >
-                    <Plus className="w-4 h-4" /> Add Candidate
+                    <UserPlus className="w-4 h-4" /> Add Candidate
                 </button>
             </div>
 
             <Divider />
-
-            <div className="overflow-x-auto bg-white rounded shadow">
-                {/* <Table ref={ref} dataSource={dataSource} columns={columns} /> */}
-                <CandidateTable loading={isLoading} />
-            </div>
+            <Card className="overflow-x-auto bg-white rounded shadow">
+                <div className="space-y-4">
+                    <TableSearch />
+                    <CandidateTable loading={isLoading} error={isError} />
+                </div>
+            </Card>
 
             <Modal
                 open={isModalOpen}
@@ -74,6 +79,8 @@ const CvUploader: React.FC = () => {
             >
                 <CandidateForm submitHandler={submitHandler} loading={createCandidateLoading} />
             </Modal>
+
+
         </div>
     );
 };

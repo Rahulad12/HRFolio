@@ -8,7 +8,6 @@ const MainRoutes = () => {
     return (
         <BrowserRouter>
             <Routes>
-
                 <Route path="/*" element={<Public />} />
                 <Route element={<Layout />}>
                     <Route path="/dashboard/*" element={<Protected />} />

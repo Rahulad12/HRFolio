@@ -16,7 +16,9 @@ export type userFormData = {
 }
 
 export type referenceData = {
-    name: [string];
+    name: string,
+    contact: string,
+    relation: string
 }
 
 export type candidateFormData = {
@@ -30,21 +32,30 @@ export type candidateFormData = {
     reference: referenceData;
 }
 
+export type candidateFilter = {
+    name: string;
+    technology: string;
+    status: string;
+    level: string;
+}
 
 export type referenceResponse = {
     _id: string;
-    name: referenceData;
+    name: string;
+    contact: string;
+    relation: string
+
 }
 export type candidateData = {
     name: string;
     email: string;
-    phone: string[];
+    phone: string;
     technology: string;
     level: string;
     experience: number;
     expectedsalary: number;
-    reference: referenceResponse;
-    status: 'New' | 'Shortlisted' | 'Interview' | 'Assessment' | 'Hired' | 'Rejected' | 'Blacklisted';
+    references: referenceResponse[];
+    status: 'shortlisted' | 'first interview' | 'second interview' | 'hired' | 'rejected';
     _id: string
 
 }

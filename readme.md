@@ -1,7 +1,7 @@
 # 📄 CV Manager
 CV Manager is a modern web application built to help organizations manage candidate CVs efficiently. It allows users to upload, view, and manage candidate information in a centralized and streamlined manner.
 
-#🚀 Features
+# 🚀 Features
 1. ✅ Add, view, update, and delete candidate profiles
 
 2. 📤 Upload CVs and candidate documents
@@ -20,7 +20,7 @@ CV Manager is a modern web application built to help organizations manage candid
 
 9. ⚙️ Redux Toolkit for state management
 
-#👨‍💻 Developer
+# 👨‍💻 Developer
 **Developed by Rahul Adhikari**
 # GitHub 
 https://github.com/rahulad12

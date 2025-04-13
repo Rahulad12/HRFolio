@@ -25,9 +25,11 @@ app.use(express.urlencoded({ extended: true }));
 //routes 
 import authRouter from './routes/authRoutes.js';
 import candidateRouter from './routes/candidateRoutes.js';
+import interviewRouter from './routes/interviewRoutes.js';
 
 app.use('/api/auth', authRouter);
 app.use('/api/candidate', candidateRouter);
+app.use('/api/interview', interviewRouter);
 
 app.get('/', (req, res) => {
     logger.info("Server is running");

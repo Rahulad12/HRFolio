@@ -65,3 +65,18 @@ export type candidateResponse = {
     data: candidateData[];
 }
 
+export type interviewData = {
+    candidate: candidateData;
+    interviewer: string;
+    date: Date;
+    time: string;
+    status: 'scheduled' | 'cancelled' | 'completed';
+    _id: string;
+    __v: number;
+}
+
+export type interviewResponse = {
+    success: boolean;
+    message: string;
+    data: interviewData[];
+}

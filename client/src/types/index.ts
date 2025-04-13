@@ -24,7 +24,7 @@ export type referenceData = {
 export type candidateFormData = {
     name: string;
     email: string;
-    phone: string[];
+    phone: number;
     technology: string;
     level: string;
     experience: number;
@@ -49,7 +49,7 @@ export type referenceResponse = {
 export type candidateData = {
     name: string;
     email: string;
-    phone: string;
+    phone: number;
     technology: string;
     level: string;
     experience: number;

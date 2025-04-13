@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Tabs, Steps, Button, Descriptions, Tag, Card, Timeline, Divider, Select } from 'antd';
+import { Tabs, Steps, Descriptions, Tag, Card, Timeline, Divider, Select } from 'antd';
 import { useParams } from 'react-router-dom';
 import {
   UserCircle,
@@ -15,6 +15,7 @@ import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../service
 import { candidateData } from '../types';
 import CandidateProfileLoading from '../component/Loding/CandidateProfileLoading';
 import { toast } from 'react-toastify';
+import { makeCapitilized } from '../utils/TextAlter';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -25,7 +26,7 @@ const CandidateProfile = () => {
 
 
   const [candidate, setCandidate] = useState<candidateData>({
-    phone: '',
+    phone: 0,
     email: '',
     name: '',
     technology: '',
@@ -69,7 +70,7 @@ const CandidateProfile = () => {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-start flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold mb-6">{candidate.name}</h1>
+            <h1 className="text-2xl font-bold mb-6">{makeCapitilized(candidate.name)}</h1>
             <div className="flex flex-wrap gap-4 mt-2 text-gray-600 text-sm">
               <span className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
@@ -108,10 +109,10 @@ const CandidateProfile = () => {
         {/* Details */}
         <Descriptions bordered column={{ xs: 1, sm: 2, md: 2 }} className="mt-6">
           <Descriptions.Item label="Technology">
-            <Tag color="blue">{candidate.technology}</Tag>
+            <Tag color="blue">{makeCapitilized(candidate.technology)}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="Level">
-            <Tag color="green">{candidate.level}</Tag>
+            <Tag color="green">{makeCapitilized(candidate.level)}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="Experience">
             <span className="flex items-center gap-2">

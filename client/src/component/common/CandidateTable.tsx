@@ -7,13 +7,13 @@ import { setCandidate } from '../../slices/candidateSlices';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { candidateData } from '../../types';
+import { makeCapitilized } from '../../utils/TextAlter';
 
 interface TableProps {
     loading: boolean;
     error: boolean;
 
 }
-
 const CandidateTable = ({ loading, error }: TableProps) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -44,7 +44,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             key: 'name',
             render: (text: string, record: candidateData) => (
                 <div className="flex flex-col">
-                    <span className="font-medium">{text}</span>
+                    <span className="font-medium">{makeCapitilized(text)}</span>
                     <div className="text-xs text-gray-500">
                         <div>{record.email}</div>
                         <div>{record.phone}</div>
@@ -56,7 +56,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             title: 'Technology',
             dataIndex: 'technology',
             key: 'technology',
-            render: (tech: string) => <Tag color="blue">{tech}</Tag>,
+            render: (tech: string) => <Tag color="blue">{makeCapitilized(tech)}</Tag>,
         },
         {
             title: 'Level',
@@ -68,7 +68,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                     Mid: 'orange',
                     Senior: 'purple',
                 };
-                return <Tag color={colorMap[level] || 'default'}>{level}</Tag>;
+                return <Tag color={colorMap[level] || 'default'}>{makeCapitilized(level)}</Tag>;
             },
         },
         {
@@ -90,7 +90,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                     Hired: 'green',
                     Rejected: 'red',
                 };
-                return <Tag color={colorMap[status] || 'default'}>{status}</Tag>;
+                return <Tag color={colorMap[status] || 'default'}>{makeCapitilized(status)}</Tag>;
             },
         },
         {

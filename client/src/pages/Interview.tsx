@@ -1,4 +1,4 @@
-import { Col, Modal, Row } from 'antd'
+import { Modal } from 'antd'
 import { Calendar } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import InterviewForm from '../component/Form/InterviewForm';
@@ -8,11 +8,15 @@ import { useCreateInterviewMutation, useGetInterviewQuery } from '../services/in
 import { interviewData } from '../types';
 import { toast } from 'react-toastify';
 import InterviewShow from '../component/common/InterviewShow';
+
 const Interview = () => {
 
     const dispatch = useAppDispatch();
+
     const [createInterview, { isLoading: interviewCreateLoading }] = useCreateInterviewMutation();
     const { data, isLoading: interviewLoading } = useGetInterviewQuery();
+
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => setIsModalOpen(false);
@@ -24,14 +28,13 @@ const Interview = () => {
         return () => {
             dispatch(storeInterview([]));
         };
-    }, [data, dispatch]);
+    }, [data]);
 
     const submitHandler = async (formData: interviewData) => {
+        console.log(formData);
         try {
             const res = await createInterview(formData).unwrap();
-            console.log(res);
             if (res.success) {
-                dispatch(storeInterview(res.data));
                 toast.success(res.message);
             }
             setIsModalOpen(false);
@@ -52,7 +55,7 @@ const Interview = () => {
                 </button>
             </div>
 
-            < InterviewShow loading={interviewLoading} />
+            <InterviewShow loading={interviewLoading} />
 
             <Modal
                 title="Add Candidate"

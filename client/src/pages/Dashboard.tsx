@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Row, Timeline } from "antd";
+import { Col, Divider, Row } from "antd";
 import DashboardHead from "../component/dashboard/DashboardHead";
 import { useEffect } from "react";
 import { storeCandidate } from "../action/SoreCandidate";

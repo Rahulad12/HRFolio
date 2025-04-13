@@ -1,8 +1,12 @@
 import { interviewData } from '../../types'
 import { Col, DatePicker, Form, Row, Select, Button, TimePicker } from 'antd'
 import dayjs from 'dayjs'
-import { useAppSelector } from '../../Hooks/hook'
+import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { makeCapitilized } from '../../utils/TextAlter'
+import { useGetCandidateQuery } from '../../services/candidateServiceApi'
+import { useEffect } from 'react'
+import { storeCandidate } from '../../action/SoreCandidate'
+
 const { Option } = Select
 
 
@@ -13,6 +17,20 @@ interface Props {
 
 const InterviewForm = ({ submitHandler, loading }: Props) => {
     const [form] = Form.useForm()
+
+    const dispatch = useAppDispatch();
+    const { data: canidateData } = useGetCandidateQuery({
+        name: "",
+        technology: "",
+        status: "",
+        level: ""
+    });
+
+    useEffect(() => {
+        if (canidateData?.data) {
+            dispatch(storeCandidate(canidateData.data));
+        }
+    })
 
     const canidate = useAppSelector((state) => state.candidate.canditate);
     const filteredCandidates = canidate.filter((candidate) => candidate.status !== 'rejected');

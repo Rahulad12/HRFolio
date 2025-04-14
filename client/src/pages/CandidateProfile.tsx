@@ -19,6 +19,11 @@ import { makeCapitilized } from '../utils/TextAlter';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
+
+interface statusType {
+  status: "shortlisted" | "first interview" | "second interview" | "hired" | "rejected";
+}
+
 const CandidateProfile = () => {
   const { id } = useParams();
   const { data, isLoading } = useGetCandidateByIdQuery(id);
@@ -45,7 +50,7 @@ const CandidateProfile = () => {
   }, [data]);
 
 
-  const updateStatus = async (newStatus: string) => {
+  const updateStatus = async (newStatus: statusType["status"]) => {
     setCandidate({ ...candidate, status: newStatus });
 
     try {

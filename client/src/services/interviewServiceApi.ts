@@ -1,6 +1,7 @@
 import { api } from "./api";
-import { interviewData, interviewResponse } from "../types";
+import { interviewData, interviewResponse, interviewResponseById } from "../types";
 import { INTERVIEW_URL } from "../constant";
+import type { Dayjs } from "dayjs";
 
 export const interviewServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -14,7 +15,7 @@ export const interviewServiceApi = api.injectEndpoints({
             invalidatesTags: ["Interview"],
         }),
 
-        getInterview: builder.query<interviewResponse, { date: string | null, status: string }>({
+        getInterview: builder.query<interviewResponse, { date: Dayjs | null | string, status: string }>({
             query: ({
                 date,
                 status
@@ -26,9 +27,28 @@ export const interviewServiceApi = api.injectEndpoints({
                     status
                 }
             }),
-            providesTags: ["Interview"]
+            providesTags: ["Interview", "Candidate"],
         }),
+        getInterviewById: builder.query<interviewResponseById, string | undefined>({
+            query: (id) => ({
+                url: `${INTERVIEW_URL}/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Interview"],
+        }),
+
+        updateInterview: builder.mutation<interviewResponse, { id: string, data: interviewData }>({
+            query: ({
+                id,
+                data
+            }) => ({
+                url: `${INTERVIEW_URL}/${id}`,
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Interview"],
+        })
     })
 })
 
-export const { useCreateInterviewMutation, useGetInterviewQuery } = interviewServiceApi
+export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useUpdateInterviewMutation } = interviewServiceApi

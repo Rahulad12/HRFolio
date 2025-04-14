@@ -1,3 +1,4 @@
+import type { Dayjs } from 'dayjs';
 export type globalResponse = {
     success: boolean;
     message: string;
@@ -68,7 +69,7 @@ export type candidateResponse = {
 export type interviewData = {
     candidate: candidateData;
     interviewer: string;
-    date: Date;
+    date: Dayjs;
     time: string;
     status: 'scheduled' | 'cancelled' | 'completed';
     _id: string;
@@ -79,4 +80,9 @@ export type interviewResponse = {
     success: boolean;
     message: string;
     data: interviewData[];
+}
+export type interviewResponseById = {
+    success: boolean;
+    message: string;
+    data: interviewData;
 }

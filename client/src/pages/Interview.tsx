@@ -4,24 +4,20 @@ import { useEffect, useState } from 'react'
 import InterviewForm from '../component/Form/InterviewForm';
 import { storeInterview } from '../action/StoreInterview';
 import { useAppDispatch, useAppSelector } from '../Hooks/hook';
-import { useCreateInterviewMutation, useGetInterviewQuery } from '../services/interviewServiceApi';
-import { interviewData } from '../types';
-import { toast } from 'react-toastify';
+import { useGetInterviewQuery } from '../services/interviewServiceApi';
 import InterviewShow from '../component/common/InterviewShow';
 
 const Interview = () => {
 
     const dispatch = useAppDispatch();
-
-    const [createInterview, { isLoading: interviewCreateLoading }] = useCreateInterviewMutation();
-
     const filterInterview = useAppSelector((state) => state.search);
 
     const { data, isLoading: interviewLoading } = useGetInterviewQuery({
-        date: filterInterview?.date?.format('YYYY-MM-DD') || "",
+        date: filterInterview?.date?.format("YYYY-MM-DD" + " " + "HH:mm:ss") || "",
         status: filterInterview?.interviewStatus
+        // date: "",
+        // status: ""
     });
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => setIsModalOpen(false);
@@ -35,19 +31,22 @@ const Interview = () => {
         };
     }, [data]);
 
-    const submitHandler = async (formData: interviewData) => {
-        console.log(formData);
-        try {
-            const res = await createInterview(formData).unwrap();
-            if (res.success) {
-                toast.success(res.message);
-            }
-            setIsModalOpen(false);
+    // const submitHandler = async (formData: interviewData) => {
+    //     console.log(formData);
+    //     try {
+    //         const res = await createInterview(formData).unwrap();
+    //         console.log(res);
+    //         if (res.success) {
+    //             dispatch(storeInterview(res.data));
+    //             toast.success(res.message);
+    //         }
+    //         setIsModalOpen(false);
 
-        } catch (error: any) {
-            toast.error(error?.data?.message);
-        }
-    }
+    //     } catch (error: any) {
+    //         toast.error(error?.data?.message);
+    //     }
+    // }
+
     return (
         <div className='space-y-6'>
             <div className="flex justify-between items-center">
@@ -68,7 +67,7 @@ const Interview = () => {
                 onCancel={handleCancel}
                 footer={null}
             >
-                <InterviewForm submitHandler={submitHandler} loading={interviewCreateLoading} />
+                <InterviewForm />
             </Modal>
 
         </div>

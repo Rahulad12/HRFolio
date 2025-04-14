@@ -49,10 +49,28 @@ const getAllInterviews = async (req, res) => {
     }
 }
 
-const filterInterviews = async (req, res) => {
-    const { date, status, time } = req.query;
+const getInterviewById = async (req, res) => {
     try {
-        const interviews = await Interview.find({ date, status, time }).populate('candidate').select('-createdAt -updatedAt -__v');
+        const interview = await Interview.findById(req.params.id)
+        if (!interview) {
+            return res.status(404).json({ success: false, message: "Interview not found" });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Interview fetched successfully",
+            data: interview
+        })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const getAllInterviewsByCandidate = async (req, res) => {
+    try {
+        const interviews = await Interview.find({ candidate: req.params.id }).populate({
+            path: 'candidate',
+            select: '-createdAt -updatedAt -__v'
+        }).select('-createdAt -updatedAt -__v');
         if (interviews.length === 0) {
             return res.status(404).json({ success: false, message: "No interviews found" });
         }
@@ -60,10 +78,30 @@ const filterInterviews = async (req, res) => {
             success: true,
             message: "Interviews fetched successfully",
             data: interviews
-        });
+        })
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
-export { createInterview, getAllInterviews, filterInterviews };
+
+const updateInterview = async (req, res) => {
+    try {
+        const updateInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updateInterview) {
+            return res.status(404).json({ success: false, message: "Interview not found" });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Interview updated successfully",
+            data: updateInterview
+        });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+
+export { createInterview, getAllInterviews, updateInterview, getInterviewById, getAllInterviewsByCandidate };
 

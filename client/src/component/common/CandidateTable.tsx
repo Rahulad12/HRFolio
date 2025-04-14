@@ -243,21 +243,13 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.4 }}
-                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2"
+                className='flex justify-center items-center text-gray-600 shadow p-4 text-sm'
             >
-                <strong className="font-bold">Error!</strong>
                 <span>No candidate data found</span>
                 <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                 >
-                    <Button
-                        type="link"
-                        onClick={() => window.location.reload()}
-                        className="text-red-700 hover:text-red-900"
-                    >
-                        Try Again
-                    </Button>
                 </motion.div>
             </motion.div>
         );

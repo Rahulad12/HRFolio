@@ -13,7 +13,9 @@ export const store = configureStore({
         search: setSearchSlice,
         interview: interviewSliceReducer
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: false
+    }).concat(api.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

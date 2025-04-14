@@ -43,7 +43,7 @@ const TableSearch = () => {
         setSelectedTechnology("");
         setSelectedLevel("");
         setSelectedStatus("");
-        dispatch(storeSearch("", "", "", " ", dayjs(), ""));
+        dispatch(storeSearch("", "", "", "", dayjs(), ""));
     };
 
     return (

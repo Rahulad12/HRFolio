@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Divider, Modal, Card } from "antd";
+import { Modal, Card } from "antd";
 import { UserPlus } from "lucide-react";
 import { candidateFormData } from "../types/index";
 import CandidateForm from "../component/Form/CandidateForm";
@@ -64,7 +64,6 @@ const CvUploader = () => {
                 </button>
             </div>
 
-            <Divider />
             <Card className="overflow-x-auto bg-white rounded shadow">
                 <div className="space-y-4">
                     <TableSearch />

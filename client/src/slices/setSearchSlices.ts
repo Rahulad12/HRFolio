@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 
 interface searchState {
@@ -10,14 +9,12 @@ interface searchState {
     date: Dayjs | null;
     interviewStatus: string;
 }
-const todayDate = dayjs().format("YYYY-MM-DD");
-console.log(todayDate);
 const initialState: searchState = {
     name: "",
     technology: "",
     status: "",
     level: "",
-    date: dayjs(todayDate),
+    date: null,
     interviewStatus: ""
 }
 

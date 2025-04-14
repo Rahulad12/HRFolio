@@ -17,8 +17,21 @@ const createInterview = async (req, res) => {
 };
 
 const getAllInterviews = async (req, res) => {
+    const { date, status } = req.query;
     try {
-        const interviews = await Interview.find().populate({
+
+        const query = {};
+
+        if (date) {
+            query.date = date;
+        }
+        if (status) {
+            query.status = status;
+        }
+
+        const interviews = await Interview.find({
+            ...query
+        }).populate({
             path: 'candidate',
             select: '-createdAt -updatedAt -__v'
         }).select('-createdAt -updatedAt -__v');

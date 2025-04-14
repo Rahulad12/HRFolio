@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import TableSearch from "../component/common/TableSearch";
 
 const CvUploader = () => {
+    console.log("cv uploader");
     const filters = useAppSelector((state) => state.search);
     const { isLoading, data: candidate, isError, refetch } = useGetCandidateQuery({
         name: filters.name,
@@ -30,6 +31,7 @@ const CvUploader = () => {
             dispatch(storeCandidate(candidate.data));
             refetch();
         }
+        console.log("cv uploader useEffect re render");
         return () => {
             dispatch(storeCandidate([]));
         };
@@ -50,7 +52,8 @@ const CvUploader = () => {
     };
 
     return (
-        <div className="p-4 space-y-4">
+        <div className=" space-y-4">
+
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Candidates</h1>
                 <button
@@ -79,8 +82,6 @@ const CvUploader = () => {
             >
                 <CandidateForm submitHandler={submitHandler} loading={createCandidateLoading} />
             </Modal>
-
-
         </div>
     );
 };

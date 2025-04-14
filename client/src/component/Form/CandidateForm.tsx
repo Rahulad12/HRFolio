@@ -28,10 +28,9 @@ const CandidateForm = ({ submitHandler, loading }: formProps) => {
     const normFile = (e: any) => Array.isArray(e) ? e : e?.fileList;
 
     return (
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-lg shadow p-8">
                 <h1 className="text-2xl font-bold mb-6">Upload Candidate Details</h1>
-
                 <Form
                     form={form}
                     layout="vertical"
@@ -157,7 +156,7 @@ const CandidateForm = ({ submitHandler, loading }: formProps) => {
                                         type="dashed"
                                         icon={<PlusCircle className="w-4 h-4" />}
                                         onClick={() => add()}
-                                        className="text-indigo-600 border-indigo-600 hover:bg-indigo-600 hover:text-white"
+                                        className="text-indigo-600 border-indigo-600 hover:bg-indigo-600 hover:text-white m-2"
                                     >
                                         Add Reference
                                     </Button>
@@ -214,6 +213,7 @@ const CandidateForm = ({ submitHandler, loading }: formProps) => {
                             size="large"
                             loading={loading}
                             disabled={loading}
+                            className="my-2"
                         >
                             Submit Application
                         </Button>

@@ -3,6 +3,7 @@ import { Search, XCircle } from "lucide-react";
 import { useState } from "react";
 import { storeSearch } from "../../action/StoreSearch";
 import { useAppDispatch } from "../../Hooks/hook";
+import dayjs from "dayjs";
 
 const statusOptions = [
     { value: "shortlisted", label: "Shortlisted" },
@@ -34,7 +35,7 @@ const TableSearch = () => {
     const [selectedStatus, setSelectedStatus] = useState("");
 
     const handleSearch = (nameValue: string) => {
-        dispatch(storeSearch(nameValue, selectedTechnology, selectedStatus, selectedLevel));
+        dispatch(storeSearch(nameValue, selectedTechnology, selectedStatus, selectedLevel, dayjs(), ""));
     };
 
     const handleReset = () => {
@@ -42,75 +43,73 @@ const TableSearch = () => {
         setSelectedTechnology("");
         setSelectedLevel("");
         setSelectedStatus("");
-        dispatch(storeSearch("", "", "", ""));
+        dispatch(storeSearch("", "", "", " ", dayjs(), ""));
     };
 
     return (
-        <div className="space-y-4">
-            <div className="flex flex-wrap gap-4 items-end">
-                <Input.Search
-                    placeholder="Search candidates by name..."
-                    allowClear
-                    enterButton={<Search className="w-4 h-4" />}
-                    value={name}
-                    onChange={(e) => {
-                        const value = e.target.value;
-                        setName(value);
-                        if (value === "") {
-                            dispatch(storeSearch("", selectedTechnology, selectedStatus, selectedLevel));
-                        }
-                    }}
-                    onSearch={() => handleSearch(name)}
-                    className="w-96"
-                />
+        <div className="flex flex-wrap gap-4 items-end">
+            <Input.Search
+                placeholder="Search candidates by name..."
+                allowClear
+                enterButton={<Search className="w-4 h-4" />}
+                value={name}
+                onChange={(e) => {
+                    const value = e.target.value;
+                    setName(value);
+                    if (value === "") {
+                        dispatch(storeSearch("", selectedTechnology, selectedStatus, selectedLevel || "", dayjs(), ""));
+                    }
+                }}
+                onSearch={() => handleSearch(name)}
+                className="w-96"
+            />
 
-                <Select
-                    placeholder="Filter by Technology"
-                    value={selectedTechnology || undefined}
-                    allowClear
-                    onChange={(value) => {
-                        const newValue = value || "";
-                        setSelectedTechnology(newValue);
-                        dispatch(storeSearch(name, newValue, selectedStatus, selectedLevel));
-                    }}
-                    className="min-w-[200px]"
-                    options={techOptions}
-                />
+            <Select
+                placeholder="Filter by Technology"
+                value={selectedTechnology || undefined}
+                allowClear
+                onChange={(value) => {
+                    const newValue = value || "";
+                    setSelectedTechnology(newValue);
+                    dispatch(storeSearch(name, newValue, selectedStatus, selectedLevel || "", dayjs(), ""));
+                }}
+                className="min-w-[200px]"
+                options={techOptions}
+            />
 
-                <Select
-                    placeholder="Filter by Level"
-                    value={selectedLevel || undefined}
-                    allowClear
-                    onChange={(value) => {
-                        const newValue = value || "";
-                        setSelectedLevel(newValue);
-                        dispatch(storeSearch(name, selectedTechnology, selectedStatus, newValue));
-                    }}
-                    className="min-w-[200px]"
-                    options={levelOptions}
-                />
+            <Select
+                placeholder="Filter by Level"
+                value={selectedLevel || undefined}
+                allowClear
+                onChange={(value) => {
+                    const newValue = value || "";
+                    setSelectedLevel(newValue);
+                    dispatch(storeSearch(name, selectedTechnology, selectedStatus, newValue || "", dayjs(), ""));
+                }}
+                className="min-w-[200px]"
+                options={levelOptions}
+            />
 
-                <Select
-                    placeholder="Filter by Status"
-                    value={selectedStatus || undefined}
-                    allowClear
-                    onChange={(value) => {
-                        const newValue = value || "";
-                        setSelectedStatus(newValue);
-                        dispatch(storeSearch(name, selectedTechnology, newValue, selectedLevel));
-                    }}
-                    className="min-w-[200px]"
-                    options={statusOptions}
-                />
+            <Select
+                placeholder="Filter by Status"
+                value={selectedStatus || undefined}
+                allowClear
+                onChange={(value) => {
+                    const newValue = value || "";
+                    setSelectedStatus(newValue);
+                    dispatch(storeSearch(name, selectedTechnology, newValue, selectedLevel || "", dayjs(), ""));
+                }}
+                className="min-w-[200px]"
+                options={statusOptions}
+            />
 
-                <Button
-                    type="default"
-                    icon={<XCircle className="w-4 h-4" />}
-                    onClick={handleReset}
-                >
-                    Reset
-                </Button>
-            </div>
+            <Button
+                type="default"
+                icon={<XCircle className="w-4 h-4" />}
+                onClick={handleReset}
+            >
+                Reset
+            </Button>
         </div>
     );
 };

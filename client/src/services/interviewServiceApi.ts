@@ -1,6 +1,6 @@
 import { api } from "./api";
-import { interviewData, interviewResponse, interviewResponseById } from "../types";
-import { INTERVIEW_URL } from "../constant";
+import { interviewData, interviewResponse, interviewResponseById, interviewerResponse } from "../types";
+import { INTERVIEW_URL, INTERVIEWER_URL } from "../constant";
 import type { Dayjs } from "dayjs";
 
 export const interviewServiceApi = api.injectEndpoints({
@@ -37,6 +37,12 @@ export const interviewServiceApi = api.injectEndpoints({
             providesTags: ["Interview"],
         }),
 
+        getInterviewer: builder.query<interviewerResponse, void>({
+            query: () => ({
+                url: `${INTERVIEWER_URL}`,
+                method: "GET",
+            }),
+        }),
         updateInterview: builder.mutation<interviewResponse, { id: string, data: interviewData }>({
             query: ({
                 id,
@@ -51,4 +57,4 @@ export const interviewServiceApi = api.injectEndpoints({
     })
 })
 
-export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useUpdateInterviewMutation } = interviewServiceApi
+export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } = interviewServiceApi

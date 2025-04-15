@@ -65,10 +65,14 @@ export type candidateResponse = {
     message: string;
     data: candidateData[];
 }
-
+export type interviewer = {
+    _id: string;
+    name: string;
+    email: string
+}
 export type interviewData = {
     candidate: candidateData;
-    interviewer: string;
+    interviewer: interviewer;
     date: Dayjs;
     time: string;
     status: 'scheduled' | 'cancelled' | 'completed';
@@ -85,4 +89,10 @@ export type interviewResponseById = {
     success: boolean;
     message: string;
     data: interviewData;
+}
+
+export type interviewerResponse = {
+    success?: boolean;
+    message?: string;
+    data?: interviewer[]
 }

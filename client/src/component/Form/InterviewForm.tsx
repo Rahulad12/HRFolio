@@ -7,7 +7,7 @@ import { useGetCandidateQuery } from '../../services/candidateServiceApi'
 import { useEffect } from 'react'
 import { storeCandidate } from '../../action/SoreCandidate'
 import { motion } from 'framer-motion'
-import { useCreateInterviewMutation } from '../../services/interviewServiceApi';
+import { useCreateInterviewMutation, useGetInterviewerQuery } from '../../services/interviewServiceApi';
 
 const { Option } = Select
 
@@ -23,6 +23,7 @@ const InterviewForm = () => {
         status: "",
         level: ""
     });
+    const { data: interviewer } = useGetInterviewerQuery();
     const [api, contextHolder] = notification.useNotification();
     useEffect(() => {
         if (canidateData?.data) {
@@ -30,12 +31,7 @@ const InterviewForm = () => {
         }
     })
     const canidate = useAppSelector((state) => state.candidate.canditate);
-    const filteredCandidates = canidate.filter((candidate) => candidate.status !== 'rejected');
-
-    const interviewer = [
-        { key: 1, name: "Devi Parsad" },
-        { key: 2, name: "Ram Tiwari" },
-    ]
+    const filteredCandidates = canidate.filter((candidate) => candidate.status !== 'rejected' && candidate.status !== 'hired' && candidate.status !== "shortlisted");
 
     const onFinish = async (values: interviewData) => {
         try {
@@ -113,8 +109,8 @@ const InterviewForm = () => {
                                 rules={[{ required: true, message: "Please select an interviewer" }]}
                             >
                                 <Select placeholder="Select Interviewer" size="large" allowClear>
-                                    {interviewer.map((i) => (
-                                        <Option key={i.key} value={i.name}>
+                                    {interviewer?.data?.map((i) => (
+                                        <Option key={i._id} value={i._id}>
                                             {i.name}
                                         </Option>
                                     ))}

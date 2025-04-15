@@ -1,6 +1,6 @@
 import { Col, Form, Row, DatePicker, TimePicker, Select, Card, Button, Skeleton, notification } from 'antd';
 import { interviewData } from "../../types/index";
-import { useGetInterviewByIdQuery, useUpdateInterviewMutation } from '../../services/interviewServiceApi';
+import { useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } from '../../services/interviewServiceApi';
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
@@ -15,6 +15,8 @@ const EditInterview = ({ id }: Props) => {
     const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
     const { data, isLoading, isError } = useGetInterviewByIdQuery(id);
+    const { data: interviewers } = useGetInterviewerQuery();
+    console.log(interviewers)
     const [updateInterview, { isLoading: updateLoading }] = useUpdateInterviewMutation();
 
     useEffect(() => {
@@ -24,7 +26,7 @@ const EditInterview = ({ id }: Props) => {
                 date: dayjs(data.data.date),
                 time: dayjs(data.data.time),
                 status: data.data.status,
-                interviewer: data.data.interviewer
+                interviewer: data.data.interviewer.name
             });
         }
     }, [data, form]);
@@ -151,8 +153,13 @@ const EditInterview = ({ id }: Props) => {
                                         rules={[{ required: true, message: "Please select an interviewer" }]}
                                     >
                                         <Select placeholder="Select interviewer">
-                                            <Option value="Ram Tiwari">Ram Tiwari</Option>
-                                            <Option value="Devi Parsad">Devi Parsad</Option>
+                                            {
+                                                interviewers?.data?.map((interviewer) => (
+                                                    <Option key={interviewer._id} value={interviewer._id}>
+                                                        {interviewer.name}
+                                                    </Option>
+                                                ))
+                                            }
                                         </Select>
                                     </Form.Item>
                                 </motion.div>

@@ -24,7 +24,7 @@ import { useEffect, useState } from 'react';
 import { storeSearch } from '../../action/StoreSearch';
 import { useAppDispatch } from '../../Hooks/hook';
 import { AnimatePresence, motion } from 'framer-motion';
-import EditInterview from './editInterview';
+import EditInterview from './EditInterview';
 
 interface Props {
     loading: boolean;
@@ -35,6 +35,7 @@ const PAGE_SIZE = 2;
 const InterviewShow = ({ loading }: Props) => {
     const dispatch = useAppDispatch();
     const interviews = useAppSelector(state => state.interview.interviews);
+    console.log(interviews);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().startOf('day'));
     const [selectedStatus, setSelectedStatus] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -219,7 +220,7 @@ const InterviewShow = ({ loading }: Props) => {
                                 className="space-y-4"
                             >
                                 {paginatedInterviews.length > 0 ? (
-                                    paginatedInterviews.map((interview) => (
+                                    paginatedInterviews?.map((interview) => (
                                         <motion.div
                                             key={interview._id}
                                             initial={{ opacity: 0, y: 10 }}
@@ -299,7 +300,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <User className="w-4 h-4" />
-                                                            <span>{makeCapitilized(interview.interviewer)}</span>
+                                                            <span>{makeCapitilized(interview.interviewer.name)}</span>
                                                         </div>
                                                     </div>
                                                 </div>

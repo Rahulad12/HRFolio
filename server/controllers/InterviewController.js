@@ -1,17 +1,22 @@
 import Interview from "../model/Interview.js";
+import Interviewers from "../model/Interviewers.js";
 
 const createInterview = async (req, res) => {
-    const { candidate, interviewer, date, time } = req.body;
-    const interviewername = interviewer.toLowerCase();
+    const { candidate, interviewerId, date, time } = req.body;
     try {
-        const interview = new Interview({ candidate, interviewer: interviewername, date, time });
-        await interview.save();
+        const interview = await Interview.create({ candidate, interviewer: interviewerId, date, time });
+
+        if (!interview) {
+            return res.status(404).json({ success: false, message: "Interview not created" });
+        }
+
         return res.status(201).json({
             success: true,
             message: "Interview created successfully",
             data: interview
         });
     } catch (error) {
+        console.log("get interview error", error);
         return res.status(500).json({ message: error.message });
     }
 };
@@ -34,7 +39,11 @@ const getAllInterviews = async (req, res) => {
         }).populate({
             path: 'candidate',
             select: '-createdAt -updatedAt -__v'
+        }).populate({
+            path: 'interviewer',
+            select: '-createdAt -updatedAt -__v'
         }).select('-createdAt -updatedAt -__v');
+        
         if (interviews.length === 0) {
             return res.status(404).json({ success: false, message: "No interviews found" });
 
@@ -45,13 +54,16 @@ const getAllInterviews = async (req, res) => {
             data: interviews
         });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 
 const getInterviewById = async (req, res) => {
     try {
-        const interview = await Interview.findById(req.params.id)
+        const interview = await Interview.findById(req.params.id).populate({
+            path:"interviewer",
+            select: '-createdAt -updatedAt -__v'
+        })
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
@@ -100,8 +112,6 @@ const updateInterview = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-
-
 
 export { createInterview, getAllInterviews, updateInterview, getInterviewById, getAllInterviewsByCandidate };
 

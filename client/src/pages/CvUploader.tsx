@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { Modal, Card } from "antd";
 import { UserPlus } from "lucide-react";
-import { candidateFormData } from "../types/index";
 import CandidateForm from "../component/Form/CandidateForm";
 import { useCreateCandidateMutation, useGetCandidateQuery } from "../services/candidateServiceApi";
 import { useAppDispatch, useAppSelector } from "../Hooks/hook";
 import { storeCandidate } from "../action/SoreCandidate";
 import CandidateTable from "../component/common/CandidateTable";
-import { toast } from "react-toastify";
 import TableSearch from "../component/common/TableSearch";
 
 const CvUploader = () => {
@@ -19,7 +17,6 @@ const CvUploader = () => {
         status: filters.status,
         level: filters.level
     });
-    const [createCandidate, { isLoading: createCandidateLoading }] = useCreateCandidateMutation();
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -36,20 +33,6 @@ const CvUploader = () => {
             dispatch(storeCandidate([]));
         };
     }, [candidate, dispatch, refetch]);
-
-    const submitHandler = async (formData: candidateFormData) => {
-        try {
-            const res = await createCandidate(formData).unwrap();
-            console.log(res);
-            if (res.success) {
-                toast.success(res.message);
-            }
-            setIsModalOpen(false);
-        } catch (err: any) {
-            const resErr: string = err.message;
-            toast.error(resErr);
-        }
-    };
 
     return (
         <div className=" space-y-4">
@@ -79,7 +62,7 @@ const CvUploader = () => {
                 centered
                 destroyOnClose
             >
-                <CandidateForm submitHandler={submitHandler} loading={createCandidateLoading} />
+                <CandidateForm />
             </Modal>
         </div>
     );

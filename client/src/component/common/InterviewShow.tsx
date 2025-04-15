@@ -242,7 +242,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                 <div className="flex items-center justify-between">
                                                     <div>
                                                         <Typography.Title level={5} className="mb-1">
-                                                            {makeCapitilized(interview.candidate.name)}
+                                                            {makeCapitilized(interview?.candidate?.name)}
                                                         </Typography.Title>
                                                         <Badge
                                                             status={
@@ -277,7 +277,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                                         ? 'error'
                                                                         : 'success'
                                                             }
-                                                            text={interview.candidate.status}
+                                                            text={interview?.candidate?.status}
                                                         />
                                                     </div>
                                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -285,7 +285,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                             size="small"
                                                             type="primary"
                                                             icon={<MessageSquare className="w-4 h-4" />}
-                                                            onClick={() => handleSendReminder(interview.interviewer._id, interview.interviewer.name, interview.interviewer.email)}
+                                                            onClick={() => handleSendReminder(interview?.interviewer?._id, interview?.interviewer?.name, interview?.interviewer?.email)}
                                                         >
                                                             Send Reminder
                                                         </Button>
@@ -298,7 +298,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                     </span>
                                                     <div className="flex items-center gap-2">
                                                         <Mail className="w-4 h-4" />
-                                                        <span>{interview?.candidate.email}</span>
+                                                        <span>{interview?.candidate?.email}</span>
                                                     </div>
                                                     <div className="text-gray-600 space-y-1 text-sm">
                                                         <div className="flex items-center gap-2">

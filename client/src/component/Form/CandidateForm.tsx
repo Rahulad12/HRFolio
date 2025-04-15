@@ -1,21 +1,21 @@
-import { Form, Input, InputNumber, Select, Upload, Button } from "antd";
+import { Form, Input, InputNumber, Select, Upload, Button, notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { MinusCircle, PlusCircle } from "lucide-react";
 import { candidateFormData } from "../../types/index";
 import { motion } from "framer-motion";
-
-interface formProps {
-    submitHandler: (formData: candidateFormData) => void;
-    loading: boolean;
-}
+import { useCreateCandidateMutation } from "../../services/candidateServiceApi";
+import { makeCapitilized } from "../../utils/TextAlter";
 
 const techOptions = ["react js", "dot net", "devops", "qa"];
 const levelOptions = ["junior", "mid", "senior"];
 
-const CandidateForm = ({ submitHandler, loading }: formProps) => {
+const CandidateForm = () => {
     const [form] = Form.useForm();
 
-    const onFinish = (formData: candidateFormData) => {
+    const [createCandidate, { isLoading: loading }] = useCreateCandidateMutation();
+
+    const [api, contextHolder] = notification.useNotification();
+    const onFinish = async (formData: candidateFormData) => {
         const filterFormData = {
             ...formData,
             name: formData.name.trim().toLowerCase(),
@@ -23,7 +23,25 @@ const CandidateForm = ({ submitHandler, loading }: formProps) => {
             experience: Number(formData.experience),
             expectedsalary: Number(formData.expectedsalary),
         };
-        submitHandler(filterFormData);
+        try {
+            const res = await createCandidate(filterFormData).unwrap();
+            console.log(res);
+            if (res.success) {
+                api.success({
+                    message: `${makeCapitilized(res.message)}`,
+                    description: 'The candidate has been successfully uploaded.',
+                    placement: 'top',
+                })
+                form.resetFields();
+            }
+        } catch (err: any) {
+            const resErr: string = err.message;
+            api.error({
+                message: `${makeCapitilized(resErr)}`,
+                description: 'The candidate has not been uploaded.',
+                placement: 'top',
+            })
+        }
     };
 
     const normFile = (e: any) => Array.isArray(e) ? e : e?.fileList;
@@ -35,13 +53,15 @@ const CandidateForm = ({ submitHandler, loading }: formProps) => {
             transition={{ duration: 0.3 }}
             className="max-w-2xl mx-auto"
         >
-            <motion.div 
+            {contextHolder}
+
+            <motion.div
                 className="bg-white rounded-lg shadow p-8"
                 initial={{ scale: 0.98 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.2 }}
             >
-                <motion.h1 
+                <motion.h1
                     className="text-2xl font-bold mb-6"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -49,7 +69,7 @@ const CandidateForm = ({ submitHandler, loading }: formProps) => {
                 >
                     Upload Candidate Details
                 </motion.h1>
-                
+
                 <Form
                     form={form}
                     layout="vertical"
@@ -216,7 +236,7 @@ const CandidateForm = ({ submitHandler, loading }: formProps) => {
 
                     <Form.List name="references">
                         {(fields, { add, remove }) => (
-                            <motion.div 
+                            <motion.div
                                 className="space-y-6"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}

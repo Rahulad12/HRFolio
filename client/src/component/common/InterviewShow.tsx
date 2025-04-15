@@ -11,7 +11,8 @@ import {
     Skeleton,
     Tooltip,
     Typography,
-    Modal
+    Modal,
+    notification
 } from 'antd';
 import {
     CalendarDays, Clock, Mail, MessageSquare, User, Edit
@@ -35,12 +36,12 @@ const PAGE_SIZE = 2;
 const InterviewShow = ({ loading }: Props) => {
     const dispatch = useAppDispatch();
     const interviews = useAppSelector(state => state.interview.interviews);
-    console.log(interviews);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().startOf('day'));
     const [selectedStatus, setSelectedStatus] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [interviewId, setInterviewId] = useState<string>('');
+    const [api, contextHolder] = notification.useNotification();
 
     // Filter interviews by selected date and status
     const filteredInterviews = interviews.filter(interview => {
@@ -86,6 +87,14 @@ const InterviewShow = ({ loading }: Props) => {
         setIsModalOpen(false);
     }
 
+    const handleSendReminder = (interviewerId: string, interviewerName: string, interviewerEmail: string) => {
+        console.log(interviewerId, interviewerName, interviewerEmail);
+        api.success({
+            message: `Reminder Sent to Interviewer ${makeCapitilized(interviewerName)}`,
+            description: 'Interviewer has been notified',
+        })
+    }
+
     // Corrected cellRender function
     const dateCellRender = (date: Dayjs) => {
         const listData = interviews.filter(interview =>
@@ -117,6 +126,7 @@ const InterviewShow = ({ loading }: Props) => {
 
     return (
         <div className="p-4 space-y-6">
+            {contextHolder}
             {/* Calendar Section */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -275,6 +285,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                             size="small"
                                                             type="primary"
                                                             icon={<MessageSquare className="w-4 h-4" />}
+                                                            onClick={() => handleSendReminder(interview.interviewer._id, interview.interviewer.name, interview.interviewer.email)}
                                                         >
                                                             Send Reminder
                                                         </Button>

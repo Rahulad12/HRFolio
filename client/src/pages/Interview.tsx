@@ -31,21 +31,6 @@ const Interview = () => {
         };
     }, [data]);
 
-    // const submitHandler = async (formData: interviewData) => {
-    //     console.log(formData);
-    //     try {
-    //         const res = await createInterview(formData).unwrap();
-    //         console.log(res);
-    //         if (res.success) {
-    //             dispatch(storeInterview(res.data));
-    //             toast.success(res.message);
-    //         }
-    //         setIsModalOpen(false);
-
-    //     } catch (error: any) {
-    //         toast.error(error?.data?.message);
-    //     }
-    // }
 
     return (
         <div className='space-y-6'>

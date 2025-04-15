@@ -25,7 +25,7 @@ import { useEffect, useState } from 'react';
 import { storeSearch } from '../../action/StoreSearch';
 import { useAppDispatch } from '../../Hooks/hook';
 import { AnimatePresence, motion } from 'framer-motion';
-import EditInterview from './EditInterview';
+import EditInterview from '../Form/EditInterview';
 
 interface Props {
     loading: boolean;
@@ -92,6 +92,8 @@ const InterviewShow = ({ loading }: Props) => {
         api.success({
             message: `Reminder Sent to Interviewer ${makeCapitilized(interviewerName)}`,
             description: 'Interviewer has been notified',
+            placement: 'top',
+            duration: 3000
         })
     }
 

@@ -161,6 +161,7 @@ const updateCandidate = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+
 const filterCandidate = async (req, res) => {
     const { name, technology, level, status } = req.query;
 

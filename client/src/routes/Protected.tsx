@@ -4,7 +4,7 @@ import Dashboard from '../pages/Dashboard';
 import CvUploader from '../pages/CvUploader';
 import CandidatePage from '../pages/CandidateProfile';
 import Interview from '../pages/Interview';
-import EditInterview from '../component/common/editInterview';
+import EditInterview from '../component/Form/EditInterview';
 const Protected = () => {
     const isAuth = useAppSelector(state => state.auth.user.token);
     if (!isAuth) return <Navigate to="/" replace />

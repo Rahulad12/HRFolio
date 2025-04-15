@@ -1,10 +1,9 @@
-import { Button, Space, Table, Tag, Tooltip, Popconfirm, Skeleton } from 'antd';
+import { Button, Space, Table, Tag, Tooltip, Popconfirm, Skeleton, notification } from 'antd';
 import { Edit, Eye, Mail, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../Hooks/hook';
 import { useDeleteCandidateMutation } from '../../services/candidateServiceApi';
 import { setCandidate } from '../../slices/candidateSlices';
-import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { candidateData } from '../../types';
 import { makeCapitilized } from '../../utils/TextAlter';
@@ -22,24 +21,22 @@ const CandidateTable = ({ loading, error }: TableProps) => {
     const ref = useRef(null);
     const candidate = useAppSelector((state) => state.candidate.canditate);
     const [data, setData] = useState<candidateData[]>([]);
-
+    const [api, contextHolder] = notification.useNotification();
     const handleDelete = async (id: string) => {
         console.log("candidate Table Rerebder")
         try {
             const res = await deleteCandidate(id).unwrap();
             dispatch(setCandidate([]));
-            toast.success(res.message, {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
+            api.success({
+                message: res.message,
+                placement: "top",
+                duration: 3000,
             })
         } catch (err: any) {
-            toast.error(err?.data?.message || "Error deleting candidate", {
-                position: "top-right",
+            api.error({
+                message: err?.data?.message || "Error deleting candidate",
+                placement: "top",
+                duration: 3000,
             })
         }
     };
@@ -254,9 +251,10 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             </motion.div>
         );
     }
-
+    //main content return
     return (
         <>
+            {contextHolder}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -26,13 +26,12 @@ const EditInterview = ({ id }: Props) => {
                 date: dayjs(data.data.date),
                 time: dayjs(data.data.time),
                 status: data.data.status,
-                interviewer: data.data.interviewer.name
+                interviewer: data.data.interviewer._id
             });
         }
     }, [data, form]);
 
     const onFinish = async (values: interviewData) => {
-
         try {
             const res = await updateInterview({ id, data: values }).unwrap();
             if (res.success) {

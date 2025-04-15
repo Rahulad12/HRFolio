@@ -2,9 +2,9 @@ import Interview from "../model/Interview.js";
 import Interviewers from "../model/Interviewers.js";
 
 const createInterview = async (req, res) => {
-    const { candidate, interviewerId, date, time } = req.body;
+    const { candidate, interviewer, date, time } = req.body;
     try {
-        const interview = await Interview.create({ candidate, interviewer: interviewerId, date, time });
+        const interview = await Interview.create({ candidate, interviewer, date, time });
 
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not created" });
@@ -43,7 +43,7 @@ const getAllInterviews = async (req, res) => {
             path: 'interviewer',
             select: '-createdAt -updatedAt -__v'
         }).select('-createdAt -updatedAt -__v');
-        
+
         if (interviews.length === 0) {
             return res.status(404).json({ success: false, message: "No interviews found" });
 
@@ -61,7 +61,7 @@ const getAllInterviews = async (req, res) => {
 const getInterviewById = async (req, res) => {
     try {
         const interview = await Interview.findById(req.params.id).populate({
-            path:"interviewer",
+            path: "interviewer",
             select: '-createdAt -updatedAt -__v'
         })
         if (!interview) {

@@ -294,24 +294,24 @@ const InterviewShow = ({ loading }: Props) => {
 
                                                 <div className="mt-3">
                                                     <span className="inline-block text-sm text-gray-800 bg-indigo-100 px-2 py-1 rounded-full mb-2">
-                                                        {makeCapitilized(interview.candidate.technology)}
+                                                        {makeCapitilized(interview?.candidate?.technology)}
                                                     </span>
                                                     <div className="flex items-center gap-2">
                                                         <Mail className="w-4 h-4" />
-                                                        <span>{interview.candidate.email}</span>
+                                                        <span>{interview?.candidate.email}</span>
                                                     </div>
                                                     <div className="text-gray-600 space-y-1 text-sm">
                                                         <div className="flex items-center gap-2">
                                                             <CalendarDays className="w-4 h-4" />
-                                                            <span>{dayjs(interview.date).format('MMMM D, YYYY')}</span>
+                                                            <span>{dayjs(interview?.date).format('MMMM D, YYYY')}</span>
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <Clock className="w-4 h-4" />
-                                                            <span>{dayjs(interview.date).format('h:mm A')}</span>
+                                                            <span>{dayjs(interview?.date).format('h:mm A')}</span>
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <User className="w-4 h-4" />
-                                                            <span>{makeCapitilized(interview.interviewer.name)}</span>
+                                                            <span>{makeCapitilized(interview?.interviewer?.name)}</span>
                                                         </div>
                                                     </div>
                                                 </div>

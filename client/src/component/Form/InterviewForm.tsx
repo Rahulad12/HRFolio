@@ -34,6 +34,7 @@ const InterviewForm = () => {
     const filteredCandidates = canidate.filter((candidate) => candidate.status !== 'rejected' && candidate.status !== 'hired' && candidate.status !== "shortlisted");
 
     const onFinish = async (values: interviewData) => {
+        console.log(values);
         try {
             const res = await createInterview({
                 ...values,
@@ -46,8 +47,12 @@ const InterviewForm = () => {
                     placement: 'top',
                 })
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            api.error({
+                message: `${makeCapitilized(error.message)}`,
+                description: 'An error occurred while scheduling the interview. Please try again.',
+                placement: 'top',
+            })
         }
     }
 

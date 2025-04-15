@@ -127,7 +127,7 @@ const InterviewShow = ({ loading }: Props) => {
     };
 
     return (
-        <div className="p-4 space-y-6">
+        <>
             {contextHolder}
             {/* Calendar Section */}
             <motion.div
@@ -362,7 +362,7 @@ const InterviewShow = ({ loading }: Props) => {
             >
                 <EditInterview id={interviewId} />
             </Modal>
-        </div>
+        </>
     );
 };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Card } from "antd";
+import { Modal, Card, Button } from "antd";
 import { UserPlus } from "lucide-react";
 import CandidateForm from "../component/Form/CandidateForm";
 import { useCreateCandidateMutation, useGetCandidateQuery } from "../services/candidateServiceApi";
@@ -35,23 +35,21 @@ const CvUploader = () => {
     }, [candidate, dispatch, refetch]);
 
     return (
-        <div className=" space-y-4">
+        <div className="p-4 flex flex-col gap-4">
 
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Candidates</h1>
-                <button
-                    className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded-md cursor-pointer"
+                <Button
+                    type="primary"
                     onClick={showModal}
                 >
                     <UserPlus className="w-4 h-4" /> Add Candidate
-                </button>
+                </Button>
             </div>
 
-            <Card className="overflow-x-auto bg-white rounded shadow">
-                <div className="space-y-4">
-                    <TableSearch />
-                    <CandidateTable loading={isLoading} error={isError} />
-                </div>
+            <TableSearch />
+            <Card className="flex flex-col gap-4">
+                <CandidateTable loading={isLoading} error={isError} />
             </Card>
 
             <Modal

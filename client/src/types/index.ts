@@ -96,3 +96,43 @@ export type interviewerResponse = {
     message?: string;
     data?: interviewer[]
 }
+
+export type assessmentFormData = {
+    assessmenet: string;
+    type: "behavioural" | "technical";
+    technology: string,
+    level: string;
+    file: File;
+}
+
+
+export type assessmentResponseData = {
+    assessmenet: string;
+    type: "behavioural" | "technical";
+    technology: string,
+    level: string;
+    _id: string
+    createdAt: string
+    updatedAt: string
+    __v: number
+}
+export type assessmentResponse = {
+    success: boolean;
+    message: string;
+    data: assessmentResponseData[];
+}
+
+export type AssignmentData = {
+    candidate: string;
+    assessment: string;
+    date: Dayjs;
+    status: 'Assigned' | 'pending' | 'completed';
+    _id: string;
+    __v: number;
+}
+
+export type assignmentResponse = {
+    success: boolean;
+    message: string;
+    data: AssignmentData[];
+}

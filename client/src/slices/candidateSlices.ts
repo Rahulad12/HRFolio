@@ -3,11 +3,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { candidateData } from "../types";
 
 interface candidateState {
-    canditate: candidateData[];
+    candidate: candidateData[];
 }
 
 const initialState: candidateState = {
-    canditate: [],
+    candidate: [],
 };
 
 const candidateSlice = createSlice({
@@ -15,7 +15,7 @@ const candidateSlice = createSlice({
     initialState,
     reducers: {
         setCandidate: (state, action: PayloadAction<candidateData[]>) => {
-            state.canditate = action.payload;
+            state.candidate = action.payload;
         },
     },
 });

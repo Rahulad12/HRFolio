@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 
 
 const DashboardHead = () => {
-    const candidates = useAppSelector(sate => sate.candidate.canditate)
+    const candidates = useAppSelector(sate => sate.candidate.candidate)
     const stats = [
         {
             title: "Total Candidates",

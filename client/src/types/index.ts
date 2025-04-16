@@ -128,7 +128,7 @@ export type assessmentResponse = {
 export type AssignmentData = {
     candidate: string[];
     assessment: string;
-    // date: Dayjs;
+    date: Dayjs;
 }
 
 export type AssignmentDataResponse = {

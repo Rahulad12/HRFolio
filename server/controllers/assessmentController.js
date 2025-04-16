@@ -16,13 +16,13 @@ const createAssessment = async (req, res) => {
 }
 
 const assignAssessment = async (req, res) => {
-    let { candidate, assessment } = req.body
+    let { candidate, assessment, date } = req.body
 
     if (!Array.isArray(candidate)) {
         candidate = [candidate];
     }
     try {
-        const existingAssignment = await AssessmentAssignment.find({ candidate: { $in: candidate }, assessment });
+        const existingAssignment = await AssessmentAssignment.find({ candidate: { $in: candidate }, assessment, date });
 
         if (existingAssignment.length > 0) {
             return res.status(400).json({ success: false, message: "Assessment already assigned" });
@@ -32,7 +32,8 @@ const assignAssessment = async (req, res) => {
             candidate.map(async (candidateId) => {
                 return await AssessmentAssignment.create({
                     candidate: candidateId,
-                    assessment
+                    assessment,
+                    date
                 });
             })
         )
@@ -87,11 +88,17 @@ const deleteAssessment = async (req, res) => {
 
 const deleteAssignment = async (req, res) => {
     try {
-        const assignment = await AssessmentAssignment.findByIdAndDelete(req.params.id);
+        const assignment = await AssessmentAssignment.findByIdAndDelete(req.params.id).populate({
+            path: "candidate",
+            select: "-createdAt -updatedAt -__v"
+        }).populate({
+            path: "assessment",
+            select: "-createdAt -updatedAt -__v"
+        });
         if (!assignment) {
             return res.status(404).json({ success: false, message: "Assignment not found" });
         }
-        return res.status(200).json({ success: true, message: "Assignment deleted successfully" });
+        return res.status(200).json({ success: true, message: "Assignment deleted successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }

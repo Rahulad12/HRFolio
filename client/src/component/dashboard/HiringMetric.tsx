@@ -1,15 +1,15 @@
-import { Card} from 'antd'
+import { Card } from 'antd'
 import { Award, Clock, UserCheck, UserX } from 'lucide-react';
 import { useAppSelector } from '../../Hooks/hook';
 
 const HiringMetric = () => {
-    const candidate = useAppSelector(state => state.candidate.canditate);
+    const candidate = useAppSelector(state => state.candidate.candidate);
 
-    const hired = candidate.filter(c => c.status === 'hired');
-    const rejected = candidate.filter(c => c.status === 'rejected');
-    const firstInterview = candidate.filter(c => c.status === 'first interview');
-    const secondInterview = candidate.filter(c => c.status === 'second interview');
-    const shortListed = candidate.filter(c => c.status === "shortlisted");
+    const hired = candidate?.filter(c => c.status === 'hired');
+    const rejected = candidate?.filter(c => c.status === 'rejected');
+    const firstInterview = candidate?.filter(c => c.status === 'first interview');
+    const secondInterview = candidate?.filter(c => c.status === 'second interview');
+    const shortListed = candidate?.filter(c => c.status === "shortlisted");
 
     const process = firstInterview.length + secondInterview.length + shortListed.length
 
@@ -39,7 +39,7 @@ const HiringMetric = () => {
         <div>
             <Card title="Hiring Pipeline">
                 <div className="grid grid-cols-2 gap-4">
-                    {hiringMetrics.map((metric, index) => (
+                    {hiringMetrics?.map((metric, index) => (
                         <div key={index} className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg">
                             {metric.icon}
                             <div>

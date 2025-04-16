@@ -1,10 +1,12 @@
-import { Button, Table } from 'antd'
+import { Button, notification, Popconfirm, Table, Tooltip } from 'antd'
 import { motion } from 'framer-motion'
 import { EditOutlined } from '@ant-design/icons'
-import { useAppSelector } from '../../Hooks/hook'
+import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { Trash2 } from 'lucide-react'
 import { makeCapitilized } from '../../utils/TextAlter'
-import type { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+import { useDeleteAssignmentMutation } from '../../services/assessmentServiceApi'
+import { storeAssignedAssessment } from '../../action/StoreAssessment'
 
 interface FlattenedAssessment {
     key: string;
@@ -18,14 +20,34 @@ interface FlattenedAssessment {
 }
 
 const AssignedAssessments = () => {
+    const dispatch = useAppDispatch();
 
     const { assignedAssessments } = useAppSelector(state => state.assessments);
     const filterAssigned = assignedAssessments?.filter(item => item.assessment !== null);
+    const [api, contextHolder] = notification.useNotification();
+    const [deleteAssignment] = useDeleteAssignmentMutation();
     const handleEditAssessment = () => {
 
     }
-    const handleDeleteAssessment = () => {
+    const handleDeleteAssessment = async (id: string) => {
+        try {
+            const res = await deleteAssignment(id);
+            if (res.data && res?.data?.success) {
+                dispatch(storeAssignedAssessment(Array.from(res?.data?.data)));
+                api.success({
+                    message: `${res?.data?.message}`,
+                    placement: "top",
+                    duration: 3000,
+                })
+            }
 
+        } catch (error: any) {
+            api.error({
+                message: `${error?.data?.message}`,
+                placement: "top",
+                duration: 3000,
+            })
+        }
     }
     const columns = [
         {
@@ -81,12 +103,12 @@ const AssignedAssessments = () => {
             )
         },
         {
-            title: 'Start Date',
+            title: 'Date',
             dataIndex: 'date',
-            key: 'startDate',
-            render: (text: string) => (
+            key: 'date',
+            render: (text: Dayjs) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span>{dayjs(text).format('YYYY-MM-DD')}</span>
                 </div>
             )
         },
@@ -104,22 +126,35 @@ const AssignedAssessments = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any) => (
+            render: (_: any, record: FlattenedAssessment) => (
                 <div className="flex gap-2">
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Button
-                            type="text"
-                            icon={<EditOutlined />}
-                            onClick={() => handleEditAssessment()}
-                        />
+                        <Tooltip title="Edit">
+                            <Button
+                                type="text"
+                                icon={<EditOutlined />}
+                                onClick={() => handleEditAssessment()}
+                            />
+                        </Tooltip>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Button
-                            type="text"
-                            danger
-                            icon={<Trash2 className='w-4 h-4' />}
-                            onClick={() => handleDeleteAssessment()}
-                        />
+                        <Tooltip title="Delete">
+                            <Popconfirm
+                                title="Delete this assignment?"
+                                description="Are you sure you want to delete, This action cannot be undone."
+                                okButtonProps={{ danger: true }}
+                                okText="Yes"
+                                cancelText="No"
+                                onConfirm={() => handleDeleteAssessment(record.key)}
+                            >
+                                <Button
+                                    type="text"
+                                    danger
+                                    icon={<Trash2 className='w-4 h-4' />}
+                                />
+                            </Popconfirm>
+
+                        </Tooltip>
                     </motion.div>
                 </div>
             ),
@@ -129,6 +164,7 @@ const AssignedAssessments = () => {
 
     return (
         <div>
+            {contextHolder}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

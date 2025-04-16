@@ -19,7 +19,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
     const navigate = useNavigate();
     const [deleteCandidate, { isLoading: isDeleting }] = useDeleteCandidateMutation();
     const ref = useRef(null);
-    const candidate = useAppSelector((state) => state.candidate.canditate);
+    const candidate = useAppSelector((state) => state.candidate.candidate);
     const [data, setData] = useState<candidateData[]>([]);
     const [api, contextHolder] = notification.useNotification();
     const handleDelete = async (id: string) => {

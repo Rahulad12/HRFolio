@@ -28,7 +28,7 @@ const Login: React.FC = () => {
 
   const submitHandler = () => {
     setIsLoading(true);
-    window.location.href = "http://localhost:5000/api/auth/google";
+    window.location.href = "https://cv-manager-36uq.onrender.com/api/auth/google";
   };
 
   return (

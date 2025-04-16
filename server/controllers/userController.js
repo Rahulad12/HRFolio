@@ -14,7 +14,7 @@ export const googleCallback = (req, res, next) => {
     passport.authenticate("google", { session: false }, (err, user, info) => {
         if (err || !user) {
             logger.error("Error or no user", err);
-            res.redirect(`http://localhost:5173/error?error=${err}`);
+            res.redirect(`https://cv-manager-beta.vercel.app/error?error=${err}`);
         }
 
         // Generate JWT
@@ -26,7 +26,7 @@ export const googleCallback = (req, res, next) => {
 
         logger.info("Redirecting to frontend");
         // Redirect to frontend with token
-        res.redirect(`http://localhost:5173/?token=${token}&email=${user.email}&name=${user.name}`);
+        res.redirect(`https://cv-manager-beta.vercel.app/?token=${token}&email=${user.email}&name=${user.name}`);
 
     })(req, res, next);
 };

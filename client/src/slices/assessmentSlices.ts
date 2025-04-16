@@ -1,16 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { assessmentResponseData, AssignmentData, AssignmentDataResponse } from "../types";
+import { AssessmentDataResponse, AssignmentDataResponse } from "../types";
+
 
 interface assessmentState {
-    success: boolean;
-    message: string;
-    assessments: assessmentResponseData[];
+    assessments: AssessmentDataResponse[];
     assignedAssessments: AssignmentDataResponse[];
 }
 
 const initialState: assessmentState = {
-    success: false,
-    message: "",
     assessments: [],
     assignedAssessments: [],
 }
@@ -19,7 +16,7 @@ export const assessmentSlice = createSlice({
     name: "assessments",
     initialState,
     reducers: {
-        setAssessments: (state, action: PayloadAction<assessmentResponseData[]>) => {
+        setAssessments: (state, action: PayloadAction<AssessmentDataResponse[]>) => {
             state.assessments = action.payload;
         },
         setAssignedAssessments: (state, action: PayloadAction<AssignmentDataResponse[]>) => {

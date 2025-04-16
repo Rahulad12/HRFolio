@@ -1,5 +1,5 @@
 import { Input, Select, Transfer } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Form } from 'antd'
 
 const AssignAssessment = () => {
@@ -39,7 +39,8 @@ const AssignAssessment = () => {
     }
     ]
     const [selectedAssessment, setSelectedAssessment] = useState([]);
-    const [selectedCandidates, setSelectedCandidates] = useState([]);
+    // const [selectedCandidates, setSelectedCandidates] = useState([]);
+    console.log(selectedAssessment);
     return (
         <div>
             <Form form={assignForm} layout="vertical">
@@ -72,7 +73,7 @@ const AssignAssessment = () => {
                     <Transfer
                         dataSource={data}
                         titles={['Available', 'Selected']}
-                        targetKeys={selectedCandidates}
+                        // targetKeys={selectedCandidates}
                         // onChange={setSelectedCandidates}
                         // render={item => `${item.name} (${item.technology} - ${item.level})`}
                         listStyle={{

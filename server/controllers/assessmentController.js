@@ -1,9 +1,9 @@
 import Assessment from "../model/Assessment.js";
 import AssessmentAssignment from "../model/AssessmentAssignment.js";
 const createAssessment = async (req, res) => {
-    const { assessment, type, technology, level } = req.body
+    const { title, type, technology, level } = req.body
     try {
-        const createdAssessment = await Assessment.create({ assessment, type, technology, level });
+        const createdAssessment = await Assessment.create({ title, type, technology, level });
         if (!createdAssessment) {
             return res.status(400).json({ success: false, message: "Assessment not created" });
         }
@@ -79,7 +79,7 @@ const deleteAssessment = async (req, res) => {
         if (!assessment) {
             return res.status(404).json({ success: false, message: "Assessment not found" });
         }
-        return res.status(200).json({ success: true, message: "Assessment deleted successfully" });
+        return res.status(200).json({ success: true, message: "Assessment deleted successfully", data: assessment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }

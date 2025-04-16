@@ -33,7 +33,7 @@ export const assessmentServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Assignment", "Assessment"]
         }),
-        deleteAssessment: builder.mutation<globalResponse, string>({
+        deleteAssessment: builder.mutation<assessmentResponse, string>({
             query: (id) => ({
                 url: `${ASSESSMENT_URL}/${id}`,
                 method: "DELETE",

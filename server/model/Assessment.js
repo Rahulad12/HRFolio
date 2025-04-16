@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const assessmentSchema = new mongoose.Schema({
-    assessment: {
+    title: {
         type: String,
         required: true,
         lowercase: true

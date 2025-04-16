@@ -99,7 +99,7 @@ export type interviewerResponse = {
 
 //assessmet types
 export type assessmentFormData = {
-    assessmenet: string;
+    title: string;
     type: "behavioural" | "technical";
     technology: string,
     level: string;
@@ -107,8 +107,9 @@ export type assessmentFormData = {
 }
 
 
-export type assessmentResponseData = {
-    assessmenet: string;
+
+export type AssessmentDataResponse = {
+    title: string;
     type: "behavioural" | "technical";
     technology: string,
     level: string;
@@ -117,10 +118,11 @@ export type assessmentResponseData = {
     updatedAt: string
     __v: number
 }
+
 export type assessmentResponse = {
     success: boolean;
     message: string;
-    data: assessmentResponseData[];
+    data: AssessmentDataResponse[];
 }
 
 export type AssignmentData = {
@@ -133,7 +135,7 @@ export type AssignmentDataResponse = {
     candidate: candidateData;
     assessment: {
         _id: string;
-        assessment: string;
+        title: string;
         type: "behavioural" | "technical";
         technology: string,
         level: string
@@ -143,6 +145,7 @@ export type AssignmentDataResponse = {
     _id: string;
     __v: number;
 }
+
 export type assignmentResponse = {
     success: boolean;
     message: string;

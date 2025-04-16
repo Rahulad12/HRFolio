@@ -13,9 +13,9 @@ const AssessmentForm = () => {
     const onFinish = async (values: assessmentFormData) => {
         try {
             const res = await createAssessment(values).unwrap();
-            console.log(res);
-            if (res.success) {
-                dispatch(storeAssessment(Array.from(res.data), []));
+            console.log(res)
+            if (res.success && res.data) {
+                dispatch(storeAssessment(Array.from(res?.data)));
                 api.success({
                     message: res.message,
                     description: 'The assessment has been successfully created.',
@@ -56,7 +56,7 @@ const AssessmentForm = () => {
                                 transition={{ delay: 0.2 }}
                             >
                                 <Form.Item
-                                    name="assessment"
+                                    name="title"
                                     label="Assessment"
                                     rules={[{ required: true, message: "Assessment Name is Required" }]}
                                 >

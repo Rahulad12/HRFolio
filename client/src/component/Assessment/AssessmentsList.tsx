@@ -4,9 +4,9 @@ import { EditOutlined } from '@ant-design/icons'
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { makeCapitilized } from '../../utils/TextAlter'
 import { Trash2 } from 'lucide-react'
-import { assessmentResponseData } from '../../types'
+import { AssessmentDataResponse } from '../../types'
 import { useCreateAssignAssessmentMutation, useDeleteAssessmentMutation } from '../../services/assessmentServiceApi'
-import { storeAssessment } from '../../action/StoreAssessment'
+import { storeAssessment, storeAssignedAssessment } from '../../action/StoreAssessment'
 const AssessmentsList = () => {
     const dispatch = useAppDispatch();
 
@@ -19,20 +19,22 @@ const AssessmentsList = () => {
 
     const [deleteAssessment] = useDeleteAssessmentMutation();
 
+
     const handleEditAssessment = () => {
 
     }
     const handleDeleteAssessment = async (id: string) => {
         try {
             const res = await deleteAssessment(id);
-            dispatch(storeAssessment([], []));
-            if (res?.data?.success) {
+            if (res?.data && res?.data?.success) {
+                dispatch(storeAssessment(Array.from(res?.data.data)));
                 api.success({
-                    message: res?.data.message,
+                    message: res.data?.message,
                     placement: "top",
                     duration: 3000,
                 })
             }
+
         } catch (error: any) {
             api.error({
                 message: error?.data?.message || "Error deleting assessment",
@@ -46,8 +48,8 @@ const AssessmentsList = () => {
     const handleAssignAssessment = async (candidateId: string, assessmnetId: string) => {
         try {
             const res = await createAssignAssessment({ candidate: [candidateId], assessment: assessmnetId }).unwrap();
-            dispatch(storeAssessment([], res.data));
-            if (res.success) {
+            if (res?.data) {
+                dispatch(storeAssignedAssessment(res?.data));
                 api.success({
                     message: res.message,
                     placement: "top",
@@ -66,7 +68,7 @@ const AssessmentsList = () => {
     const columns = [
         {
             title: 'Assessment',
-            dataIndex: 'assessment',
+            dataIndex: 'title',
             key: 'assessment',
             render: (text: string) => (
                 <div className='flex gap-2'>
@@ -107,7 +109,7 @@ const AssessmentsList = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any, record: assessmentResponseData) => (
+            render: (_: any, record: AssessmentDataResponse) => (
                 <div className="flex gap-2">
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <Tooltip title="Edit Assessment" placement="top">

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal, Card, Button } from "antd";
 import { UserPlus } from "lucide-react";
 import CandidateForm from "../component/Form/CandidateForm";
-import { useCreateCandidateMutation, useGetCandidateQuery } from "../services/candidateServiceApi";
+import { useGetCandidateQuery } from "../services/candidateServiceApi";
 import { useAppDispatch, useAppSelector } from "../Hooks/hook";
 import { storeCandidate } from "../action/SoreCandidate";
 import CandidateTable from "../component/common/CandidateTable";

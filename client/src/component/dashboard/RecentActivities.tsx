@@ -1,5 +1,4 @@
 import { Card, Timeline } from 'antd'
-import React from 'react'
 
 const RecentActivities = () => {
     const activities = [

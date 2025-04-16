@@ -8,7 +8,7 @@ import AssignedAssessments from "../component/Assessment/AssignedAssessments";
 import AssessmentsList from "../component/Assessment/AssessmentsList";
 import AssignAssessment from "../component/Assessment/AssignAssessment";
 import { useGetAssessmentQuery, useGetAssignedAssessmentQuery } from "../services/assessmentServiceApi";
-import { storeAssessment } from "../action/StoreAssessment";
+import { storeAssessment, storeAssignedAssessment } from "../action/StoreAssessment";
 import { useAppDispatch } from "../Hooks/hook";
 import { getCandidate } from "../action/SoreCandidate";
 
@@ -23,11 +23,11 @@ const Assessment = () => {
     const { data: assignedAssessment } = useGetAssignedAssessmentQuery();
 
     useEffect(() => {
-        const unassigned = assessment?.data || [];
-        const assigned = assignedAssessment?.data || [];
-
-        if (unassigned.length > 0 || assigned.length > 0) {
-            dispatch(storeAssessment(unassigned, assigned));
+        if (assessment?.data) {
+            dispatch(storeAssessment(assessment?.data));
+        }
+        if (assignedAssessment?.data) {
+            dispatch(storeAssignedAssessment(assignedAssessment?.data));
         }
     }, [assessment, assignedAssessment]);
 

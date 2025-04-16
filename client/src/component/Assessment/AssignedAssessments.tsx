@@ -1,6 +1,6 @@
 import { Button, Table } from 'antd'
 import { motion } from 'framer-motion'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
 import { useAppSelector } from '../../Hooks/hook'
 import { Trash2 } from 'lucide-react'
 import { makeCapitilized } from '../../utils/TextAlter'
@@ -104,7 +104,7 @@ const AssignedAssessments = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any, record: any) => (
+            render: (_: any) => (
                 <div className="flex gap-2">
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <Button
@@ -139,7 +139,7 @@ const AssignedAssessments = () => {
                     columns={columns}
                     dataSource={filterAssigned?.map((item, index): FlattenedAssessment => ({
                         key: item._id || index.toString(),
-                        assessment: item.assessment?.assessment,
+                        assessment: item.assessment?.title,
                         technology: item.assessment?.technology,
                         level: item.assessment?.level,
                         type: item.assessment?.type,

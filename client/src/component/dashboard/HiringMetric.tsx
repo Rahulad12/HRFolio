@@ -1,4 +1,4 @@
-import { Card, Col, Row } from 'antd'
+import { Card} from 'antd'
 import { Award, Clock, UserCheck, UserX } from 'lucide-react';
 import { useAppSelector } from '../../Hooks/hook';
 

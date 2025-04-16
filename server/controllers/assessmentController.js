@@ -16,14 +16,28 @@ const createAssessment = async (req, res) => {
 }
 
 const assignAssessment = async (req, res) => {
-    const { candidate, date, assessment } = req.body
+    let { candidate, assessment } = req.body
+
+    if (!Array.isArray(candidate)) {
+        candidate = [candidate];
+    }
     try {
-        const assignment = await AssessmentAssignment.create({ candidate, date, assessment });
-        if (!assignment) {
-            return res.status(400).json({ success: false, message: "Assessment is not Assigned" });
+        const existingAssignment = await AssessmentAssignment.find({ candidate: { $in: candidate }, assessment });
+
+        if (existingAssignment.length > 0) {
+            return res.status(400).json({ success: false, message: "Assessment already assigned" });
         }
 
-        return res.status(200).json({ success: true, message: "Assessment Assigned successfully" });
+        const assignments = await Promise.all(
+            candidate.map(async (candidateId) => {
+                return await AssessmentAssignment.create({
+                    candidate: candidateId,
+                    assessment
+                });
+            })
+        )
+
+        return res.status(200).json({ success: true, message: "Assessment Assigned successfully", data: assignments });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
@@ -59,4 +73,29 @@ const getAssignment = async (req, res) => {
     }
 }
 
-export { createAssessment, assignAssessment, getAssessment, getAssignment }
+const deleteAssessment = async (req, res) => {
+    try {
+        const assessment = await Assessment.findByIdAndDelete(req.params.id);
+        if (!assessment) {
+            return res.status(404).json({ success: false, message: "Assessment not found" });
+        }
+        return res.status(200).json({ success: true, message: "Assessment deleted successfully" });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const deleteAssignment = async (req, res) => {
+    try {
+        const assignment = await AssessmentAssignment.findByIdAndDelete(req.params.id);
+        if (!assignment) {
+            return res.status(404).json({ success: false, message: "Assignment not found" });
+        }
+        return res.status(200).json({ success: true, message: "Assignment deleted successfully" });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+export { createAssessment, assignAssessment, getAssessment, getAssignment, deleteAssessment, deleteAssignment }

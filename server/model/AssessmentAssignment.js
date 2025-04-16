@@ -11,7 +11,6 @@ const assessmentAssignmentSchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        required: true
     },
     status: {
         type: String,
@@ -19,7 +18,7 @@ const assessmentAssignmentSchema = new mongoose.Schema({
         default: "Assigned",
         required: true
     },
-},{
+}, {
     timestamps: true
 });
 

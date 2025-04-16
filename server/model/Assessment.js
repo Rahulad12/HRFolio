@@ -8,6 +8,7 @@ const assessmentSchema = new mongoose.Schema({
     },
     type: {
         type: String,
+        enum: ["behavioural", "technical"],
         required: true,
         lowercase: true
     },

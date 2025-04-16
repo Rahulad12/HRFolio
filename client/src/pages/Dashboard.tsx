@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Row, Timeline } from "antd";
+import { Col, Divider, Row } from "antd";
 import DashboardHead from "../component/dashboard/DashboardHead";
 import { useEffect } from "react";
 import { storeCandidate } from "../action/SoreCandidate";
@@ -36,15 +36,16 @@ const Dashboard = () => {
 
       <DashboardHead />
       <Divider />
-      <Row gutter={[16, 16]}>
-        <Col>
-          <RecentActivities />
-        </Col>
-        <Col>
-          <HiringMetric />
-        </Col>
-      </Row>
-
+      <div className="border border-gray-200 p-4 ">
+        <Row gutter={16} className="flex justify-around">
+          <Col>
+            <RecentActivities />
+          </Col>
+          <Col>
+            <HiringMetric />
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };

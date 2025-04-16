@@ -31,7 +31,7 @@ const baseQueryWithLogout: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
         const result = await rawBaseQuery(args, api, extraOptions);
 
         // Handle 401 Unauthorized error
-        if (result.error?.status === 401) {
+        if (result.error?.status === 401 || result.error?.status === 403) {
             api.dispatch(logout());
         }
 
@@ -57,6 +57,6 @@ const baseQueryWithLogout: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const api = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithLogout,
-    tagTypes: ['Candidate', 'Interview'],
+    tagTypes: ['Candidate', 'Interview','Assessment', 'Assignment'],
     endpoints: () => ({}),
 });

@@ -1,3 +1,4 @@
+import type { Dayjs } from 'dayjs';
 export type globalResponse = {
     success: boolean;
     message: string;
@@ -64,11 +65,15 @@ export type candidateResponse = {
     message: string;
     data: candidateData[];
 }
-
+export type interviewer = {
+    _id: string;
+    name: string;
+    email: string
+}
 export type interviewData = {
     candidate: candidateData;
-    interviewer: string;
-    date: Date;
+    interviewer: interviewer;
+    date: Dayjs;
     time: string;
     status: 'scheduled' | 'cancelled' | 'completed';
     _id: string;
@@ -79,4 +84,70 @@ export type interviewResponse = {
     success: boolean;
     message: string;
     data: interviewData[];
+}
+export type interviewResponseById = {
+    success: boolean;
+    message: string;
+    data: interviewData;
+}
+
+export type interviewerResponse = {
+    success?: boolean;
+    message?: string;
+    data?: interviewer[]
+}
+
+//assessmet types
+export type assessmentFormData = {
+    title: string;
+    type: "behavioural" | "technical";
+    technology: string,
+    level: string;
+    file: File;
+}
+
+
+
+export type AssessmentDataResponse = {
+    title: string;
+    type: "behavioural" | "technical";
+    technology: string,
+    level: string;
+    _id: string
+    createdAt: string
+    updatedAt: string
+    __v: number
+}
+
+export type assessmentResponse = {
+    success: boolean;
+    message: string;
+    data: AssessmentDataResponse[];
+}
+
+export type AssignmentData = {
+    candidate: string[];
+    assessment: string;
+    // date: Dayjs;
+}
+
+export type AssignmentDataResponse = {
+    candidate: candidateData;
+    assessment: {
+        _id: string;
+        title: string;
+        type: "behavioural" | "technical";
+        technology: string,
+        level: string
+    }
+    date: Dayjs;
+    status: 'Assigned' | 'pending' | 'completed';
+    _id: string;
+    __v: number;
+}
+
+export type assignmentResponse = {
+    success: boolean;
+    message: string;
+    data: AssignmentDataResponse[];
 }

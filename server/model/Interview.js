@@ -6,8 +6,8 @@ const interviewSchema = new mongoose.Schema({
         ref: "candidates"
     },
     interviewer: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "interviewers"
     },
     date: {
         type: Date,

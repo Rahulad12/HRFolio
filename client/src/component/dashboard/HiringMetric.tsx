@@ -1,4 +1,4 @@
-import { Card, Col, Row } from 'antd'
+import { Card} from 'antd'
 import { Award, Clock, UserCheck, UserX } from 'lucide-react';
 import { useAppSelector } from '../../Hooks/hook';
 
@@ -37,10 +37,10 @@ const HiringMetric = () => {
     ];
     return (
         <div>
-            <Card title="Hiring Pipeline" className="bg-white rounded-lg shadow">
+            <Card title="Hiring Pipeline">
                 <div className="grid grid-cols-2 gap-4">
                     {hiringMetrics.map((metric, index) => (
-                        <div key={index} className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg">
                             {metric.icon}
                             <div>
                                 <p className="text-gray-600 text-sm">{metric.title}</p>
@@ -54,4 +54,4 @@ const HiringMetric = () => {
     )
 }
 
-export default HiringMetric
+export default HiringMetric;

@@ -6,6 +6,8 @@ import {
     Calendar
 } from "lucide-react";
 import { useAppSelector } from "../../Hooks/hook";
+import { motion } from "framer-motion";
+
 
 const DashboardHead = () => {
     const candidates = useAppSelector(sate => sate.candidate.canditate)
@@ -40,18 +42,26 @@ const DashboardHead = () => {
         <div className="space-y-6">
             <Row gutter={[16, 16]}>
                 {stats.map((stat, index) => (
+
                     <Col xs={24} sm={12} md={12} lg={6} key={index}>
-                        <Card className="hover:shadow-lg transition-all duration-300">
-                            <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-lg ${stat.color}`}>
-                                    {stat.icon}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Card className="hover:shadow-lg transition-all duration-300">
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-3 rounded-lg ${stat.color}`}>
+                                        {stat.icon}
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-600 text-sm">{stat.title}</p>
+                                        <p className="text-2xl font-semibold">{stat.value}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-gray-600 text-sm">{stat.title}</p>
-                                    <p className="text-2xl font-semibold">{stat.value}</p>
-                                </div>
-                            </div>
-                        </Card>
+                            </Card>
+                        </motion.div>
                     </Col>
                 ))}
             </Row>

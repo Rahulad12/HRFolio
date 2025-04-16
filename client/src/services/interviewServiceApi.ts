@@ -1,6 +1,7 @@
 import { api } from "./api";
-import { interviewData, interviewResponse } from "../types";
-import { INTERVIEW_URL } from "../constant";
+import { interviewData, interviewResponse, interviewResponseById, interviewerResponse } from "../types";
+import { INTERVIEW_URL, INTERVIEWER_URL } from "../constant";
+import type { Dayjs } from "dayjs";
 
 export const interviewServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -14,14 +15,46 @@ export const interviewServiceApi = api.injectEndpoints({
             invalidatesTags: ["Interview"],
         }),
 
-        getInterview: builder.query<interviewResponse, void>({
-            query: () => ({
+        getInterview: builder.query<interviewResponse, { date: Dayjs | null | string, status: string }>({
+            query: ({
+                date,
+                status
+            }) => ({
                 url: `${INTERVIEW_URL}`,
-                method: "GET"
+                method: "GET",
+                params: {
+                    date,
+                    status
+                }
             }),
-            providesTags: ["Interview"]
+            providesTags: ["Interview", "Candidate"],
         }),
+        getInterviewById: builder.query<interviewResponseById, string | undefined>({
+            query: (id) => ({
+                url: `${INTERVIEW_URL}/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Interview"],
+        }),
+
+        getInterviewer: builder.query<interviewerResponse, void>({
+            query: () => ({
+                url: `${INTERVIEWER_URL}`,
+                method: "GET",
+            }),
+        }),
+        updateInterview: builder.mutation<interviewResponse, { id: string, data: interviewData }>({
+            query: ({
+                id,
+                data
+            }) => ({
+                url: `${INTERVIEW_URL}/${id}`,
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Interview"],
+        })
     })
 })
 
-export const { useCreateInterviewMutation, useGetInterviewQuery } = interviewServiceApi
+export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } = interviewServiceApi

@@ -1,5 +1,6 @@
 const makeCapitilized = (text: string) => {
 
+    if(!text) return '';
     const hasSpace = text.includes(' ');
     if (!hasSpace) return text.charAt(0).toUpperCase() + text.slice(1)
 

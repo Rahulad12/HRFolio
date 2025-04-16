@@ -1,17 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { Dayjs } from "dayjs";
 
 interface searchState {
     name: string;
     technology: string;
     status: string;
     level: string;
+    date: Dayjs | null;
+    interviewStatus: string;
 }
-
 const initialState: searchState = {
     name: "",
     technology: "",
     status: "",
     level: "",
+    date: null,
+    interviewStatus: ""
 }
 
 const setSearchSlice = createSlice({
@@ -30,10 +34,16 @@ const setSearchSlice = createSlice({
         setLevel: (state, action: PayloadAction<string>) => {
             state.level = action.payload;
         },
+        setDate: (state, action: PayloadAction<Dayjs | null>) => {
+            state.date = action.payload;
+        },
+        setInterviewStatus: (state, action: PayloadAction<string>) => {
+            state.interviewStatus = action.payload;
+        },
 
     },
 });
 
-export const { setName, setTechnology, setStatus, setLevel } = setSearchSlice.actions;
+export const { setName, setTechnology, setStatus, setLevel, setDate, setInterviewStatus } = setSearchSlice.actions;
 
 export default setSearchSlice.reducer;

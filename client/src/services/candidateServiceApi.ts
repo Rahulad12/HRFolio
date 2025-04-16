@@ -31,6 +31,7 @@ export const candidateServiceApi = api.injectEndpoints({
                 },
             }),
             providesTags: ["Candidate"],
+            
         }),
 
         getCandidateById: builder.query<candidateIdResposne, string | undefined>({

@@ -97,6 +97,7 @@ export type interviewerResponse = {
     data?: interviewer[]
 }
 
+//assessmet types
 export type assessmentFormData = {
     assessmenet: string;
     type: "behavioural" | "technical";
@@ -123,16 +124,27 @@ export type assessmentResponse = {
 }
 
 export type AssignmentData = {
-    candidate: string;
+    candidate: string[];
     assessment: string;
+    // date: Dayjs;
+}
+
+export type AssignmentDataResponse = {
+    candidate: candidateData;
+    assessment: {
+        _id: string;
+        assessment: string;
+        type: "behavioural" | "technical";
+        technology: string,
+        level: string
+    }
     date: Dayjs;
     status: 'Assigned' | 'pending' | 'completed';
     _id: string;
     __v: number;
 }
-
 export type assignmentResponse = {
     success: boolean;
     message: string;
-    data: AssignmentData[];
+    data: AssignmentDataResponse[];
 }

@@ -1,21 +1,43 @@
 import { Button, Card, Modal, Tabs } from "antd";
 import { motion } from "framer-motion"
-import { Plus, UserPlus } from "lucide-react"
-import { useState } from "react";
+import { Plus } from "lucide-react"
+import { useEffect, useState } from "react";
 import AssessmentForm from "../component/Form/AssessmentForm";
 import TabPane from "antd/es/tabs/TabPane";
 import AssignedAssessments from "../component/Assessment/AssignedAssessments";
 import AssessmentsList from "../component/Assessment/AssessmentsList";
 import AssignAssessment from "../component/Assessment/AssignAssessment";
+import { useGetAssessmentQuery, useGetAssignedAssessmentQuery } from "../services/assessmentServiceApi";
+import { storeAssessment } from "../action/StoreAssessment";
+import { useAppDispatch } from "../Hooks/hook";
+import { getCandidate } from "../action/SoreCandidate";
+
 const Assessment = () => {
+    getCandidate(); // this function helps to get the data from store so i cannot have to store again and again
+
+    const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('1');
+    const { data: assessment } = useGetAssessmentQuery();
+    const { data: assignedAssessment } = useGetAssignedAssessmentQuery();
+
+    useEffect(() => {
+        const unassigned = assessment?.data || [];
+        const assigned = assignedAssessment?.data || [];
+
+        if (unassigned.length > 0 || assigned.length > 0) {
+            dispatch(storeAssessment(unassigned, assigned));
+        }
+    }, [assessment, assignedAssessment]);
+
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => setIsModalOpen(false);
 
     const showAssignModal = () => setIsAssignModalOpen(true);
     const handleAssignCancel = () => setIsAssignModalOpen(false);
+
+
     return (
         <div className="p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ import authReducer from "./slices/authSlices.ts"
 import candidateSliceReducer from "./slices/candidateSlices.ts"
 import setSearchSlice from "./slices/setSearchSlices.ts"
 import interviewSliceReducer from "./slices/interviewSlices.ts"
+import assessmentSlice from "./slices/assessmentSlices.ts"
 
 export const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
         auth: authReducer,
         candidate: candidateSliceReducer,
         search: setSearchSlice,
-        interview: interviewSliceReducer
+        interview: interviewSliceReducer,
+        assessments: assessmentSlice,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

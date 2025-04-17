@@ -30,8 +30,8 @@ const InterviewForm = () => {
             dispatch(storeCandidate(canidateData.data));
         }
     })
-    const canidate = useAppSelector((state) => state.candidate.canditate);
-    const filteredCandidates = canidate.filter((candidate) => candidate.status !== 'rejected' && candidate.status !== 'hired' && candidate.status !== "shortlisted");
+    const candidate = useAppSelector((state) => state.candidate.candidate);
+    const filteredCandidates = candidate?.filter((candidate) => candidate.status !== 'rejected' && candidate.status !== 'hired' && candidate.status !== "shortlisted");
 
     const onFinish = async (values: interviewData) => {
         console.log(values);

@@ -44,7 +44,7 @@ const Assessment = () => {
                         icon={<Plus />}
                         onClick={showAssignModal}
                     >
-                        Bulk Assign
+                        Assign Assessment
                     </Button>
                     <Button
                         type="primary"

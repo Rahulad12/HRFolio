@@ -1,4 +1,5 @@
 import type { Dayjs } from 'dayjs';
+import { Key } from 'react';
 export type globalResponse = {
     success: boolean;
     message: string;
@@ -124,9 +125,13 @@ export type assessmentResponse = {
     message: string;
     data: AssessmentDataResponse[];
 }
-
+export type assessmentResponseById = {
+    success: boolean;
+    message: string;
+    data: AssessmentDataResponse
+}
 export type AssignmentData = {
-    candidate: string[];
+    candidate: string[] | Key[];
     assessment: string;
     date: Dayjs;
 }
@@ -150,4 +155,10 @@ export type assignmentResponse = {
     success: boolean;
     message: string;
     data: AssignmentDataResponse[];
+}
+
+export type assignmentResponseById = {
+    success: boolean;
+    message: string;
+    data: AssignmentDataResponse;
 }

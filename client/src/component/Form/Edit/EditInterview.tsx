@@ -1,6 +1,6 @@
 import { Col, Form, Row, DatePicker, TimePicker, Select, Card, Button, Skeleton, notification } from 'antd';
-import { interviewData } from "../../types/index";
-import { useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } from '../../services/interviewServiceApi';
+import { interviewData } from "../../../types/index";
+import { useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } from '../../../services/interviewServiceApi';
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
@@ -16,7 +16,6 @@ const EditInterview = ({ id }: Props) => {
     const [api, contextHolder] = notification.useNotification();
     const { data, isLoading, isError } = useGetInterviewByIdQuery(id);
     const { data: interviewers } = useGetInterviewerQuery();
-    console.log(interviewers)
     const [updateInterview, { isLoading: updateLoading }] = useUpdateInterviewMutation();
 
     useEffect(() => {

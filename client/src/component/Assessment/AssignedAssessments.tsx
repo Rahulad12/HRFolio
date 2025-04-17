@@ -1,13 +1,14 @@
-import { Button, notification, Popconfirm, Table, Tooltip } from 'antd'
+import { Button, Modal, notification, Popconfirm, Table, Tooltip } from 'antd'
 import { motion } from 'framer-motion'
-import { EditOutlined } from '@ant-design/icons'
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
-import { Trash2 } from 'lucide-react'
+import { Edit, Trash2 } from 'lucide-react'
 import { makeCapitilized } from '../../utils/TextAlter'
 import dayjs, { Dayjs } from 'dayjs'
-import { useDeleteAssignmentMutation } from '../../services/assessmentServiceApi'
+import { useDeleteAssignmentMutation, useUpdateAssignmnetMutation } from '../../services/assessmentServiceApi'
 import { storeAssignedAssessment } from '../../action/StoreAssessment'
-
+import EditAssignment from '../Form/Edit/EditAssignment'
+import { useState } from 'react'
+import { AssignmentData } from '../../types'
 interface FlattenedAssessment {
     key: string;
     assessment: string;
@@ -25,9 +26,35 @@ const AssignedAssessments = () => {
     const { assignedAssessments } = useAppSelector(state => state.assessments);
     const filterAssigned = assignedAssessments?.filter(item => item.assessment !== null);
     const [api, contextHolder] = notification.useNotification();
-    const [deleteAssignment] = useDeleteAssignmentMutation();
-    const handleEditAssessment = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [assignmentId, setAssignmentId] = useState<string>('');
 
+    const showModal = (id: string) => {
+        setIsModalOpen(true)
+        setAssignmentId(id)
+    };
+    const handleCancel = () => setIsModalOpen(false);
+
+    const [deleteAssignment] = useDeleteAssignmentMutation();
+    const [updateAssignmnet] = useUpdateAssignmnetMutation();
+    const handleEditAssessment = async (value: AssignmentData) => {
+        try {
+            const res = await updateAssignmnet({ data: value, id: assignmentId });
+            if (res.data && res?.data?.success) {
+                dispatch(storeAssignedAssessment(Array.from(res?.data?.data)));
+                api.success({
+                    message: `${res?.data?.message}`,
+                    placement: "top",
+                    duration: 3000,
+                })
+            }
+        } catch (error: any) {
+            api.error({
+                message: `${error?.data?.message}`,
+                placement: "top",
+                duration: 3000,
+            })
+        }
     }
     const handleDeleteAssessment = async (id: string) => {
         try {
@@ -129,11 +156,11 @@ const AssignedAssessments = () => {
             render: (_: any, record: FlattenedAssessment) => (
                 <div className="flex gap-2">
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Tooltip title="Edit">
+                        <Tooltip title="Edit Assignment">
                             <Button
                                 type="text"
-                                icon={<EditOutlined />}
-                                onClick={() => handleEditAssessment()}
+                                icon={<Edit className='w-4 h-4' />}
+                                onClick={() => showModal(record.key)}
                             />
                         </Tooltip>
                     </motion.div>
@@ -187,8 +214,15 @@ const AssignedAssessments = () => {
                     size='small'
                     className="antd-table-custom"
                 />
-            </motion.div>
 
+                <Modal
+                    open={isModalOpen}
+                    footer={null}
+                    onCancel={handleCancel}
+                >
+                    <EditAssignment handleEdit={handleEditAssessment} id={assignmentId} />
+                </Modal>
+            </motion.div>
         </div>
     )
 }

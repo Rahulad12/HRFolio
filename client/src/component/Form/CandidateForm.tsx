@@ -5,9 +5,7 @@ import { candidateFormData } from "../../types/index";
 import { motion } from "framer-motion";
 import { useCreateCandidateMutation } from "../../services/candidateServiceApi";
 import { makeCapitilized } from "../../utils/TextAlter";
-
-const techOptions = ["react js", "dot net", "devops", "qa"];
-const levelOptions = ["junior", "mid", "senior"];
+import Predefineddata from "../../data/PredefinedData";
 
 const CandidateForm = () => {
     const [form] = Form.useForm();
@@ -139,9 +137,9 @@ const CandidateForm = () => {
                                 rules={[{ required: true, message: "Please select technology" }]}
                             >
                                 <Select size="large" placeholder="Select technology">
-                                    {techOptions.map((tech) => (
-                                        <Select.Option key={tech} value={tech}>
-                                            {tech.toUpperCase()}
+                                    {Predefineddata.Technology?.map((tech) => (
+                                        <Select.Option key={tech.key} value={tech.value}>
+                                            {makeCapitilized(tech.label)}
                                         </Select.Option>
                                     ))}
                                 </Select>
@@ -159,9 +157,9 @@ const CandidateForm = () => {
                                 rules={[{ required: true, message: "Please select level" }]}
                             >
                                 <Select size="large" placeholder="Select level">
-                                    {levelOptions.map((lvl) => (
-                                        <Select.Option key={lvl} value={lvl}>
-                                            {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+                                    {Predefineddata.Level?.map((lvl) => (
+                                        <Select.Option key={lvl.key} value={lvl.value}>
+                                            {makeCapitilized(lvl.label)}
                                         </Select.Option>
                                     ))}
                                 </Select>
@@ -279,6 +277,10 @@ const CandidateForm = () => {
                                                 {...restField}
                                                 name={[name, "contact"]}
                                                 label="Contact"
+                                                rules={[{
+                                                    pattern: /^[0-9]{10}$/,
+                                                    message: "Enter a valid 10-digit phone number",
+                                                },]}
                                             >
                                                 <Input placeholder="Contact info" />
                                             </Form.Item>

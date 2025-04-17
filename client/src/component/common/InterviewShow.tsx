@@ -25,7 +25,7 @@ import { useEffect, useState } from 'react';
 import { storeSearch } from '../../action/StoreSearch';
 import { useAppDispatch } from '../../Hooks/hook';
 import { AnimatePresence, motion } from 'framer-motion';
-import EditInterview from '../Form/EditInterview';
+import EditInterview from '../Form/Edit/EditInterview';
 
 interface Props {
     loading: boolean;

@@ -1,28 +1,49 @@
-import { Button, DatePicker, Form, notification, Popconfirm, Select, Table, Tooltip } from 'antd'
+import { Button, notification, Popconfirm, Table, Tooltip, Modal } from 'antd'
 import { motion } from 'framer-motion'
-import { EditOutlined } from '@ant-design/icons'
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { makeCapitilized } from '../../utils/TextAlter'
-import { Trash2 } from 'lucide-react'
-import { AssessmentDataResponse } from '../../types'
-import { useCreateAssignAssessmentMutation, useDeleteAssessmentMutation } from '../../services/assessmentServiceApi'
-import { storeAssessment, storeAssignedAssessment } from '../../action/StoreAssessment'
-import type { Dayjs } from 'dayjs'
+import { Edit, Trash2 } from 'lucide-react'
+import { AssessmentDataResponse, assessmentFormData } from '../../types'
+import { useDeleteAssessmentMutation } from '../../services/assessmentServiceApi'
+import { storeAssessment } from '../../action/StoreAssessment'
+import EditAssessment from '../Form/Edit/EditAssessment'
+import { useState } from 'react'
+import { useUpdateAssessmentMutation } from "../../services/assessmentServiceApi";
 const AssessmentsList = () => {
-    const [form] = Form.useForm();
     const dispatch = useAppDispatch();
 
     const { assessments } = useAppSelector(state => state.assessments);
-    const { candidate } = useAppSelector(state => state.candidate);
 
     const [api, contextHolder] = notification.useNotification();
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [assessmentId, setAssessmentId] = useState<string>("");
+    const showModal = (id: string) => {
+        setIsModalOpen(true);
+        setAssessmentId(id);
+    }
+    const handleCancel = () => setIsModalOpen(false);
 
-    const [createAssignAssessment] = useCreateAssignAssessmentMutation();
 
     const [deleteAssessment] = useDeleteAssessmentMutation();
-
-    const handleEditAssessment = () => {
-
+    const [updateAssessment] = useUpdateAssessmentMutation();
+    const handleEditAssessment = async (value: assessmentFormData) => {
+        try {
+            const res = await updateAssessment({ id: assessmentId, data: value });
+            if (res?.data && res?.data?.success) {
+                dispatch(storeAssessment(Array.from(res?.data.data)));
+                api.success({
+                    message: res.data?.message,
+                    placement: "top",
+                    duration: 3000,
+                })
+            }
+        } catch (error: any) {
+            api.error({
+                message: error?.data?.message || "Error updating assessment",
+                placement: "top",
+                duration: 3000,
+            })
+        }
     }
     const handleDeleteAssessment = async (id: string) => {
         try {
@@ -44,26 +65,6 @@ const AssessmentsList = () => {
             })
         }
 
-    }
-
-    const handleAssignAssessment = async (candidateId: string, date: Dayjs, assessmnetId: string) => {
-        try {
-            const res = await createAssignAssessment({ candidate: [candidateId], assessment: assessmnetId, date }).unwrap();
-            if (res?.data) {
-                dispatch(storeAssignedAssessment(res?.data));
-                api.success({
-                    message: res.message,
-                    placement: "top",
-                    duration: 3000,
-                })
-            }
-        } catch (error: any) {
-            api.error({
-                message: error?.data?.message || "Error assigning assessment",
-                placement: "top",
-                duration: 3000,
-            })
-        }
     }
 
     const columns = [
@@ -119,8 +120,8 @@ const AssessmentsList = () => {
                             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                                 <Button
                                     type="default"
-                                    icon={<EditOutlined />}
-                                    onClick={() => handleEditAssessment()}
+                                    icon={<Edit className='w-4 h-4' />}
+                                    onClick={() => showModal(record._id)}
                                     size="small"
                                 />
                             </motion.div>
@@ -148,49 +149,6 @@ const AssessmentsList = () => {
                         </Tooltip>
                     </div>
 
-                    {/* Assign Form */}
-                    <div className="bg-gray-50 p-2 rounded shadow-inner mt-2">
-                        <Form
-                            form={form}
-                            layout="inline"
-                            onFinish={(values) =>
-                                handleAssignAssessment(
-                                    values[`candidate_${record._id}`],
-                                    values[`date_${record._id}`],
-                                    record._id
-                                )
-                            }
-                        >
-                            <Form.Item
-                                name={`candidate_${record._id}`}
-                                rules={[{ required: true, message: 'Select candidate' }]}
-                            >
-                                <Select
-                                    size="small"
-                                    placeholder="Candidate"
-                                    style={{ width: 130 }}
-                                    options={candidate.map((c) => ({
-                                        label: c.name,
-                                        value: c._id,
-                                    }))}
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                name={`date_${record._id}`}
-                                rules={[{ required: true, message: 'Pick a date' }]}
-                            >
-                                <DatePicker size="small" />
-                            </Form.Item>
-
-                            <Form.Item>
-                                <Button type="primary" htmlType="submit" size="small">
-                                    Assign
-                                </Button>
-                            </Form.Item>
-                        </Form>
-                    </div>
-
                 </div>
             ),
         }
@@ -215,8 +173,14 @@ const AssessmentsList = () => {
                         pageSize: 3,
                     }}
                 />
+                <Modal
+                    onCancel={handleCancel}
+                    open={isModalOpen}
+                    footer={null}
+                >
+                    <EditAssessment handleEdit={handleEditAssessment} id={assessmentId} />
+                </Modal>
             </motion.div>
-
         </div>
     )
 }

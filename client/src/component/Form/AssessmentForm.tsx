@@ -5,8 +5,8 @@ import { useCreateAssessmentMutation } from '../../services/assessmentServiceApi
 import { assessmentFormData } from '../../types';
 import { storeAssessment } from '../../action/StoreAssessment';
 import { useAppDispatch } from '../../Hooks/hook';
+import Predefineddata from '../../data/PredefinedData';
 const AssessmentForm = () => {
-
     const dispatch = useAppDispatch();
     const [api, contextHolder] = notification.useNotification();
     const [createAssessment, { isLoading }] = useCreateAssessmentMutation();
@@ -77,8 +77,11 @@ const AssessmentForm = () => {
                                     rules={[{ required: true, message: "Type is Required" }]}
                                 >
                                     <Select size='large' placeholder='Select Type' allowClear>
-                                        <Select.Option value="behavioural">Behavioural</Select.Option>
-                                        <Select.Option value="technical">Technical</Select.Option>
+                                        {
+                                            Predefineddata.Type?.map((type) => (
+                                                <Select.Option value={type.value}>{type.label}</Select.Option>
+                                            ))
+                                        }
                                     </Select>
                                 </Form.Item>
                             </motion.div>
@@ -96,7 +99,11 @@ const AssessmentForm = () => {
                                     rules={[{ required: true, message: "Technology is Required" }]}
                                 >
                                     <Select size='large' placeholder='Select Technology' allowClear>
-                                        <Select.Option value="react js">React Js</Select.Option>
+                                        {
+                                            Predefineddata.Technology?.map((tech) => (
+                                                <Select.Option value={tech.value}>{tech.label}</Select.Option>
+                                            ))
+                                        }
                                     </Select>
                                 </Form.Item>
                             </motion.div>
@@ -114,9 +121,11 @@ const AssessmentForm = () => {
                                     rules={[{ required: true, message: "Level is Required" }]}
                                 >
                                     <Select size='large' placeholder='Select Level' allowClear>
-                                        <Select.Option value="junior">Junior</Select.Option>
-                                        <Select.Option value="mid">Mid</Select.Option>
-                                        <Select.Option value="senior">Senior</Select.Option>
+                                        {
+                                            Predefineddata.Level?.map((level) => (
+                                                <Select.Option value={level.value}>{level.label}</Select.Option>
+                                            ))
+                                        }
                                     </Select>
                                 </Form.Item>
                             </motion.div>

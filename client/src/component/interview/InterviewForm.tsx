@@ -1,5 +1,5 @@
 import { interviewData } from '../../types'
-import { Col, DatePicker, Form, Row, Select, Button, TimePicker, notification } from 'antd'
+import { Col, DatePicker, Form, Row, Select, Button, TimePicker, notification, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { makeCapitilized } from '../../utils/TextAlter'
@@ -62,17 +62,12 @@ const InterviewForm = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-xl shadow"
         >
             {contextHolder}
-            <motion.h2
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="text-xl font-semibold mb-4"
-            >
+
+            <Typography.Title level={3}>
                 Schedule Interview
-            </motion.h2>
+            </Typography.Title>
 
             <Form
                 form={form}
@@ -80,9 +75,8 @@ const InterviewForm = () => {
                 onFinish={onFinish}
                 autoComplete="off"
             >
-                <Row gutter={24}>
-                    {/* First Column - Candidate, Interviewer, Time */}
-                    <Col xs={24} md={12}>
+                <Row gutter={12}>
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -102,7 +96,9 @@ const InterviewForm = () => {
                                 </Select>
                             </Form.Item>
                         </motion.div>
+                    </Col>
 
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -122,20 +118,20 @@ const InterviewForm = () => {
                                 </Select>
                             </Form.Item>
                         </motion.div>
-
+                    </Col>
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.4 }}
                         >
                             <Form.Item name="time" label="Interview Time" rules={[{ required: true }]}>
-                                <TimePicker format="HH:mm" className="w-full" />
+                                <TimePicker format="HH:mm" className="w-full" size='large' />
                             </Form.Item>
                         </motion.div>
                     </Col>
 
-                    {/* Second Column - Calendar Picker (Only Date) */}
-                    <Col xs={24} md={12}>
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -181,7 +177,7 @@ const InterviewForm = () => {
                     </Form.Item>
                 </motion.div>
             </Form>
-        </motion.div>
+        </motion.div >
     )
 }
 

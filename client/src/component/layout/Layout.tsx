@@ -1,25 +1,31 @@
-import { Outlet, Navigate } from 'react-router-dom';
-
-import Navbar from './Nabbar';
+import { useState } from 'react';
+import { Layout as AntLayout } from 'antd';
 import Sidebar from './Sidebar';
-import { useAppSelector } from '../../Hooks/hook';
+import Navbar from './Nabbar';
+import { Outlet } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
+const { Content } = AntLayout;
 
-export default function Layout() {
-    const { token: isAuthenticated } = useAppSelector((state => state.auth.user));
+const Layout = () => {
+    const { darkMode } = useTheme();
 
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
-    }
+    const [collapsed, setCollapsed] = useState(false);
+
+
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Navbar />
-            <div className="flex">
-                <Sidebar />
-                <main className="flex-1 p-6">
+        <AntLayout className='h-dvh'>
+            <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} isDarkMode={darkMode} />
+            <AntLayout className={`transition-all duration-300 ${collapsed ? 'ml-[80px]' : 'ml-[260px]'}`}>
+                <Navbar collapsed={collapsed} isDarkMode={darkMode} />
+                <Content
+                    className={`px-2 mt-16 min-h-screen overflow-y-auto transition-all duration-300 ${darkMode ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'}`}
+                >
                     <Outlet />
-                </main>
-            </div>
-        </div>
+                </Content>
+            </AntLayout>
+        </AntLayout>
     );
-}
+};
+
+export default Layout;

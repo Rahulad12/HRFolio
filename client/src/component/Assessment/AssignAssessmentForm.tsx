@@ -4,9 +4,8 @@ import type { Dayjs } from 'dayjs';
 import { useCreateAssignAssessmentMutation } from '../../services/assessmentServiceApi';
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
 import { storeAssignedAssessment } from '../../action/StoreAssessment';
-const { Option } = Select;
 
-const AssignAssessment = () => {
+const AssignAssessmentForm = () => {
     const dispatch = useAppDispatch();
     const [assignForm] = Form.useForm();
     const [selectedCandidates, setSelectedCandidates] = useState<Key[]>([]);
@@ -60,6 +59,8 @@ const AssignAssessment = () => {
         level: candidate.level,
     }));
 
+
+
     return (
         <div>
             <Form
@@ -72,11 +73,11 @@ const AssignAssessment = () => {
                     label="Select Assessment"
                     rules={[{ required: true, message: 'Please select an assessment' }]}
                 >
-                    <Select placeholder="Select assessment">
-                        {assessments.map(assessment => (
-                            <Option key={assessment._id} value={assessment._id}>
+                    <Select placeholder="Select assessment" style={{ width: '100%' }} allowClear>
+                        {assessments?.map(assessment => (
+                            <Select.Option key={assessment._id} value={assessment._id}>
                                 {assessment.title}
-                            </Option>
+                            </Select.Option>
                         ))}
                     </Select>
                 </Form.Item>
@@ -111,4 +112,4 @@ const AssignAssessment = () => {
     );
 };
 
-export default AssignAssessment;
+export default AssignAssessmentForm;

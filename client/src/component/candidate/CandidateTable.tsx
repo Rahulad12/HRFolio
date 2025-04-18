@@ -1,6 +1,6 @@
-import { Button, Space, Table, Tag, Tooltip, Popconfirm, Skeleton, notification } from 'antd';
-import { Edit, Eye, Mail, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Button, Space, Tag, Tooltip, Popconfirm, Skeleton, notification } from 'antd';
+import { Edit, Eye, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../Hooks/hook';
 import { useDeleteCandidateMutation } from '../../services/candidateServiceApi';
 import { setCandidate } from '../../slices/candidateSlices';
@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { candidateData } from '../../types';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { TableColumnsType } from 'antd';
+import CustomTable from '../common/Table';
 
 interface TableProps {
     loading: boolean;
@@ -18,24 +20,22 @@ const CandidateTable = ({ loading, error }: TableProps) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [deleteCandidate, { isLoading: isDeleting }] = useDeleteCandidateMutation();
-    const ref = useRef(null);
     const candidate = useAppSelector((state) => state.candidate.candidate);
     const [data, setData] = useState<candidateData[]>([]);
     const [api, contextHolder] = notification.useNotification();
     const handleDelete = async (id: string) => {
-        console.log("candidate Table Rerebder")
         try {
             const res = await deleteCandidate(id).unwrap();
             dispatch(setCandidate([]));
             api.success({
                 message: res.message,
-                placement: "top",
+                placement: "topRight",
                 duration: 3000,
             })
         } catch (err: any) {
             api.error({
                 message: err?.data?.message || "Error deleting candidate",
-                placement: "top",
+                placement: "topRight",
                 duration: 3000,
             })
         }
@@ -43,27 +43,18 @@ const CandidateTable = ({ loading, error }: TableProps) => {
 
     useEffect(() => {
         setData(candidate || []);
-        console.log("candidate table useEffect render")
     }, [candidate]);
 
-    const columns = [
+    const columns: TableColumnsType<candidateData> = [
         {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
             render: (text: string, record: candidateData) => (
-                <div
-                    className="flex flex-col"
-                >
-                    <span className="font-medium hover:text-blue-600 cursor-pointer"
-                        onClick={() => navigate(`/dashboard/candidate/${record._id}`)}>
-                        {makeCapitilized(text)}
-                    </span>
-                    <div className="text-xs text-gray-500">
-                        <div className="truncate max-w-[180px]">{record.email}</div>
-                        <div>{record.phone}</div>
-                    </div>
-                </div>
+                <span className="font-semibold hover:text-blue-600 cursor-pointer"
+                    onClick={() => navigate(`/dashboard/candidate/${record._id}`)}>
+                    {makeCapitilized(text)}
+                </span>
             ),
         },
         {
@@ -71,15 +62,9 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             dataIndex: 'technology',
             key: 'technology',
             render: (tech: string) => (
-                <motion.div
-                    initial={{ scale: 0.8 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    <Tag color="blue" className="capitalize">
-                        {makeCapitilized(tech)}
-                    </Tag>
-                </motion.div>
+                <span>
+                    {makeCapitilized(tech)}
+                </span>
             ),
         },
         {
@@ -87,20 +72,10 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             dataIndex: 'level',
             key: 'level',
             render: (level: string) => {
-                const colorMap: { [key: string]: string } = {
-                    junior: 'green',
-                    mid: 'orange',
-                    senior: 'purple',
-                };
                 return (
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <Tag color={colorMap[level] || 'default'} className="capitalize">
-                            {makeCapitilized(level)}
-                        </Tag>
-                    </motion.div>
+                    <span>
+                        {makeCapitilized(level)}
+                    </span>
                 );
             },
         },
@@ -109,15 +84,27 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             dataIndex: 'experience',
             key: 'experience',
             render: (exp: number) => (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                >
+                <span>
                     {`${exp} ${exp === 1 ? 'year' : 'years'}`}
-                </motion.div>
+                </span>
             ),
             sorter: (a: candidateData, b: candidateData) => a.experience - b.experience,
+        },
+
+        {
+            title: 'Expected Salary',
+            dataIndex: 'expectedsalary',
+            key: 'expectedsalary',
+            render: (salary: number) => (
+                <motion.span
+                    className="font-medium"
+                    initial={{ x: -10 }}
+                    animate={{ x: 0 }}
+                >
+                    ${salary?.toLocaleString('en-US') || '0'}
+                </motion.span>
+            ),
+            sorter: (a: candidateData, b: candidateData) => a.expectedsalary - b.expectedsalary,
         },
         {
             title: 'Status',
@@ -136,27 +123,12 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 300 }}
                     >
-                        <Tag color={colorMap[status] || 'default'} className="capitalize">
+                        <Tag color={colorMap[status] || 'default'} className="capitalize rounded-xl">
                             {makeCapitilized(status)}
                         </Tag>
                     </motion.div>
                 );
             },
-        },
-        {
-            title: 'Expected Salary',
-            dataIndex: 'expectedsalary',
-            key: 'expectedsalary',
-            render: (salary: number) => (
-                <motion.span
-                    className="font-medium"
-                    initial={{ x: -10 }}
-                    animate={{ x: 0 }}
-                >
-                    ${salary?.toLocaleString('en-US') || '0'}
-                </motion.span>
-            ),
-            sorter: (a: candidateData, b: candidateData) => a.expectedsalary - b.expectedsalary,
         },
         {
             title: 'Actions',
@@ -181,16 +153,6 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                                 icon={<Edit className="w-4 h-4" />}
                                 onClick={() => navigate(`/dashboard/candidate/edit/${record._id}`)}
                                 className="text-green-500 hover:bg-green-50"
-                            />
-                        </Tooltip>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Tooltip title="Send Email">
-                            <Button
-                                type="text"
-                                icon={<Mail className="w-4 h-4" />}
-                                onClick={() => console.log('Send Email', record._id)}
-                                className="text-purple-500 hover:bg-purple-50"
                             />
                         </Tooltip>
                     </motion.div>
@@ -262,46 +224,11 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                 className="bg-white rounded-lg shadow overflow-hidden"
             >
                 <AnimatePresence>
-                    <Table
-                        ref={ref}
-                        dataSource={data}
-                        rowKey="_id"
-                        columns={columns}
+                    <CustomTable
                         loading={loading}
-                        size='small'
-                        sortDirections={['ascend', 'descend', 'ascend']}
-                        pagination={{
-                            total: data.length,
-                            pageSize: 5,
-                            showSizeChanger: true,
-                            pageSizeOptions: ['5', '10', '20', '50'],
-                            showTotal: (total) => (
-                                <motion.span
-                                    className="text-gray-600"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                >
-                                    Showing <b>{Math.min(5, total)}</b> of <b>{total}</b> candidates
-                                </motion.span>
-                            ),
-                        }}
-                        className="antd-table-custom"
-                        rowClassName="hover:bg-gray-50 transition-colors"
-                        components={{
-                            body: {
-                                row: ({ children, ...props }) => (
-                                    <motion.tr
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.3 }}
-                                        {...props}
-                                    >
-                                        {children}
-                                    </motion.tr>
-                                )
-                            }
-                        }}
+                        data={data}
+                        columns={columns}
+                        pageSize={5}
                     />
                 </AnimatePresence>
             </motion.div>

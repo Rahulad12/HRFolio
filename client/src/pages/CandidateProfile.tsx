@@ -57,7 +57,7 @@ const CandidateProfile = () => {
       if (res.success) {
         api.success({
           message: res.message,
-          placement: "top",
+          placement: "topRight",
           duration: 3000,
         })
       }
@@ -65,7 +65,7 @@ const CandidateProfile = () => {
       console.error(err);
       api.error({
         message: "Error updating status",
-        placement: "top",
+        placement: "topRight",
         duration: 3000,
       })
     }

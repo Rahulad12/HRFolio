@@ -44,14 +44,14 @@ const AssignedAssessments = () => {
                 dispatch(storeAssignedAssessment(Array.from(res?.data?.data)));
                 api.success({
                     message: `${res?.data?.message}`,
-                    placement: "top",
+                    placement: "topRight",
                     duration: 3000,
                 })
             }
         } catch (error: any) {
             api.error({
                 message: `${error?.data?.message}`,
-                placement: "top",
+                placement: "topRight",
                 duration: 3000,
             })
         }
@@ -63,7 +63,7 @@ const AssignedAssessments = () => {
                 dispatch(storeAssignedAssessment(Array.from(res?.data?.data)));
                 api.success({
                     message: `${res?.data?.message}`,
-                    placement: "top",
+                    placement: "topRight",
                     duration: 3000,
                 })
             }
@@ -71,7 +71,7 @@ const AssignedAssessments = () => {
         } catch (error: any) {
             api.error({
                 message: `${error?.data?.message}`,
-                placement: "top",
+                placement: "topRight",
                 duration: 3000,
             })
         }
@@ -83,7 +83,7 @@ const AssignedAssessments = () => {
             key: 'assessment',
             render: (text: string) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span className='font-semibold'>{makeCapitilized(text)}</span>
                 </div>
             )
         },

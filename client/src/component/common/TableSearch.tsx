@@ -1,5 +1,5 @@
-import { Input, Select, Button } from "antd";
-import { Search, XCircle } from "lucide-react";
+import { Input, Select } from "antd";
+import { Search } from "lucide-react";
 import { useState } from "react";
 import { storeSearch } from "../../action/StoreSearch";
 import { useAppDispatch } from "../../Hooks/hook";
@@ -38,21 +38,14 @@ const TableSearch = () => {
         dispatch(storeSearch(nameValue, selectedTechnology, selectedStatus, selectedLevel, dayjs(), ""));
     };
 
-    const handleReset = () => {
-        setName("");
-        setSelectedTechnology("");
-        setSelectedLevel("");
-        setSelectedStatus("");
-        dispatch(storeSearch("", "", "", "", dayjs(), ""));
-    };
-
     return (
-        <div className="flex flex-wrap gap-4 items-end">
+        <div className="flex flex-wrap gap-4 justify-between mb-3 max-w-full  p-2">
             <Input.Search
                 placeholder="Search candidates by name..."
                 allowClear
                 enterButton={<Search className="w-4 h-4" />}
                 value={name}
+                style={{ width: 304 }}
                 onChange={(e) => {
                     const value = e.target.value;
                     setName(value);
@@ -61,55 +54,55 @@ const TableSearch = () => {
                     }
                 }}
                 onSearch={() => handleSearch(name)}
-                className="w-96"
             />
+            <div
+                className="flex flex-wrap gap-4 items-center">
 
-            <Select
-                placeholder="Filter by Technology"
-                value={selectedTechnology || undefined}
-                allowClear
-                onChange={(value) => {
-                    const newValue = value || "";
-                    setSelectedTechnology(newValue);
-                    dispatch(storeSearch(name, newValue, selectedStatus, selectedLevel || "", dayjs(), ""));
-                }}
-                className="min-w-[200px]"
-                options={techOptions}
-            />
+                <Select
+                    placeholder="Filter by Technology"
+                    value={selectedTechnology || undefined}
+                    showSearch
+                    allowClear
+                    onChange={(value) => {
+                        const newValue = value || "";
+                        setSelectedTechnology(newValue);
+                        dispatch(storeSearch(name, newValue, selectedStatus, selectedLevel || "", dayjs(), ""));
+                    }}
+                    className="min-w-[200px]"
+                    options={techOptions}
+                />
+                <Select
+                    placeholder="Filter by Level"
+                    value={selectedLevel || undefined}
+                    allowClear
+                    showSearch
+                    onChange={(value) => {
+                        const newValue = value || "";
+                        setSelectedLevel(newValue);
+                        dispatch(storeSearch(name, selectedTechnology, selectedStatus, newValue || "", dayjs(), ""));
+                    }}
+                    className="min-w-[200px]"
+                    options={levelOptions}
+                />
 
-            <Select
-                placeholder="Filter by Level"
-                value={selectedLevel || undefined}
-                allowClear
-                onChange={(value) => {
-                    const newValue = value || "";
-                    setSelectedLevel(newValue);
-                    dispatch(storeSearch(name, selectedTechnology, selectedStatus, newValue || "", dayjs(), ""));
-                }}
-                className="min-w-[200px]"
-                options={levelOptions}
-            />
+                <Select
+                    placeholder="Filter by Status"
+                    value={selectedStatus || undefined}
+                    allowClear
+                    showSearch
+                    onChange={(value) => {
+                        const newValue = value || "";
+                        setSelectedStatus(newValue);
+                        dispatch(storeSearch(name, selectedTechnology, newValue, selectedLevel || "", dayjs(), ""));
+                    }}
+                    className="min-w-[200px]"
+                    options={statusOptions}
+                />
 
-            <Select
-                placeholder="Filter by Status"
-                value={selectedStatus || undefined}
-                allowClear
-                onChange={(value) => {
-                    const newValue = value || "";
-                    setSelectedStatus(newValue);
-                    dispatch(storeSearch(name, selectedTechnology, newValue, selectedLevel || "", dayjs(), ""));
-                }}
-                className="min-w-[200px]"
-                options={statusOptions}
-            />
+            </div>
 
-            <Button
-                type="default"
-                icon={<XCircle className="w-4 h-4" />}
-                onClick={handleReset}
-            >
-                Reset
-            </Button>
+
+
         </div>
     );
 };

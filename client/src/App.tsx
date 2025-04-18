@@ -2,30 +2,21 @@ import { Provider } from "react-redux"
 import MainRoutes from "./routes/MainRoutes"
 import { store } from "./store"
 import "./App.css"
-import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AntdProvider from "./providers/AntdProvider"
+import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
   return (
     <>
       <Provider store={store}>
-        <MainRoutes />
+        <ThemeProvider>
+          <AntdProvider>
+            <MainRoutes />
+          </AntdProvider>
+        </ThemeProvider>
+
       </Provider>
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        limit={1}
-        transition={Slide}
-        className="toast-container"
-        toastClassName="toast-centered" />
     </>
 
   )

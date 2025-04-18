@@ -62,7 +62,7 @@ const EditAssessment = ({ handleEdit, id }: Props) => {
                                         <Select size="large" placeholder="Select Type">
                                             {
                                                 Predifineddata.Type?.map((type) => (
-                                                    <Select.Option value={type.value}>{type.label}</Select.Option>
+                                                    <Select.Option value={type.value} key={type.key}>{type.label}</Select.Option>
                                                 ))
                                             }
                                         </Select>

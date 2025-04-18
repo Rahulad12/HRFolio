@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import AuthForm from "../component/common/AuthForm";
+import AuthForm from "../component/Form/AuthForm";
 import { useAppDispatch } from '../Hooks/hook';
 import { setCredentials } from '../slices/authSlices';
 import { useLocation } from 'react-router-dom';
@@ -32,7 +32,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className='min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4'>
       <AuthForm submitHandler={submitHandler} formType="login" loading={isLoading} />
     </div>
   );

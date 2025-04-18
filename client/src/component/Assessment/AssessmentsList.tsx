@@ -1,4 +1,4 @@
-import { Button, notification, Popconfirm, Table, Tooltip, Modal } from 'antd'
+import { Button, notification, Popconfirm, Tooltip, Modal } from 'antd'
 import { motion } from 'framer-motion'
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { makeCapitilized } from '../../utils/TextAlter'
@@ -9,6 +9,9 @@ import { storeAssessment } from '../../action/StoreAssessment'
 import EditAssessment from '../Form/Edit/EditAssessment'
 import { useState } from 'react'
 import { useUpdateAssessmentMutation } from "../../services/assessmentServiceApi";
+import CustomTable from '../common/Table'
+import type { TableColumnsType } from 'antd';
+FIX: "IF I click update with out any changing then the store is being clear if i do any change then it will run perfectly"
 const AssessmentsList = () => {
     const dispatch = useAppDispatch();
 
@@ -29,18 +32,19 @@ const AssessmentsList = () => {
     const handleEditAssessment = async (value: assessmentFormData) => {
         try {
             const res = await updateAssessment({ id: assessmentId, data: value });
+            console.log(res);
             if (res?.data && res?.data?.success) {
                 dispatch(storeAssessment(Array.from(res?.data.data)));
                 api.success({
                     message: res.data?.message,
-                    placement: "top",
+                    placement: "topRight",
                     duration: 3000,
                 })
             }
         } catch (error: any) {
             api.error({
                 message: error?.data?.message || "Error updating assessment",
-                placement: "top",
+                placement: "topRight",
                 duration: 3000,
             })
         }
@@ -52,29 +56,27 @@ const AssessmentsList = () => {
                 dispatch(storeAssessment(Array.from(res?.data.data)));
                 api.success({
                     message: res.data?.message,
-                    placement: "top",
+                    placement: "topRight",
                     duration: 3000,
                 })
             }
-
         } catch (error: any) {
             api.error({
                 message: error?.data?.message || "Error deleting assessment",
-                placement: "top",
+                placement: "topRight",
                 duration: 3000,
             })
         }
-
     }
 
-    const columns = [
+    const columns: TableColumnsType<AssessmentDataResponse> = [
         {
             title: 'Assessment',
             dataIndex: 'title',
             key: 'assessment',
             render: (text: string) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span className='font-semibold'>{makeCapitilized(text)}</span>
                 </div>
             )
         },
@@ -112,42 +114,37 @@ const AssessmentsList = () => {
             title: 'Actions',
             key: 'actions',
             render: (_: any, record: AssessmentDataResponse) => (
-                <div className="flex flex-col gap-2">
-
-                    <div className="flex items-center gap-2">
-                        {/* Edit Button */}
+                <div className="flex gap-2">
+                    {/* Edit Button */}
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <Tooltip title="Edit Assessment" placement="top">
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                <Button
-                                    type="default"
-                                    icon={<Edit className='w-4 h-4' />}
-                                    onClick={() => showModal(record._id)}
-                                    size="small"
-                                />
-                            </motion.div>
+                            <Button
+                                type="text"
+                                icon={<Edit className='w-4 h-4' />}
+                                onClick={() => showModal(record._id)}
+                            />
                         </Tooltip>
+                    </motion.div>
 
-                        {/* Delete Button */}
+                    {/* Delete Button */}
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <Tooltip title="Delete Assessment" placement="top">
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                <Popconfirm
-                                    title="Delete this assessment?"
-                                    description="Are you sure you want to delete this assessment?"
-                                    onConfirm={() => handleDeleteAssessment(record._id)}
-                                    okText="Yes"
-                                    cancelText="No"
-                                    okButtonProps={{ danger: true }}
-                                >
-                                    <Button
-                                        danger
-                                        type="default"
-                                        icon={<Trash2 className="w-4 h-4" />}
-                                        size="small"
-                                    />
-                                </Popconfirm>
-                            </motion.div>
+                            <Popconfirm
+                                title="Delete this assessment?"
+                                description="Are you sure you want to delete, This action cannot be undone."
+                                okButtonProps={{ danger: true }}
+                                okText="Yes"
+                                cancelText="No"
+                                onConfirm={() => handleDeleteAssessment(record._id)}
+                            >
+                                <Button
+                                    danger
+                                    type="text"
+                                    icon={<Trash2 className="w-4 h-4" />}
+                                />
+                            </Popconfirm>
                         </Tooltip>
-                    </div>
+                    </motion.div>
 
                 </div>
             ),
@@ -163,15 +160,11 @@ const AssessmentsList = () => {
                 transition={{ duration: 0.5, type: "spring" }}
                 className="bg-white rounded-lg shadow overflow-hidden"
             >
-                <Table
+                <CustomTable
+                    loading={false}
+                    data={assessments}
                     columns={columns}
-                    dataSource={Array.isArray(assessments) ? assessments : []}
-                    size="middle"
-                    rowKey="_id"
-                    className="antd-table-custom"
-                    pagination={{
-                        pageSize: 3,
-                    }}
+                    pageSize={5}
                 />
                 <Modal
                     onCancel={handleCancel}

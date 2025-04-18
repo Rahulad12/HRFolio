@@ -1,11 +1,12 @@
-import { Button, Modal } from 'antd'
+import { Modal } from 'antd'
 import { Calendar } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import InterviewForm from '../component/Form/InterviewForm';
+import InterviewForm from '../component/interview/InterviewForm';
 import { storeInterview } from '../action/StoreInterview';
 import { useAppDispatch, useAppSelector } from '../Hooks/hook';
 import { useGetInterviewQuery } from '../services/interviewServiceApi';
-import InterviewShow from '../component/common/InterviewShow';
+import InterviewShow from '../component/interview/InterviewShow';
+import PrimaryButton from '../component/ui/button/Primary';
 
 const Interview = () => {
 
@@ -36,18 +37,12 @@ const Interview = () => {
         <div className='p-4 flex flex-col gap-4'>
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Interview</h1>
-                <Button
-                    type='primary'
-                    onClick={showModal}
-                >
-                    <Calendar className="w-4 h-4" /> Add Interview
-                </Button>
+                <PrimaryButton text="Add Interview" icon={<Calendar className="w-4 h-4" />} onClick={showModal} />
             </div>
 
             <InterviewShow loading={interviewLoading} />
 
             <Modal
-                title="Add Candidate"
                 open={isModalOpen}
                 onCancel={handleCancel}
                 footer={null}

@@ -45,7 +45,7 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
     dispatch(logout());
   };
 
-  const sidebarBg = isDarkMode ? "#191D32" : "#FBFBFF";
+  const sidebarBg = isDarkMode ? "#1e293b" : "#FBFBFF";
   const borderColor = isDarkMode ? "#2A2E45" : "#e5e7eb";
   const logoTextColor = isDarkMode ? "#FBFBFF" : "#191D32";
   const toggleIconColor = isDarkMode ? "#FBFBFF" : "#4B5563";
@@ -83,7 +83,7 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
       </div>
 
       {/* Menu */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1">
         <Menu
           mode="inline"
           theme={isDarkMode ? "dark" : "light"}

@@ -22,7 +22,7 @@ const assessmentSchema = new mongoose.Schema({
         required: true,
         lowercase: true
     },
-},{
+}, {
     timestamps: true
 })
 

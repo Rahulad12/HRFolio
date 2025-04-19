@@ -20,7 +20,9 @@ const buttonPropsSlice = createSlice({
     name: "buttonProps",
     initialState,
     reducers: {
-        buttonState: (state, action) => state = action.payload,
+        buttonState: (state, action) => {
+            return action.payload;
+        },
     },
 });
 

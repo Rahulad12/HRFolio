@@ -1,65 +1,81 @@
-import { Card, Col, Row } from "antd";
+import { Card, Col, Row, Space, Statistic } from "antd";
 import {
-    Users,
-    ClipboardCheck,
-    FileCheck,
-    Calendar
-} from "lucide-react";
+    CalendarOutlined,
+    TeamOutlined,
+    ClockCircleOutlined,
+    TrophyOutlined,
+} from '@ant-design/icons';
 import { useAppSelector } from "../../Hooks/hook";
 import { motion } from "framer-motion";
-
-
+import dayjs from "dayjs";
 const DashboardHead = () => {
-    const candidates = useAppSelector(sate => sate.candidate.candidate)
+    const candidates = useAppSelector(state => state.candidate.candidate);
+    const { interviews } = useAppSelector(state => state.interview);
+
+    const startOfWeek = dayjs().startOf('week');
+    const endOfWeek = dayjs().endOf('week');
+
+    const filterInterviews = interviews?.filter(i => dayjs(i.date).isBetween(startOfWeek, endOfWeek, null, '[]'));
+    const filterStatusByHired = candidates?.filter(c => c.status === 'hired');
+
     const stats = [
         {
-            title: "Total Candidates",
-            value: candidates.length,
-            icon: <Users className="w-6 h-6 text-blue-500" />,
-            color: "bg-blue-100",
+            title: 'Total Candidates',
+            value: candidates?.length,
+            icon: <TeamOutlined />,
+            color: '#1890ff',
+            prefix: '',
+            suffix: '',
         },
         {
-            title: "Interviews Today",
-            value: 8,
-            icon: <Calendar className="w-6 h-6 text-purple-500" />,
-            color: "bg-purple-100",
+            title: 'Interviews This Week',
+            value: filterInterviews?.length,
+            icon: <CalendarOutlined />,
+            color: '#52c41a',
+            prefix: '',
+            suffix: '',
         },
         {
-            title: "Pending Assessments",
+            title: 'Pending Reviews',
             value: 12,
-            icon: <ClipboardCheck className="w-6 h-6 text-orange-500" />,
-            color: "bg-orange-100",
+            icon: <ClockCircleOutlined />,
+            color: '#faad14',
+            prefix: '',
+            suffix: '',
         },
         {
-            title: "Documents Pending",
-            value: 5,
-            icon: <FileCheck className="w-6 h-6 text-red-500" />,
-            color: "bg-red-100",
+            title: 'Hired This Month',
+            value: filterStatusByHired?.length,
+            icon: <TrophyOutlined />,
+            color: '#722ed1',
+            prefix: '',
+            suffix: '',
         },
     ];
 
     return (
-        <div className="space-y-6">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
             <Row gutter={[16, 16]}>
                 {stats.map((stat, index) => (
-
                     <Col xs={24} sm={12} md={12} lg={6} key={index}>
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 }}
                         >
-                            <Card className="hover:shadow-lg transition-all duration-300">
-                                <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-lg ${stat.color}`}>
+                            <Card
+                                className={`rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ${stat.color}`}
+                            >
+                                <Statistic
+                                    title={<Space>
                                         {stat.icon}
-                                    </div>
-                                    <div>
-                                        <p className="text-gray-600 text-sm">{stat.title}</p>
-                                        <p className="text-2xl font-semibold">{stat.value}</p>
-                                    </div>
-                                </div>
+                                        <span>{stat.title}</span>
+                                    </Space>}
+                                    value={stat.value}
+                                    prefix={stat.icon}
+                                    suffix={stat.suffix}
+                                    valueStyle={{ color: stat.color }}
+                                />
                             </Card>
                         </motion.div>
                     </Col>

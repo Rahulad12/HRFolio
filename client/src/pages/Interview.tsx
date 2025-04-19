@@ -7,6 +7,8 @@ import { useAppDispatch, useAppSelector } from '../Hooks/hook';
 import { useGetInterviewQuery } from '../services/interviewServiceApi';
 import InterviewShow from '../component/interview/InterviewShow';
 import PrimaryButton from '../component/ui/button/Primary';
+import Hero from '../component/common/Hero';
+import { buttonState } from '../slices/ButtonPropsSlices';
 
 const Interview = () => {
 
@@ -27,18 +29,16 @@ const Interview = () => {
         if (data?.data) {
             dispatch(storeInterview(data.data));
         }
+        dispatch(buttonState({ text: "Create Interview", icon: <Calendar className="w-4 h-4" />, onClick: showModal }));
         return () => {
             dispatch(storeInterview([]));
         };
-    }, [data]);
+    }, [data, dispatch]);
 
 
     return (
         <div className='p-4 flex flex-col gap-4'>
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Interview</h1>
-                <PrimaryButton text="Add Interview" icon={<Calendar className="w-4 h-4" />} onClick={showModal} />
-            </div>
+            <Hero title="Interview" />
 
             <InterviewShow loading={interviewLoading} />
 

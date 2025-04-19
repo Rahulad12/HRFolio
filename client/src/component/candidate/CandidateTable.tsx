@@ -16,6 +16,14 @@ interface TableProps {
     error: boolean;
 }
 
+const statusColors: Record<string, string> = {
+    shortlisted: 'blue',
+    'first interview': 'orange',
+    'second interview': 'purple',
+    hired: 'green',
+    rejected: 'red',
+};
+
 const CandidateTable = ({ loading, error }: TableProps) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -96,13 +104,10 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             dataIndex: 'expectedsalary',
             key: 'expectedsalary',
             render: (salary: number) => (
-                <motion.span
-                    className="font-medium"
-                    initial={{ x: -10 }}
-                    animate={{ x: 0 }}
+                <span
                 >
                     ${salary?.toLocaleString('en-US') || '0'}
-                </motion.span>
+                </span>
             ),
             sorter: (a: candidateData, b: candidateData) => a.expectedsalary - b.expectedsalary,
         },
@@ -110,25 +115,12 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            render: (status: string) => {
-                const colorMap: { [key: string]: string } = {
-                    Shortlisted: 'cyan',
-                    'first interview': 'purple',
-                    'second interview': 'geekblue',
-                    Hired: 'green',
-                    Rejected: 'red',
-                };
-                return (
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                    >
-                        <Tag color={colorMap[status] || 'default'} className="capitalize rounded-xl">
-                            {makeCapitilized(status)}
-                        </Tag>
-                    </motion.div>
-                );
-            },
+            width: 100,
+            render: (status: string) => (
+                <Tag color={statusColors[status.toLowerCase()] || 'default'}>
+                    {status}
+                </Tag>
+            ),
         },
         {
             title: 'Actions',
@@ -136,7 +128,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             width: 180,
             render: (_: any, record: candidateData) => (
                 <Space size="small">
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <Tooltip title="View Details">
                             <Button
                                 type="text"
@@ -145,7 +137,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                                 className="text-blue-500 hover:bg-blue-50"
                             />
                         </Tooltip>
-                    </motion.div>
+                    </motion.div> */}
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <Tooltip title="Edit">
                             <Button

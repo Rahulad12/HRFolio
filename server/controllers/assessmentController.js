@@ -1,7 +1,6 @@
-import { get } from "mongoose";
 import Assessment from "../model/Assessment.js";
 import AssessmentAssignment from "../model/AssessmentAssignment.js";
-import Candidate from "../model/Candidate.js";
+import Score from "../model/ScoreModle.js";
 const createAssessment = async (req, res) => {
     const { title, type, technology, level } = req.body
     try {
@@ -159,4 +158,53 @@ const getAssignmentById = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-export { createAssessment, assignAssessment, getAssessment, getAssignment, deleteAssessment, deleteAssignment, updateAssessment, updateAssignmnet, getAssessmentById, getAssignmentById }
+
+const createScore = async (req, res) => {
+    const { candidate, assessment, score } = req.body;
+    try {
+        if (score < 0 || score > 100) return res.status(400).json({ success: false, message: "Score must be between 0 and 100" });
+        const createdScore = await Score.create({ candidate, assessment, score, status: score >= 40 ? "Passed" : "Failed" });
+        if (!createdScore) {
+            return res.status(400).json({ success: false, message: "Score not created" });
+        }
+        return res.status(200).json({ success: true, message: "Score created successfully", data: createdScore });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+const getScoreById = async (req, res) => {
+    try {
+        const score = await Score.find({ candidate: req.params.id }).select("-createdAt -updatedAt -__v").populate({
+            path: "candidate",
+            select: "-createdAt -updatedAt -__v"
+        }).populate({
+            path: "assessment",
+            select: "-createdAt -updatedAt -__v"
+        });
+        if (score.length === 0) {
+            return res.status(404).json({ success: false, message: "No score found" });
+        }
+        return res.status(200).json({ success: true, message: "Score fetched successfully", data: score });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const getScore = async (req, res) => {
+    try {
+        const score = await Score.find({}).select("-createdAt -updatedAt -__v").populate({
+            path: "candidate",
+            select: "-createdAt -updatedAt -__v"
+        }).populate({
+            path: "assessment",
+            select: "-createdAt -updatedAt -__v"
+        });
+        if (score.length === 0) {
+            return res.status(404).json({ success: false, message: "No score found" });
+        }
+        return res.status(200).json({ success: true, message: "Score fetched successfully", data: score });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+export { createAssessment, assignAssessment, getAssessment, getAssignment, deleteAssessment, deleteAssignment, updateAssessment, updateAssignmnet, getAssessmentById, getAssignmentById, createScore, getScoreById, getScore }

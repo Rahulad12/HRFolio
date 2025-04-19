@@ -59,7 +59,7 @@ export type candidateData = {
     references: referenceResponse[];
     status: 'shortlisted' | 'first interview' | 'second interview' | 'hired' | 'rejected';
     _id: string
-
+    createdAt: string
 }
 export type candidateResponse = {
     success: boolean;

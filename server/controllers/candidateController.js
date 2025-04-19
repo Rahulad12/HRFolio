@@ -58,7 +58,7 @@ const createCandidate = async (req, res) => {
 const getCandidateById = async (req, res) => {
     const { id } = req.params;
     try {
-        const candidate = await Candidate.findById(id).select("-createdAt -updatedAt -__v").populate({
+        const candidate = await Candidate.findById(id).select(" -updatedAt -__v").populate({
             path: "references",
             select: "-createdAt -updatedAt -__v -candidate"
         });
@@ -115,7 +115,7 @@ const getAllCandidates = async (req, res) => {
         }
 
         const candidates = await Candidate.find(query).select(
-            "-createdAt -updatedAt -__v -references"
+            "-updatedAt -__v -references"
         );
 
         if (!candidates.length) {

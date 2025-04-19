@@ -44,14 +44,15 @@ const InterviewForm = () => {
                 api.success({
                     message: `${makeCapitilized(res.message)}`,
                     description: 'The interview has been successfully scheduled.',
-                    placement: 'top',
+                    placement: 'topRight',
                 })
+                form.resetFields();
             }
         } catch (error: any) {
             api.error({
                 message: `${makeCapitilized(error.message)}`,
                 description: 'An error occurred while scheduling the interview. Please try again.',
-                placement: 'top',
+                placement: 'topRight',
             })
         }
     }

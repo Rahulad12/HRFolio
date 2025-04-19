@@ -39,7 +39,7 @@ const TableSearch = () => {
     };
 
     return (
-        <div className="flex flex-wrap gap-4 justify-between mb-3 max-w-full  p-2">
+        <div className="flex flex-wrap gap-4 justify-between max-w-full  p-2">
             <Input.Search
                 placeholder="Search candidates by name..."
                 allowClear

@@ -37,9 +37,8 @@ const Interview = () => {
     return (
         <div className='p-4 flex flex-col gap-4'>
             <Hero title="Interview" />
-
             <InterviewShow loading={interviewLoading} />
-
+            
             <Modal
                 open={isModalOpen}
                 onCancel={handleCancel}

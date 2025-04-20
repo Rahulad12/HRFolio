@@ -1,11 +1,14 @@
 import InterviewerData from "./InterviewData.js";
 import connectDB from "../config/db.js";
 import Interviewers from "../model/Interviewers.js";
+import Candiate from "../model/Candidate.js";
+import sampleCandidates from "./CandidateData.js";
 
 // Destroy data
 const destroyData = async () => {
     try {
         await Interviewers.deleteMany({});
+        await Candiate.deleteMany({});
         console.log("Data destroyed");
         process.exit();
     } catch (err) {
@@ -17,8 +20,10 @@ const destroyData = async () => {
 // Insert data
 const insertData = async () => {
     try {
-        await Interviewers.deleteMany(); // Optional: clear before insert
-        await Interviewers.insertMany(InterviewerData);
+        // await Interviewers.deleteMany(); // Optional: clear before insert
+        // await Interviewers.insertMany(InterviewerData);
+        await Candiate.insertMany(sampleCandidates
+        );
         console.log("Data inserted");
         process.exit();
     } catch (err) {

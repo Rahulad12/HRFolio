@@ -12,7 +12,7 @@ import {
     Tooltip,
     Typography,
     Modal,
-    notification
+    notification,
 } from 'antd';
 import {
     CalendarDays, Clock, Mail, MessageSquare, User, Edit
@@ -25,7 +25,7 @@ import { useEffect, useState } from 'react';
 import { storeSearch } from '../../action/StoreSearch';
 import { useAppDispatch } from '../../Hooks/hook';
 import { AnimatePresence, motion } from 'framer-motion';
-import EditInterview from '../Form/EditInterview';
+import EditInterview from '../Form/Edit/EditInterview';
 
 interface Props {
     loading: boolean;
@@ -61,7 +61,7 @@ const InterviewShow = ({ loading }: Props) => {
     );
 
     useEffect(() => {
-        dispatch(storeSearch("", "", "", "", selectedDate, selectedStatus));
+        dispatch(storeSearch("", "", selectedDate, selectedStatus));
     }, [selectedDate, selectedStatus, dispatch]);
 
     const handleDateChange = (date: Dayjs | null) => {
@@ -92,7 +92,7 @@ const InterviewShow = ({ loading }: Props) => {
         api.success({
             message: `Reminder Sent to Interviewer ${makeCapitilized(interviewerName)}`,
             description: 'Interviewer has been notified',
-            placement: 'top',
+            placement: 'topRight',
             duration: 3000
         })
     }
@@ -118,7 +118,7 @@ const InterviewShow = ({ loading }: Props) => {
                                 : interview.status === 'cancelled'
                                     ? 'error'
                                     : 'success'}
-                            text={interview.status}
+                            text={makeCapitilized(interview.status)}
                         />
                     </motion.li>
                 ))}
@@ -254,7 +254,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                                         ? 'error'
                                                                         : 'success'
                                                             }
-                                                            text={interview.status}
+                                                            text={makeCapitilized(interview.status)}
                                                         />
                                                         <span>
                                                             <Tooltip title="Edit">
@@ -279,7 +279,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                                         ? 'error'
                                                                         : 'success'
                                                             }
-                                                            text={interview?.candidate?.status}
+                                                            text={makeCapitilized(interview?.candidate?.status)}
                                                         />
                                                     </div>
                                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -359,6 +359,7 @@ const InterviewShow = ({ loading }: Props) => {
                 onCancel={closeModal}
                 footer={null}
                 width={600}
+                title="Edit Interview"
             >
                 <EditInterview id={interviewId} />
             </Modal>

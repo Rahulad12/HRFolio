@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { assessmentFormData, assessmentResponse, AssignmentData, assignmentResponse, globalResponse } from "../types/index"
+import { assessmentFormData, assessmentResponse, assessmentResponseById, AssignmentData, assignmentResponse, assignmentResponseById } from "../types/index"
 import { ASSESSMENT_URL } from "../constant";
 export const assessmentServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -40,13 +40,43 @@ export const assessmentServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Assessment"]
         }),
-        deleteAssignment: builder.mutation<globalResponse, string>({
+        deleteAssignment: builder.mutation<assignmentResponse, string>({
             query: (id) => ({
                 url: `${ASSESSMENT_URL}/assignment/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Assignment", "Assessment"]
-        })
+        }),
+        updateAssessment: builder.mutation<assessmentResponse, { data: assessmentFormData, id: string }>({
+            query: ({ data, id }) => ({
+                url: `${ASSESSMENT_URL}/${id}`,
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Assessment"]
+        }),
+        updateAssignmnet: builder.mutation<assignmentResponse, { data: AssignmentData, id: string }>({
+            query: ({ data, id }) => ({
+                url: `${ASSESSMENT_URL}/assignment/${id}`,
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Assignment", "Assessment"]
+        }),
+        getAssessmentById: builder.query<assessmentResponseById, string | undefined>({
+            query: (id) => ({
+                url: `${ASSESSMENT_URL}/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Assessment"]
+        }),
+        getAssignmentById: builder.query<assignmentResponseById, string | undefined>({
+            query: (id) => ({
+                url: `${ASSESSMENT_URL}/assignment/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Assignment", "Assessment"]
+        }),
     }),
 });
 
@@ -56,5 +86,9 @@ export const {
     useCreateAssignAssessmentMutation,
     useGetAssignedAssessmentQuery,
     useDeleteAssessmentMutation,
-    useDeleteAssignmentMutation
+    useDeleteAssignmentMutation,
+    useUpdateAssessmentMutation,
+    useUpdateAssignmnetMutation,
+    useGetAssessmentByIdQuery,
+    useGetAssignmentByIdQuery
 } = assessmentServiceApi;

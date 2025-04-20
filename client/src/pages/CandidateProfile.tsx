@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Tabs, Steps, Descriptions, Tag, Card, Timeline, Divider, Select } from 'antd';
+import { Tabs, Steps, Descriptions, Tag, Card, Timeline, Divider, Select, notification } from 'antd';
 import { useParams } from 'react-router-dom';
 import {
   UserCircle,
@@ -14,9 +14,8 @@ import {
 import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../services/candidateServiceApi';
 import { candidateData } from '../types';
 import CandidateProfileLoading from '../component/Loding/CandidateProfileLoading';
-import { toast } from 'react-toastify';
 import { makeCapitilized } from '../utils/TextAlter';
-
+import Predefineddata from '../data/PredefinedData';
 const { TabPane } = Tabs;
 const { Option } = Select;
 
@@ -42,7 +41,7 @@ const CandidateProfile = () => {
     status: 'shortlisted',
     _id: '',
   });
-
+  const [api, contextHolder] = notification.useNotification();
   useEffect(() => {
     if (data?.data) {
       setCandidate(data.data);
@@ -56,11 +55,19 @@ const CandidateProfile = () => {
     try {
       const res = await updateCandidate({ id: candidate._id, data: { status: newStatus } }).unwrap();
       if (res.success) {
-        toast.success(res.message);
+        api.success({
+          message: res.message,
+          placement: "topRight",
+          duration: 3000,
+        })
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update candidate status");
+      api.error({
+        message: "Error updating status",
+        placement: "topRight",
+        duration: 3000,
+      })
     }
   };
 
@@ -71,6 +78,7 @@ const CandidateProfile = () => {
 
   return (
     <div className="space-y-6">
+      {contextHolder}
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-start flex-wrap gap-4">
@@ -94,11 +102,13 @@ const CandidateProfile = () => {
             size="large"
             onChange={updateStatus}
           >
-            <Option value="shortlisted">Shortlisted</Option>
-            <Option value="first interview">First Interview</Option>
-            <Option value="second interview">Second Interview</Option>
-            <Option value="hired">Hired</Option>
-            <Option value="rejected">Rejected</Option>
+            {
+              Predefineddata.Status?.map((status) => (
+                <Option key={status.key} value={status.value}>
+                  {makeCapitilized(status.label)}
+                </Option>
+              ))
+            }
           </Select>
         </div>
 

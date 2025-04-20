@@ -10,12 +10,14 @@ interface userResponse {
 const token = localStorage.getItem("token") ? localStorage.getItem("token") : ""
 const username = localStorage.getItem("username") ? localStorage.getItem("username") : ""
 const email = localStorage.getItem("email") ? localStorage.getItem("email") : ""
+const picture = localStorage.getItem("picture") ? localStorage.getItem("picture") : ""
 
 const initialState: userResponse = {
     user: {
         username: username || "",
         email: email || "",
-        token: token || ""
+        token: token || "",
+        picture: picture || "",
     },
     success: false,
     message: ""
@@ -30,24 +32,27 @@ export const auth = createSlice({
             state.success = action.payload.success;
             state.message = action.payload.message
 
-            const { username, email, token } = action.payload.user;
+            const { username, email, token, picture } = action.payload.user;
 
             localStorage.setItem("token", token);
             localStorage.setItem("username", username);
             localStorage.setItem("email", email);
+            localStorage.setItem("picture", picture || "");
 
         },
         logout: (state) => {
             state.user = {
                 username: "",
                 email: "",
-                token: ""
+                token: "",
+                picture: "",
             };
             state.success = false;
             state.message = ""
             localStorage.removeItem("token");
             localStorage.removeItem("username");
             localStorage.removeItem("email");
+            localStorage.removeItem("picture");
         }
     }
 });

@@ -1,25 +1,39 @@
-import { Outlet, Navigate } from 'react-router-dom';
-
-import Navbar from './Nabbar';
+import { useState } from 'react';
+import { Layout as AntLayout } from 'antd';
 import Sidebar from './Sidebar';
-import { useAppSelector } from '../../Hooks/hook';
+import Navbar from './Nabbar';
+import { Outlet } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 
-export default function Layout() {
-    const { token: isAuthenticated } = useAppSelector((state => state.auth.user));
+const { Content } = AntLayout;
 
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
-    }
-
+const Layout = () => {
+    const { darkMode } = useTheme();
+    const [collapsed, setCollapsed] = useState(false);
+    const LayoutBg = darkMode ? '#020817' : '#FFFFFF';
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Navbar />
-            <div className="flex">
-                <Sidebar />
-                <main className="flex-1 p-6">
+        <AntLayout className='h-dvh transition-colors duration-300'>
+            <Sidebar
+                collapsed={collapsed}
+                setCollapsed={setCollapsed}
+                isDarkMode={darkMode}
+            />
+
+            <AntLayout
+                className={`transition-all duration-300 ${collapsed ? 'ml-[80px]' : 'ml-[260px]'
+                    }`}
+            >
+                <Navbar collapsed={collapsed} isDarkMode={darkMode} />
+                <Content
+                    className="px-2 mt-16 min-h-screen overflow-y-auto transition-all duration-300" style={{
+                        backgroundColor: LayoutBg
+                    }}>
+
                     <Outlet />
-                </main>
-            </div>
-        </div>
+                </Content>
+            </AntLayout>
+        </AntLayout>
     );
-}
+};
+
+export default Layout;

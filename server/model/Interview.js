@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import candidate from "./Candidate.js";
 
 const interviewSchema = new mongoose.Schema({
     candidate: {
@@ -25,5 +26,8 @@ const interviewSchema = new mongoose.Schema({
     },
 });
 
+
 const Interview = mongoose.model("interview", interviewSchema);
+
+
 export default Interview;

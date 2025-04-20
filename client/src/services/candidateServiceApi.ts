@@ -24,14 +24,12 @@ export const candidateServiceApi = api.injectEndpoints({
                 url: `${CANDIDATE_URL}`,
                 method: "GET",
                 params: {
-                    name: filters.name,
-                    technology: filters.technology,
+                    searchText: filters.searchText,
                     status: filters.status,
-                    level: filters.level
                 },
             }),
             providesTags: ["Candidate"],
-            
+
         }),
 
         getCandidateById: builder.query<candidateIdResposne, string | undefined>({

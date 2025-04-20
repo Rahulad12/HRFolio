@@ -12,10 +12,8 @@ export const storeCandidate = (candidate: candidateData[]) => (dispatch: AppDisp
 export const getCandidate = () => {
     const dispatch = useAppDispatch();
     const { data, isSuccess } = useGetCandidateQuery({
-        name: "",
-        technology: "",
+        searchText: "",
         status: "",
-        level: ""
     },
         {
             refetchOnMountOrArgChange: false

@@ -1,78 +1,39 @@
-import { Button, Card, Modal, Tabs } from "antd";
+import { Modal } from "antd";
 import { motion } from "framer-motion"
 import { Plus } from "lucide-react"
 import { useEffect, useState } from "react";
-import AssessmentForm from "../component/Form/AssessmentForm";
-import TabPane from "antd/es/tabs/TabPane";
-import AssignedAssessments from "../component/Assessment/AssignedAssessments";
-import AssessmentsList from "../component/Assessment/AssessmentsList";
-import AssignAssessment from "../component/Assessment/AssignAssessment";
-import { useGetAssessmentQuery, useGetAssignedAssessmentQuery } from "../services/assessmentServiceApi";
-import { storeAssessment, storeAssignedAssessment } from "../action/StoreAssessment";
+import AssessmentForm from "../component/Assessment/AssessmentForm";
+import { useGetAssessmentQuery } from "../services/assessmentServiceApi";
+import { storeAssessment } from "../action/StoreAssessment";
 import { useAppDispatch } from "../Hooks/hook";
-import { getCandidate } from "../action/SoreCandidate";
+import { getCandidate } from "../action/StoreCandidate";
+import AssessmentsList from "../component/Assessment/AssessmentsList";
+import Hero from "../component/common/Hero";
+import { buttonState } from "../slices/ButtonPropsSlices";
 
 const Assessment = () => {
     getCandidate(); // this function helps to get the data from store so i cannot have to store again and again
 
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('1');
     const { data: assessment } = useGetAssessmentQuery();
-    const { data: assignedAssessment } = useGetAssignedAssessmentQuery();
 
     useEffect(() => {
         if (assessment?.data) {
             dispatch(storeAssessment(assessment?.data));
         }
-        if (assignedAssessment?.data) {
-            dispatch(storeAssignedAssessment(assignedAssessment?.data));
-        }
-    }, [assessment, assignedAssessment]);
+        dispatch(buttonState({ text: "Create Assessment", icon: <Plus className="w-4 h-4" />, onClick: showModal }));
+    }, [assessment,dispatch]);
 
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => setIsModalOpen(false);
 
-    const showAssignModal = () => setIsAssignModalOpen(true);
-    const handleAssignCancel = () => setIsAssignModalOpen(false);
-
-
     return (
         <div className="p-4 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Manage Assessments</h1>
-                <div className="space-x-4">
-                    <Button
-                        icon={<Plus />}
-                        onClick={showAssignModal}
-                    >
-                        Bulk Assign
-                    </Button>
-                    <Button
-                        type="primary"
-                        icon={<Plus />}
-                        onClick={showModal}
-                    >
-                        Create Assessment
-                    </Button>
-                </div>
-            </div>
+            <Hero title="Assessments" />
             {/* tabs to select assessment type */}
-            <Tabs activeKey={activeTab} onChange={setActiveTab}>
-                <TabPane tab="Assessment List" key="1">
-                    <Card className="flex flex-col gap-4">
-                        <AssessmentsList />
-                    </Card>
-                </TabPane>
-
-                <TabPane tab="Assigned Assessments" key="2">
-                    <Card className="bg-white rounded-lg shadow">
-                        <AssignedAssessments />
-                    </Card>
-                </TabPane>
-            </Tabs>
-
+            <AssessmentsList />
+            {/* modal to create assessment */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -83,19 +44,11 @@ const Assessment = () => {
                     open={isModalOpen}
                     onCancel={handleCancel}
                     footer={null}
+                    title="Create Assessment"
                 >
                     <AssessmentForm />
                 </Modal>
             </motion.div>
-
-            <Modal
-                open={isAssignModalOpen}
-                onCancel={handleAssignCancel}
-                footer={null}
-            >
-                <AssignAssessment />
-
-            </Modal>
         </div>
     )
 }

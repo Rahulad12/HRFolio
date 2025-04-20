@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { makeCapitilized } from '../../utils/TextAlter'
 import { useGetCandidateQuery } from '../../services/candidateServiceApi'
 import { useEffect } from 'react'
-import { storeCandidate } from '../../action/SoreCandidate'
+import { storeCandidate } from '../../action/StoreCandidate'
 import { motion } from 'framer-motion'
 import { useCreateInterviewMutation, useGetInterviewerQuery } from '../../services/interviewServiceApi';
 
@@ -18,10 +18,8 @@ const InterviewForm = () => {
 
     const [createInterview, { isLoading: interviewCreateLoading }] = useCreateInterviewMutation();
     const { data: canidateData } = useGetCandidateQuery({
-        name: "",
-        technology: "",
+        searchText: "",
         status: "",
-        level: ""
     });
     const { data: interviewer } = useGetInterviewerQuery();
     const [api, contextHolder] = notification.useNotification();
@@ -30,8 +28,8 @@ const InterviewForm = () => {
             dispatch(storeCandidate(canidateData.data));
         }
     })
-    const canidate = useAppSelector((state) => state.candidate.canditate);
-    const filteredCandidates = canidate.filter((candidate) => candidate.status !== 'rejected' && candidate.status !== 'hired' && candidate.status !== "shortlisted");
+    const candidate = useAppSelector((state) => state.candidate.candidate);
+    const filteredCandidates = candidate?.filter((candidate) => candidate.status !== 'rejected' && candidate.status !== 'hired' && candidate.status !== "shortlisted");
 
     const onFinish = async (values: interviewData) => {
         console.log(values);
@@ -44,35 +42,26 @@ const InterviewForm = () => {
                 api.success({
                     message: `${makeCapitilized(res.message)}`,
                     description: 'The interview has been successfully scheduled.',
-                    placement: 'top',
+                    placement: 'topRight',
                 })
+                form.resetFields();
             }
         } catch (error: any) {
             api.error({
                 message: `${makeCapitilized(error.message)}`,
                 description: 'An error occurred while scheduling the interview. Please try again.',
-                placement: 'top',
+                placement: 'topRight',
             })
         }
     }
 
     return (
-
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-xl shadow"
         >
             {contextHolder}
-            <motion.h2
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="text-xl font-semibold mb-4"
-            >
-                Schedule Interview
-            </motion.h2>
 
             <Form
                 form={form}
@@ -80,9 +69,8 @@ const InterviewForm = () => {
                 onFinish={onFinish}
                 autoComplete="off"
             >
-                <Row gutter={24}>
-                    {/* First Column - Candidate, Interviewer, Time */}
-                    <Col xs={24} md={12}>
+                <Row gutter={12}>
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -102,7 +90,9 @@ const InterviewForm = () => {
                                 </Select>
                             </Form.Item>
                         </motion.div>
+                    </Col>
 
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -122,20 +112,20 @@ const InterviewForm = () => {
                                 </Select>
                             </Form.Item>
                         </motion.div>
-
+                    </Col>
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.4 }}
                         >
                             <Form.Item name="time" label="Interview Time" rules={[{ required: true }]}>
-                                <TimePicker format="HH:mm" className="w-full" />
+                                <TimePicker format="HH:mm" className="w-full" size='large' />
                             </Form.Item>
                         </motion.div>
                     </Col>
 
-                    {/* Second Column - Calendar Picker (Only Date) */}
-                    <Col xs={24} md={12}>
+                    <Col span={12}>
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -161,7 +151,7 @@ const InterviewForm = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-right mt-4"
+                    className="text-left mt-4"
                 >
                     <Form.Item>
                         <motion.div
@@ -181,7 +171,7 @@ const InterviewForm = () => {
                     </Form.Item>
                 </motion.div>
             </Form>
-        </motion.div>
+        </motion.div >
     )
 }
 

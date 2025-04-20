@@ -58,7 +58,7 @@ const createCandidate = async (req, res) => {
 const getCandidateById = async (req, res) => {
     const { id } = req.params;
     try {
-        const candidate = await Candidate.findById(id).select("-createdAt -updatedAt -__v").populate({
+        const candidate = await Candidate.findById(id).select(" -updatedAt -__v").populate({
             path: "references",
             select: "-createdAt -updatedAt -__v -candidate"
         });
@@ -95,27 +95,25 @@ const getCandidateById = async (req, res) => {
 //     }
 // }
 const getAllCandidates = async (req, res) => {
-    const { name, technology, level, status } = req.query;
-
+    const { searchText, status } = req.query;
     try {
         // If no filter is passed, you can return an error or return all
         const query = {};
 
-        if (name) {
-            query.name = { $regex: name, $options: "i" };
+        if (searchText) {
+            query.$or = [
+                { name: { $regex: searchText, $options: "i" } },
+                { technology: { $regex: searchText, $options: "i" } },
+                { level: { $regex: searchText, $options: "i" } },
+            ];
         }
-        if (technology) {
-            query.technology = { $regex: technology, $options: "i" };
-        }
-        if (level) {
-            query.level = { $regex: level, $options: "i" };
-        }
+
         if (status) {
             query.status = { $regex: status, $options: "i" };
         }
 
         const candidates = await Candidate.find(query).select(
-            "-createdAt -updatedAt -__v -references"
+            "-updatedAt -__v -references"
         );
 
         if (!candidates.length) {

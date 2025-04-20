@@ -1,4 +1,5 @@
 import type { Dayjs } from 'dayjs';
+import { Key } from 'react';
 export type globalResponse = {
     success: boolean;
     message: string;
@@ -8,6 +9,7 @@ export type user = {
     username: string;
     email: string;
     token: string;
+    picture: string | null;
 }
 
 export type userFormData = {
@@ -34,10 +36,8 @@ export type candidateFormData = {
 }
 
 export type candidateFilter = {
-    name: string;
-    technology: string;
+    searchText: string;
     status: string;
-    level: string;
 }
 
 export type referenceResponse = {
@@ -58,7 +58,7 @@ export type candidateData = {
     references: referenceResponse[];
     status: 'shortlisted' | 'first interview' | 'second interview' | 'hired' | 'rejected';
     _id: string
-
+    createdAt: string
 }
 export type candidateResponse = {
     success: boolean;
@@ -124,11 +124,15 @@ export type assessmentResponse = {
     message: string;
     data: AssessmentDataResponse[];
 }
-
+export type assessmentResponseById = {
+    success: boolean;
+    message: string;
+    data: AssessmentDataResponse
+}
 export type AssignmentData = {
-    candidate: string[];
+    candidate: string[] | Key[];
     assessment: string;
-    // date: Dayjs;
+    date: Dayjs;
 }
 
 export type AssignmentDataResponse = {
@@ -150,4 +154,10 @@ export type assignmentResponse = {
     success: boolean;
     message: string;
     data: AssignmentDataResponse[];
+}
+
+export type assignmentResponseById = {
+    success: boolean;
+    message: string;
+    data: AssignmentDataResponse;
 }

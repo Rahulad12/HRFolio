@@ -1,60 +1,105 @@
-import { Button, Table } from 'antd'
+import { Button, Modal, notification, Popconfirm, Tooltip } from 'antd'
 import { motion } from 'framer-motion'
-import { EditOutlined } from '@ant-design/icons'
-import { useAppSelector } from '../../Hooks/hook'
-import { Trash2 } from 'lucide-react'
+import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
+import { Edit, Trash2 } from 'lucide-react'
 import { makeCapitilized } from '../../utils/TextAlter'
-import type { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
+import { useDeleteAssignmentMutation, useUpdateAssignmnetMutation } from '../../services/assessmentServiceApi'
+import { storeAssignedAssessment } from '../../action/StoreAssessment'
+import EditAssignment from '../Form/Edit/EditAssignment'
+import { useState } from 'react'
+import { AssignmentData, AssignmentDataResponse } from '../../types'
+import CustomTable from '../common/Table'
 
-interface FlattenedAssessment {
-    key: string;
-    assessment: string;
-    type: string;
-    technology: string;
-    level: string;
-    status: string;
-    date: Dayjs;
-    candidate: string;
-}
+import { candidateData, assessmentFormData } from '../../types'
+
+
 
 const AssignedAssessments = () => {
+    const dispatch = useAppDispatch();
 
     const { assignedAssessments } = useAppSelector(state => state.assessments);
-    const filterAssigned = assignedAssessments?.filter(item => item.assessment !== null);
-    const handleEditAssessment = () => {
+    const filterAssigned: AssignmentDataResponse[] = assignedAssessments?.filter(item => item.assessment !== null);
+    const [api, contextHolder] = notification.useNotification();
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [assignmentId, setAssignmentId] = useState<string>('');
 
+    const showModal = (id: string) => {
+        setIsModalOpen(true)
+        setAssignmentId(id)
+    };
+    const handleCancel = () => setIsModalOpen(false);
+
+    const [deleteAssignment] = useDeleteAssignmentMutation();
+    const [updateAssignmnet] = useUpdateAssignmnetMutation();
+    const handleEditAssessment = async (value: AssignmentData) => {
+        try {
+            const res = await updateAssignmnet({ data: value, id: assignmentId });
+            if (res.data && res?.data?.success) {
+                dispatch(storeAssignedAssessment(Array.from(res?.data?.data)));
+                api.success({
+                    message: `${res?.data?.message}`,
+                    placement: "topRight",
+                    duration: 3000,
+                })
+            }
+        } catch (error: any) {
+            api.error({
+                message: `${error?.data?.message}`,
+                placement: "topRight",
+                duration: 3000,
+            })
+        }
     }
-    const handleDeleteAssessment = () => {
+    const handleDeleteAssessment = async (id: string) => {
+        try {
+            const res = await deleteAssignment(id);
+            if (res.data && res?.data?.success) {
+                dispatch(storeAssignedAssessment(Array.from(res?.data?.data)));
+                api.success({
+                    message: `${res?.data?.message}`,
+                    placement: "topRight",
+                    duration: 3000,
+                })
+            }
 
+        } catch (error: any) {
+            api.error({
+                message: `${error?.data?.message}`,
+                placement: "topRight",
+                duration: 3000,
+            })
+        }
     }
     const columns = [
         {
             title: 'Assessment',
             dataIndex: 'assessment',
             key: 'assessment',
-            render: (text: string) => (
+            render: (record: assessmentFormData) => (
+                console.log(record),
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span className='font-semibold'>{makeCapitilized(record?.title)}</span>
                 </div>
             )
         },
         {
             title: 'Type',
-            dataIndex: 'type',
+            dataIndex: 'assessment',
             key: 'type',
-            render: (text: string) => (
+            render: (record: assessmentFormData) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span>{makeCapitilized(record?.type)}</span>
                 </div>
             )
         },
         {
             title: 'Technology',
-            dataIndex: 'technology',
+            dataIndex: 'assessment',
             key: 'technology',
-            render: (text: string) => (
+            render: (record: assessmentFormData) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span>{makeCapitilized(record?.technology)}</span>
                 </div>
             )
         },
@@ -62,11 +107,11 @@ const AssignedAssessments = () => {
 
         {
             title: 'Level',
-            dataIndex: 'level',
+            dataIndex: 'assessment',
             key: 'level',
-            render: (text: string) => (
+            render: (record: assessmentFormData) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span>{makeCapitilized(record?.level)}</span>
                 </div>
             )
         },
@@ -81,12 +126,12 @@ const AssignedAssessments = () => {
             )
         },
         {
-            title: 'Start Date',
+            title: 'Date',
             dataIndex: 'date',
-            key: 'startDate',
+            key: 'date',
             render: (text: string) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span>{dayjs(text).format('YYYY-MM-DD')}</span>
                 </div>
             )
         },
@@ -94,9 +139,9 @@ const AssignedAssessments = () => {
             title: 'Candidate',
             dataIndex: 'candidate',
             key: 'candidate',
-            render: (text: string) => (
+            render: (record: candidateData) => (
                 <div className='flex gap-2'>
-                    <span>{makeCapitilized(text)}</span>
+                    <span>{makeCapitilized(record?.name)}</span>
                     {/* <span>{makeCapitilized(record)}</span> */}
                 </div>
             )
@@ -104,22 +149,35 @@ const AssignedAssessments = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any) => (
+            render: (_: any, record: AssignmentDataResponse) => (
                 <div className="flex gap-2">
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Button
-                            type="text"
-                            icon={<EditOutlined />}
-                            onClick={() => handleEditAssessment()}
-                        />
+                        <Tooltip title="Edit Assignment">
+                            <Button
+                                type="text"
+                                icon={<Edit className='w-4 h-4' />}
+                                onClick={() => showModal(record._id)}
+                            />
+                        </Tooltip>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Button
-                            type="text"
-                            danger
-                            icon={<Trash2 className='w-4 h-4' />}
-                            onClick={() => handleDeleteAssessment()}
-                        />
+                        <Tooltip title="Delete">
+                            <Popconfirm
+                                title="Delete this assignment?"
+                                description="Are you sure you want to delete, This action cannot be undone."
+                                okButtonProps={{ danger: true }}
+                                okText="Yes"
+                                cancelText="No"
+                                onConfirm={() => handleDeleteAssessment(record._id)}
+                            >
+                                <Button
+                                    type="text"
+                                    danger
+                                    icon={<Trash2 className='w-4 h-4' />}
+                                />
+                            </Popconfirm>
+
+                        </Tooltip>
                     </motion.div>
                 </div>
             ),
@@ -129,30 +187,23 @@ const AssignedAssessments = () => {
 
     return (
         <div>
+            {contextHolder}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, type: "spring" }}
                 className="bg-white rounded-lg shadow overflow-hidden"
             >
-                <Table
-                    columns={columns}
-                    dataSource={filterAssigned?.map((item, index): FlattenedAssessment => ({
-                        key: item._id || index.toString(),
-                        assessment: item.assessment?.title,
-                        technology: item.assessment?.technology,
-                        level: item.assessment?.level,
-                        type: item.assessment?.type,
-                        status: item.status,
-                        date: item.date,
-                        candidate: `${item.candidate?.name} ${item.candidate?.email}`,
-                    }))}
-
-                    size='small'
-                    className="antd-table-custom"
-                />
+                <CustomTable columns={columns} data={filterAssigned} loading={false} pageSize={5} />
+                <Modal
+                    open={isModalOpen}
+                    footer={null}
+                    onCancel={handleCancel}
+                    title="Edit Assignment"
+                >
+                    <EditAssignment handleEdit={handleEditAssessment} id={assignmentId} />
+                </Modal>
             </motion.div>
-
         </div>
     )
 }

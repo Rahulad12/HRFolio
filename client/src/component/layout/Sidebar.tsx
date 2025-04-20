@@ -69,9 +69,9 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
       <div className="h-16 flex items-center justify-between px-4 border-b" style={{ borderColor }}>
         <div className="flex items-center">
           {
-            collapsed && (<div className="w-10 h-10 rounded-lg flex items-center justify-center bg-orange-600">
+            collapsed && (<div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-950">
               <>
-                <span className="text-xl font-semibold text-blue-800">H</span>
+                <span className="text-xl font-semibold text-orange-600">H</span>
                 <span className="text-xl font-semibold text-white">R</span>
               </>
 

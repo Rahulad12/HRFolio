@@ -37,11 +37,11 @@ const Dashboard = () => {
   }, [candidate, interview, dispatch]);
 
   return (
-    <div className="dashboard-container  p-4">
+    <div className="dashboard-container p-4">
       {/* Welcome Header */}
       <Space direction="vertical" size="middle">
         <div className="flex justify-between items-center">
-          <Typography.Title level={3} style={{ margin: 0 }}>
+          <Typography.Title level={3} className="m-4">
             Welcome back, {user?.username}
           </Typography.Title>
         </div>

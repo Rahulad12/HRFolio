@@ -170,6 +170,7 @@ const AssessmentsList = () => {
                     onCancel={handleCancel}
                     open={isModalOpen}
                     footer={null}
+                    title="Edit Assessment"
                 >
                     <EditAssessment handleEdit={handleEditAssessment} id={assessmentId} />
                 </Modal>

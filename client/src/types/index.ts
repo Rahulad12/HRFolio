@@ -36,10 +36,8 @@ export type candidateFormData = {
 }
 
 export type candidateFilter = {
-    name: string;
-    technology: string;
+    searchText: string;
     status: string;
-    level: string;
 }
 
 export type referenceResponse = {

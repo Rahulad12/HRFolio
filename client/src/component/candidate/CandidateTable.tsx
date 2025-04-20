@@ -118,7 +118,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             width: 100,
             render: (status: string) => (
                 <Tag color={statusColors[status.toLowerCase()] || 'default'}>
-                    {status}
+                    {makeCapitilized(status)}
                 </Tag>
             ),
         },
@@ -128,16 +128,6 @@ const CandidateTable = ({ loading, error }: TableProps) => {
             width: 180,
             render: (_: any, record: candidateData) => (
                 <Space size="small">
-                    {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <Tooltip title="View Details">
-                            <Button
-                                type="text"
-                                icon={<Eye className="w-4 h-4" />}
-                                onClick={() => navigate(`/dashboard/candidate/${record._id}`)}
-                                className="text-blue-500 hover:bg-blue-50"
-                            />
-                        </Tooltip>
-                    </motion.div> */}
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                         <Tooltip title="Edit">
                             <Button

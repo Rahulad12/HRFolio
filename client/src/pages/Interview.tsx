@@ -6,7 +6,6 @@ import { storeInterview } from '../action/StoreInterview';
 import { useAppDispatch, useAppSelector } from '../Hooks/hook';
 import { useGetInterviewQuery } from '../services/interviewServiceApi';
 import InterviewShow from '../component/interview/InterviewShow';
-import PrimaryButton from '../component/ui/button/Primary';
 import Hero from '../component/common/Hero';
 import { buttonState } from '../slices/ButtonPropsSlices';
 
@@ -18,9 +17,8 @@ const Interview = () => {
     const { data, isLoading: interviewLoading } = useGetInterviewQuery({
         date: filterInterview?.date?.format("YYYY-MM-DD" + " " + "HH:mm:ss") || "",
         status: filterInterview?.interviewStatus
-        // date: "",
-        // status: ""
     });
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const showModal = () => setIsModalOpen(true);
     const handleCancel = () => setIsModalOpen(false);
@@ -46,6 +44,7 @@ const Interview = () => {
                 open={isModalOpen}
                 onCancel={handleCancel}
                 footer={null}
+                title="Schedule Interview"
             >
                 <InterviewForm />
             </Modal>

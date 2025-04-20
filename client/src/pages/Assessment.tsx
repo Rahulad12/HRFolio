@@ -6,7 +6,7 @@ import AssessmentForm from "../component/Assessment/AssessmentForm";
 import { useGetAssessmentQuery } from "../services/assessmentServiceApi";
 import { storeAssessment } from "../action/StoreAssessment";
 import { useAppDispatch } from "../Hooks/hook";
-import { getCandidate } from "../action/SoreCandidate";
+import { getCandidate } from "../action/StoreCandidate";
 import AssessmentsList from "../component/Assessment/AssessmentsList";
 import Hero from "../component/common/Hero";
 import { buttonState } from "../slices/ButtonPropsSlices";
@@ -44,6 +44,7 @@ const Assessment = () => {
                     open={isModalOpen}
                     onCancel={handleCancel}
                     footer={null}
+                    title="Create Assessment"
                 >
                     <AssessmentForm />
                 </Modal>

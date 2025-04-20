@@ -4,7 +4,7 @@ import { UserPlus } from "lucide-react";
 import CandidateForm from "../component/candidate/CandidateForm";
 import { useGetCandidateQuery } from "../services/candidateServiceApi";
 import { useAppDispatch, useAppSelector } from "../Hooks/hook";
-import { storeCandidate } from "../action/SoreCandidate";
+import { storeCandidate } from "../action/StoreCandidate";
 import CandidateTable from "../component/candidate/CandidateTable";
 import TableSearch from "../component/common/TableSearch";
 import { buttonState } from '../slices/ButtonPropsSlices';
@@ -15,10 +15,8 @@ const CvUploader = () => {
     const filters = useAppSelector((state) => state.search);
 
     const { isLoading, data: candidate, isError, refetch } = useGetCandidateQuery({
-        name: filters.name,
-        technology: filters.technology,
-        status: filters.status,
-        level: filters.level
+        searchText: filters?.text,
+        status: filters?.status,
     });
 
     const dispatch = useAppDispatch();
@@ -58,6 +56,7 @@ const CvUploader = () => {
                 footer={null}
                 width={800}
                 destroyOnClose
+                title="Add Candidate"
             >
                 <CandidateForm />
             </Modal>

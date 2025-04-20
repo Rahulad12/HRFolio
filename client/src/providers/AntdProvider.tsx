@@ -1,4 +1,4 @@
-import { ConfigProvider, App as AntdApp } from "antd";
+import { ConfigProvider, App as AntdApp, theme as antdTheme } from "antd";
 import { useTheme } from "../context/ThemeContext";
 
 const AntdProvider = ({ children }: { children: React.ReactNode }) => {
@@ -10,8 +10,11 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
   const colorHover = darkMode ? "#3f3f55" : "#f0f0f0"; // Hover color for menu items
 
   return (
-    <ConfigProvider 
+    <ConfigProvider
       theme={{
+        algorithm: darkMode
+          ? antdTheme.darkAlgorithm
+          : antdTheme.defaultAlgorithm,
         token: {
           colorPrimary,
           colorBgBase,
@@ -37,13 +40,13 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
           Table: {
             colorText: colorTextBase,
             colorBgContainer: colorBgBase,
-            headerBg: darkMode ? "#2A2E45" : "#f4f4f8",
-            headerColor: darkMode ? "#C0C0C0" : "#191D32",
+            headerBg: darkMode ? "#2A2E45" : "#191D32",
+            headerColor: darkMode ? "#C0C0C0" : "#FFFF",
             colorTextHeading: colorPrimary,
             borderColor: darkMode ? "#2A2E45" : "#e5e7eb",
             paddingSM: 8,
             fontSize: 13,
-            footerBg: darkMode ? "#2A2E45" : "#f4f4f8",
+            footerBg: darkMode ? "#2A2E45" : "#fafaf7",
             footerColor: colorPrimary,
             borderRadius: 4,
           },

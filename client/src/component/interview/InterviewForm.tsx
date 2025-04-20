@@ -1,11 +1,11 @@
 import { interviewData } from '../../types'
-import { Col, DatePicker, Form, Row, Select, Button, TimePicker, notification, Typography } from 'antd'
+import { Col, DatePicker, Form, Row, Select, Button, TimePicker, notification } from 'antd'
 import dayjs from 'dayjs'
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import { makeCapitilized } from '../../utils/TextAlter'
 import { useGetCandidateQuery } from '../../services/candidateServiceApi'
 import { useEffect } from 'react'
-import { storeCandidate } from '../../action/SoreCandidate'
+import { storeCandidate } from '../../action/StoreCandidate'
 import { motion } from 'framer-motion'
 import { useCreateInterviewMutation, useGetInterviewerQuery } from '../../services/interviewServiceApi';
 
@@ -18,10 +18,8 @@ const InterviewForm = () => {
 
     const [createInterview, { isLoading: interviewCreateLoading }] = useCreateInterviewMutation();
     const { data: canidateData } = useGetCandidateQuery({
-        name: "",
-        technology: "",
+        searchText: "",
         status: "",
-        level: ""
     });
     const { data: interviewer } = useGetInterviewerQuery();
     const [api, contextHolder] = notification.useNotification();
@@ -58,17 +56,12 @@ const InterviewForm = () => {
     }
 
     return (
-
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
         >
             {contextHolder}
-
-            <Typography.Title level={3}>
-                Schedule Interview
-            </Typography.Title>
 
             <Form
                 form={form}
@@ -158,7 +151,7 @@ const InterviewForm = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-right mt-4"
+                    className="text-left mt-4"
                 >
                     <Form.Item>
                         <motion.div

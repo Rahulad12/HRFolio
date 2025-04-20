@@ -1,4 +1,4 @@
-import { Badge, Card, Table } from "antd"
+import { Badge, Card } from "antd"
 import CustomTable from "../common/Table"
 const RecentAssessment = () => {
     const columns = [{
@@ -33,8 +33,8 @@ const RecentAssessment = () => {
         title: "Assessment Date",
         dataIndex: "assessment",
         key: "date",
-        render: (text: string, record: any) => {
-            return <span>{record?.assessment?.date}</span>
+        render: (record: any) => {
+            return <span>{record?.date}</span>
         }
     }
     ]
@@ -64,15 +64,7 @@ const RecentAssessment = () => {
     ]
     return (
         <Card title="Recent Assessment">
-            <Table
-                columns={columns}
-                dataSource={data}
-                loading={false}
-                rowKey="Key"
-                size="small"
-                scroll={{ x: 55 * 5 }}
-                pagination={false}
-            />
+            <CustomTable loading={false} data={data} columns={columns} />
         </Card>
     )
 }

@@ -19,16 +19,15 @@ const TableSearch = () => {
 
     const [searchText, setSearchText] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("All");
-    console.log(searchText);
 
     const handleSearch = () => {
-        dispatch(storeSearch(searchText, "", selectedStatus, dayjs(), ""));
+        dispatch(storeSearch(searchText, "", dayjs(), ""));
     };
 
     const handleStatusChange: MenuProps["onClick"] = (info) => {
         const status = info.key;
         setSelectedStatus(status);
-        dispatch(storeSearch(searchText, "", status, dayjs(), ""));
+        dispatch(storeSearch("", status, dayjs(), ""));
     }
 
     const dropdownItems: MenuProps["items"] = statusOptions.map((option) => ({
@@ -38,19 +37,19 @@ const TableSearch = () => {
 
 
     return (
-        <div className="flex flex-wrap gap-4 justify-between max-w-full p-2">
+        <div className="flex flex-wrap gap-4 justify-between items-center p-2">
             <Input.Search
-                placeholder="Search by name or technology..."
+                placeholder="Search by name or technology or level..."
                 allowClear
                 enterButton={<Search className="w-4 h-4" />}
                 value={searchText}
-                style={{ width: 304 }}
+                style={{ width: 400}}
                 onChange={(e) => {
                     const value = e.target.value;
                     setSearchText(value);
 
                     if (value === "") {
-                        dispatch(storeSearch("", "all", selectedStatus, dayjs()));
+                        dispatch(storeSearch("", selectedStatus, dayjs(), ""));
                     }
                 }}
                 onSearch={handleSearch}
@@ -63,20 +62,6 @@ const TableSearch = () => {
                     <span className="text-sm text-blue-950">{selectedStatus}</span>
                 </div>
             </Dropdown>
-            {/* <Select
-                placeholder="Filter by Status"
-                value={selectedStatus || undefined}
-                allowClear
-                showSearch
-                onChange={(value) => {
-                    const newValue = value || "";
-                    setSelectedStatus(newValue);
-
-                    dispatch(storeSearch(searchText, "all", newValue, dayjs(), ""));
-                }}
-                className="min-w-[200px]"
-                options={statusOptions}
-            /> */}
         </div>
     );
 };

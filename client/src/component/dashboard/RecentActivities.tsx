@@ -105,7 +105,7 @@ const RecentActivities = () => {
     );
 
     return (
-        <Card className="h-fit w-full" extra={<FilterDropdown />}>
+        <Card className="h-fit w-full" title="Recent Candidates" extra={<FilterDropdown />}>
             <CustomTable loading={false} data={filteredCandidates} columns={columns} pageSize={5} />
         </Card>
     );

@@ -5,7 +5,7 @@ import AssignAssessmentForm from "../component/Assessment/AssignAssessmentForm";
 import { useGetAssignedAssessmentQuery, useGetAssessmentQuery } from "../services/assessmentServiceApi";
 import { storeAssessment, storeAssignedAssessment } from "../action/StoreAssessment";
 import { useAppDispatch } from "../Hooks/hook";
-import { getCandidate } from "../action/SoreCandidate";
+import { getCandidate } from "../action/StoreCandidate";
 import AssignedAssessments from "../component/Assessment/AssignedAssessments";
 import Hero from "../component/common/Hero";
 import { buttonState } from "../slices/ButtonPropsSlices";
@@ -40,12 +40,14 @@ const AssignedAssessment = () => {
 
             <AssignedAssessments />
             {/* modal to create assessment */}
-
-
             <Modal
                 open={isAssignModalOpen}
                 onCancel={handleCancel}
                 footer={null}
+                title="Assign Assessment"
+                width={800}
+                className="flex flex-col gap-4 items-center justify-center"
+
             >
                 <AssignAssessmentForm />
 

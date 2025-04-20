@@ -3,7 +3,7 @@ import { setText, setStatus, setDate, setInterviewStatus } from "../slices/setSe
 import type { Dayjs } from 'dayjs';
 
 export const storeSearch = (searchText: string, status: string, date: Dayjs | null, interviewStatus: string) => (dispatch: AppDispatch) => {
-
+    console.log(searchText, status, date, interviewStatus);
     if (searchText) {
         dispatch(setText(searchText));
     }

@@ -1,7 +1,7 @@
 import { Card, Col, Divider, Row, Typography, Space } from "antd";
 import DashboardHead from "../component/dashboard/DashboardHead";
 import { useEffect } from "react";
-import { storeCandidate } from "../action/SoreCandidate";
+import { storeCandidate } from "../action/StoreCandidate";
 import { useAppDispatch, useAppSelector } from "../Hooks/hook";
 import { useGetCandidateQuery } from "../services/candidateServiceApi";
 import RecentActivities from "../component/dashboard/RecentActivities";
@@ -15,13 +15,12 @@ import ExperienceGraph from "../component/dashboard/graph/ExperienceGraph";
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
-  const filters = useAppSelector((state) => state.search);
+
   const { user } = useAppSelector(state => state.auth);
+
   const { data: candidate } = useGetCandidateQuery({
-    name: filters.name,
-    technology: filters.technology,
-    status: filters.status,
-    level: filters.level
+    searchText: "",
+    status: "",
   });
   const { data: interview } = useGetInterviewQuery({
     date: "",

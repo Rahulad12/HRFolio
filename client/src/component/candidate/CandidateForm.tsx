@@ -41,7 +41,6 @@ const CandidateForm = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
         >
-            <Typography.Title level={3} >Add Candidate</Typography.Title>
             <Form
                 form={form}
                 layout="vertical"
@@ -249,7 +248,7 @@ const CandidateForm = () => {
                     )}
                 </Form.List>
 
-                <div className="mt-10 text-right">
+                <div className="mt-10 text-left">
                     <Button
                         type="primary"
                         htmlType="submit"

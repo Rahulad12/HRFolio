@@ -13,7 +13,6 @@ import {
     Typography,
     Modal,
     notification,
-    Timeline
 } from 'antd';
 import {
     CalendarDays, Clock, Mail, MessageSquare, User, Edit
@@ -62,7 +61,7 @@ const InterviewShow = ({ loading }: Props) => {
     );
 
     useEffect(() => {
-        dispatch(storeSearch("", "", "", "", selectedDate, selectedStatus));
+        dispatch(storeSearch("", "", selectedDate, selectedStatus));
     }, [selectedDate, selectedStatus, dispatch]);
 
     const handleDateChange = (date: Dayjs | null) => {
@@ -360,6 +359,7 @@ const InterviewShow = ({ loading }: Props) => {
                 onCancel={closeModal}
                 footer={null}
                 width={600}
+                title="Edit Interview"
             >
                 <EditInterview id={interviewId} />
             </Modal>

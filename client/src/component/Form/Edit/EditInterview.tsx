@@ -1,4 +1,4 @@
-import { Col, Form, Row, DatePicker, TimePicker, Select, Card, Button, Skeleton, notification } from 'antd';
+import { Col, Form, Row, DatePicker, TimePicker, Select, Card, Button, Skeleton, notification, message } from 'antd';
 import { interviewData } from "../../../types/index";
 import { useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } from '../../../services/interviewServiceApi';
 import { useEffect } from 'react';
@@ -34,18 +34,10 @@ const EditInterview = ({ id }: Props) => {
         try {
             const res = await updateInterview({ id, data: values }).unwrap();
             if (res.success) {
-                api.success({
-                    message: 'Interview Updated',
-                    description: 'The interview details have been successfully updated.',
-                    placement: 'top',
-                });
+                message.success(res.message);
             }
         } catch (error: any) {
-            api.error({
-                message: `${error.message}`,
-                description: 'An error occurred while updating the interview details. Please try again.',
-                placement: 'top',
-            });
+            message.error(error.message);
         }
     };
 

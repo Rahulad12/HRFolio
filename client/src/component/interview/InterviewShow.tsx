@@ -12,7 +12,8 @@ import {
     Tooltip,
     Typography,
     Modal,
-    notification
+    notification,
+    Timeline
 } from 'antd';
 import {
     CalendarDays, Clock, Mail, MessageSquare, User, Edit
@@ -92,7 +93,7 @@ const InterviewShow = ({ loading }: Props) => {
         api.success({
             message: `Reminder Sent to Interviewer ${makeCapitilized(interviewerName)}`,
             description: 'Interviewer has been notified',
-            placement: 'top',
+            placement: 'topRight',
             duration: 3000
         })
     }
@@ -118,7 +119,7 @@ const InterviewShow = ({ loading }: Props) => {
                                 : interview.status === 'cancelled'
                                     ? 'error'
                                     : 'success'}
-                            text={interview.status}
+                            text={makeCapitilized(interview.status)}
                         />
                     </motion.li>
                 ))}
@@ -254,7 +255,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                                         ? 'error'
                                                                         : 'success'
                                                             }
-                                                            text={interview.status}
+                                                            text={makeCapitilized(interview.status)}
                                                         />
                                                         <span>
                                                             <Tooltip title="Edit">
@@ -279,7 +280,7 @@ const InterviewShow = ({ loading }: Props) => {
                                                                         ? 'error'
                                                                         : 'success'
                                                             }
-                                                            text={interview?.candidate?.status}
+                                                            text={makeCapitilized(interview?.candidate?.status)}
                                                         />
                                                     </div>
                                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

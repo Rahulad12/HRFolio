@@ -18,7 +18,6 @@ const PrimaryButton = ({ text, icon, onClick, disabled, loading }: Props) => {
                     colorPrimaryHover: "#2E3354",
                     colorPrimaryActive: "#1F3B61",
                     borderRadius: 6,
-                    borderRadiusSM: 8,
                     colorIcon: "#191D32",
                     padding: 12,
                     paddingSM: 8,

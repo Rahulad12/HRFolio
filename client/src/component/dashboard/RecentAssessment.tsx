@@ -70,6 +70,7 @@ const RecentAssessment = () => {
                 loading={false}
                 rowKey="Key"
                 size="small"
+                scroll={{ x: 55 * 5 }}
                 pagination={false}
             />
         </Card>

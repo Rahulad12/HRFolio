@@ -1,9 +1,9 @@
-import { Card, Dropdown, MenuProps, Progress, Table, Tag } from 'antd';
+import { Card, Dropdown, MenuProps, Progress, Tag } from 'antd';
 import { useAppSelector } from '../../Hooks/hook';
 import { candidateData } from '../../types';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { Filter } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -70,6 +70,7 @@ const RecentActivities = () => {
             title: 'Role',
             dataIndex: 'technology',
             key: 'technology',
+            render: (text: string) => <span>{makeCapitilized(text)}</span>,
         },
         {
             title: 'Status',
@@ -104,7 +105,7 @@ const RecentActivities = () => {
     );
 
     return (
-        <Card title="Recent Candidates" className="h-fit w-full" extra={<FilterDropdown />}>
+        <Card className="h-fit w-full" extra={<FilterDropdown />}>
             <CustomTable loading={false} data={filteredCandidates} columns={columns} pageSize={5} />
         </Card>
     );

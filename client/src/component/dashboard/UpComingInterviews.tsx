@@ -42,6 +42,22 @@ const UpComingInterviews = () => {
                                         <Text>Stage: {interview?.candidate?.status}</Text>
                                     </>
                                 )}
+                                {
+                                    interview?.candidate?.level && (
+                                        <>
+                                            <br />
+                                            <Text>Level: {interview?.candidate?.level}</Text>
+                                        </>
+                                    )
+                                }
+                                {
+                                    interview?.status && (
+                                        <>
+                                            <br />
+                                            <Text>Status: {interview?.status}</Text>
+                                        </>
+                                    )
+                                }
                             </div>
                         </Timeline.Item>
                     ))}

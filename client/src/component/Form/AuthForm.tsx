@@ -1,40 +1,40 @@
-import { Button, Typography, Divider } from 'antd';
-import { LogIn } from 'lucide-react';
+import { Divider } from "antd";
+import { FcGoogle } from "react-icons/fc";
 
 interface Props {
     submitHandler: () => void;
-    formType: 'login' | 'register';
+    formType: "login" | "register";
     loading: boolean;
 }
 
 const AuthForm = ({ submitHandler, formType, loading }: Props) => {
-
     const formTitle =
-        formType === 'login' ? 'Sign in to CV Manager' : 'Register to CV Manager';
+        formType === "login"
+            ? "Sign in to HRFolio"
+            : "Register to HRFolio";
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg space-y-6 border border-blue-100">
-                {/* Header */}
-                <div className="flex flex-col items-center gap-2">
-                    <LogIn className="text-blue-700" size={48} />
-                    <Typography.Title level={2} className='text-blue-700 font-bold'>
-                        {formTitle}
-                    </Typography.Title>
+        <div className="w-90 h-full max-w-md mx-auto flex border flex-col items-center justify-center bg-gray-800 rounded-xl p-4">
+            <div className="card-head flex flex-col items-center">
+                <div className="logo">
+                    <span className="text-orange-600 text-6xl">Hr</span>
+                    <span className="text-white text-3xl">Folio</span>
                 </div>
-                {/* OR Divider */}
-                <Divider />
-
-                {/* Google Sign-in */}
-                <Button
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 h-full"
-                    loading={loading}
-                    disabled={loading}
-                    iconPosition="end"
-                    onClick={submitHandler}
+                {/* <div className="text-white text-2xl">
+                    <span>{formType === "login" ? "Sign in in one click" : "Register in one click"}</span>
+                </div> */}
+            </div>
+            <Divider className="bg-white" />
+            <div className="card-body">
+                <div
+                    className={`border border-white w-80 h-10 text-white p-2 flex items-center justify-center cursor-pointer ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                    onClick={!loading ? submitHandler : undefined}
                 >
-                    Continue with Google
-                </Button>
+                    <span className="p-2"><FcGoogle size={30} /></span>
+                    <span className="font-bold w-full text-center">
+                        {loading ? "Processing..." : "Continue with Google"}
+                    </span>
+                </div>
             </div>
         </div>
     );

@@ -12,6 +12,9 @@ const userSchema = new mongoose.Schema({
     },
     googleId: {
         type: String
+    },
+    picture: {
+        type: String
     }
 }, {
     timestamps: true

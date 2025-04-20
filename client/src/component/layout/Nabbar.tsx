@@ -24,7 +24,7 @@ const Navbar = ({ collapsed, isDarkMode }: NavbarProps) => {
             <div className="flex items-center gap-6 justify-end">
                 <ThemeToggle />
                 <div className="flex items-center gap-3 cursor-pointer">
-                    <Avatar src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces" />
+                    <Avatar src={user?.picture} />
                     <div className="hidden md:block">
                         <p className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{user?.username}</p>
                     </div>

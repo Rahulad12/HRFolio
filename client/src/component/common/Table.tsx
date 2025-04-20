@@ -2,7 +2,6 @@ import { Table, Pagination } from 'antd';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import { useNavigate } from 'react-router-dom';
 
 interface AnimatedTableProps {
     loading: boolean;
@@ -30,10 +29,8 @@ const CustomTable = ({
     data,
     columns,
     pageSize = 2,
-    className = '',
 }: AnimatedTableProps) => {
     const { darkMode } = useTheme();
-    const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(1);
 

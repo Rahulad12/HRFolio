@@ -26,7 +26,7 @@ export const googleCallback = (req, res, next) => {
 
         logger.info("Redirecting to frontend");
         // Redirect to frontend with token
-        res.redirect(`http://localhost:5173/?token=${token}&email=${user.email}&name=${user.name}`);
+        res.redirect(`http://localhost:5173/?token=${token}&email=${user.email}&name=${user.name}&picture=${user.picture}`);
 
     })(req, res, next);
 };

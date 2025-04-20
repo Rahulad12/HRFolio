@@ -5,7 +5,6 @@ interface searchState {
     name: string;
     technology: string;
     status: string;
-    level: string;
     date: Dayjs | null;
     interviewStatus: string;
 }
@@ -13,7 +12,6 @@ const initialState: searchState = {
     name: "",
     technology: "",
     status: "",
-    level: "",
     date: null,
     interviewStatus: ""
 }
@@ -22,18 +20,12 @@ const setSearchSlice = createSlice({
     name: "searchSlice",
     initialState,
     reducers: {
-        setName: (state, action: PayloadAction<string>) => {
-            state.name = action.payload;
-        },
-        setTechnology: (state, action: PayloadAction<string>) => {
-            state.technology = action.payload;
-        },
+        setText: (state, action: PayloadAction<string>) => { state.name = action.payload },
+
         setStatus: (state, action: PayloadAction<string>) => {
             state.status = action.payload;
         },
-        setLevel: (state, action: PayloadAction<string>) => {
-            state.level = action.payload;
-        },
+
         setDate: (state, action: PayloadAction<Dayjs | null>) => {
             state.date = action.payload;
         },
@@ -44,6 +36,6 @@ const setSearchSlice = createSlice({
     },
 });
 
-export const { setName, setTechnology, setStatus, setLevel, setDate, setInterviewStatus } = setSearchSlice.actions;
+export const { setText, setStatus, setDate, setInterviewStatus } = setSearchSlice.actions;
 
 export default setSearchSlice.reducer;

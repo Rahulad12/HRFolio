@@ -9,6 +9,7 @@ export type user = {
     username: string;
     email: string;
     token: string;
+    picture: string | null;
 }
 
 export type userFormData = {

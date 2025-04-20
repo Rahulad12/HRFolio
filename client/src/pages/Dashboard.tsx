@@ -1,19 +1,22 @@
-import { Col, Divider, Row, Typography } from "antd";
+import { Card, Col, Divider, Row, Typography, Space } from "antd";
 import DashboardHead from "../component/dashboard/DashboardHead";
 import { useEffect } from "react";
 import { storeCandidate } from "../action/SoreCandidate";
 import { useAppDispatch, useAppSelector } from "../Hooks/hook";
 import { useGetCandidateQuery } from "../services/candidateServiceApi";
-import ExperienceMetrics from "../component/dashboard/ExperienceMetrics";
 import RecentActivities from "../component/dashboard/RecentActivities";
 import { useGetInterviewQuery } from "../services/interviewServiceApi";
 import { storeInterview } from "../action/StoreInterview";
 import UpComingInterviews from "../component/dashboard/UpComingInterviews";
 import RecentAssessment from "../component/dashboard/RecentAssessment";
+import CandidateByTechnology from "../component/dashboard/graph/CandidateByTechnology";
+import CandidateByStatus from "../component/dashboard/graph/CandidateByStatus";
+import ExperienceGraph from "../component/dashboard/graph/ExperienceGraph";
+
 const Dashboard = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector((state) => state.search);
-
+  const { user } = useAppSelector(state => state.auth);
   const { data: candidate } = useGetCandidateQuery({
     name: filters.name,
     technology: filters.technology,
@@ -32,37 +35,68 @@ const Dashboard = () => {
     if (interview?.data) {
       dispatch(storeInterview(interview.data));
     }
-    return () => {
-      dispatch(storeCandidate([]));
-      dispatch(storeInterview([]));
-    };
   }, [candidate, interview, dispatch]);
 
-
-
   return (
-    <div className="p-4 flex flex-col flex-wrap">
-      <div className="flex justify-between items-center">
-        <Typography.Title level={2} className="text-blue-700 font-bold">Dashboard</Typography.Title>
-      </div>
+    <div className="dashboard-container  p-4">
+      {/* Welcome Header */}
+      <Space direction="vertical" size="middle">
+        <div className="flex justify-between items-center">
+          <Typography.Title level={3} style={{ margin: 0 }}>
+            Welcome back, {user?.username}
+          </Typography.Title>
+        </div>
 
-      <DashboardHead />
-      <Divider />
-      <Row gutter={[16, 16]} className="flex flex-wrap">
-        <Col span={24} >
-          <RecentActivities />
-        </Col>
-        <Col span={6}>
-          <ExperienceMetrics />
-        </Col>
-        <Col span={8}>
-          <UpComingInterviews />
-        </Col>
-        <Col span={10}>
-          <RecentAssessment />
-        </Col>
-      </Row>
+        {/* Dashboard Head/Summary Cards */}
+        <DashboardHead />
 
+        <Divider />
+
+        {/* Main Content Area */}
+        <Row gutter={[24, 24]}>
+          {/* Left Column */}
+          <Col xs={24} lg={12}>
+            <Space direction="vertical" size="middle" >
+              <RecentActivities />
+              <Card
+                title="Candidates Statistics"
+                className="shadow-sm border"
+              >
+                <Row gutter={[24, 24]}>
+                  <Col xs={24}>
+                    <CandidateByTechnology />
+                  </Col>
+                  <Col xs={24}>
+                    <CandidateByStatus />
+                  </Col>
+                </Row>
+              </Card>
+            </Space>
+          </Col>
+
+          {/* Right Column */}
+          <Col xs={24} lg={12}>
+            <Space direction="vertical" size="middle" >
+
+              <RecentAssessment />
+
+              <Row gutter={[24, 24]}>
+                <Col xs={24}>
+                  <Card
+                    title="Experience Distribution"
+                    className="shadow-sm"
+                  >
+                    <ExperienceGraph />
+                  </Card>
+                </Col>
+                <Col xs={24}>
+                  <UpComingInterviews />
+                </Col>
+              </Row>
+            </Space>
+          </Col>
+        </Row>
+      </Space>
     </div>
   );
 };

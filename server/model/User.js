@@ -15,6 +15,15 @@ const userSchema = new mongoose.Schema({
     },
     picture: {
         type: String
+    },
+    isLoggedIn: {
+        type: Boolean,
+        default: false
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active"
     }
 }, {
     timestamps: true

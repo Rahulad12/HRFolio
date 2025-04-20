@@ -18,6 +18,7 @@ const initialState: userResponse = {
         email: email || "",
         token: token || "",
         picture: picture || "",
+        loggedIn: false
     },
     success: false,
     message: ""
@@ -32,13 +33,13 @@ export const auth = createSlice({
             state.success = action.payload.success;
             state.message = action.payload.message
 
-            const { username, email, token, picture } = action.payload.user;
+            const { username, email, token, picture, loggedIn } = action.payload.user;
 
             localStorage.setItem("token", token);
             localStorage.setItem("username", username);
             localStorage.setItem("email", email);
             localStorage.setItem("picture", picture || "");
-
+            localStorage.setItem("googleLogin", loggedIn ? "true" : "false");
         },
         logout: (state) => {
             state.user = {
@@ -46,13 +47,11 @@ export const auth = createSlice({
                 email: "",
                 token: "",
                 picture: "",
+                loggedIn: false
             };
             state.success = false;
             state.message = ""
             localStorage.removeItem("token");
-            localStorage.removeItem("username");
-            localStorage.removeItem("email");
-            localStorage.removeItem("picture");
         }
     }
 });

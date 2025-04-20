@@ -1,4 +1,4 @@
-import { Menu, Button, Typography, Image } from "antd";
+import { Menu, Button } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import {
   Users, FileText, Calendar,
@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { logout } from "../../slices/authSlices";
 import { useAppDispatch } from "../../Hooks/hook";
-
+import Logo from "../common/Logo";
 
 
 interface SidebarProps {
@@ -66,13 +66,13 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
       }}
     >
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b" style={{ borderColor }}>
+      <div className="h-16 flex items-center justify-between px-3 border-b" style={{ borderColor }}>
         <div className="flex items-center">
           {
-            collapsed && (<div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-950">
+            collapsed && (<div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-orange-600`}>
               <>
-                <span className="text-xl font-semibold text-orange-600">H</span>
-                <span className="text-xl font-semibold text-white">R</span>
+                <span className="text-2xl font-semibold text-blue-950">H</span>
+                <span className="text-2xl font-semibold text-white ">R</span>
               </>
 
             </div>
@@ -80,8 +80,7 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
           }
           {!collapsed && (
             <div className="text-4xl font-semibold ml-3" style={{ color: logoTextColor }}>
-              <span className="text-orange-600 text-5xl">HR</span>
-              <span className="text-3xl">Folio</span>
+              <Logo />
             </div>
           )}
         </div>

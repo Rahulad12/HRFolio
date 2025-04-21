@@ -13,11 +13,12 @@ const Navbar = ({ collapsed, isDarkMode }: NavbarProps) => {
 
     return (
         <Header
-            className="fixed top-0 right-0 z-10 flex items-center justify-between px-6 transition-all duration-300"
+            className="fixed top-0 right-0 z-10 flex items-center justify-between px-6 transition-all duration-300 "
             style={{
                 left: collapsed ? 80 : 260,
                 height: 64,
-                backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                // backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                backgroundColor: isDarkMode ? '#1e293b' : '#1e293b',
                 borderBottom: `1px solid ${isDarkMode ? '#334155' : '#e5e7eb'}`,
                 paddingLeft: 24,
                 paddingRight: 24,
@@ -26,15 +27,14 @@ const Navbar = ({ collapsed, isDarkMode }: NavbarProps) => {
             {/* Optional logo or title here */}
             <div className="flex-1" />
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 text-white">
                 <ThemeToggle />
                 <div className="flex items-center gap-2 cursor-pointer">
                     <Avatar size="large" src={user?.picture} />
                     <div className="hidden md:block">
                         <p
-                            className={`font-medium text-sm ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}
+                            className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-white'
+                                }`}
                         >
                             {user?.username}
                         </p>

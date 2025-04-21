@@ -19,7 +19,7 @@ export const googleCallback = (req, res, next) => {
 
         if (user.status === "inactive") {
             logger.warn("User is banned");
-            return res.redirect(`http://localhost:5173/error?error=${encodeURIComponent("User is banned")}`);
+            return res.redirect(`http://localhost:5173/error?error=${encodeURIComponent("Your account is banned")}`);
         }
 
         const token = jwt.sign(

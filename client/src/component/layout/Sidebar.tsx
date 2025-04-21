@@ -39,7 +39,19 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
         },
       ],
     },
-    { label: <Link to="/dashboard/offers">Offers</Link>, key: "/dashboard/offers", icon: <Mail size={18} /> },
+    {
+      label: "Offers", key: "offers", icon: <Mail size={18} />,
+      children: [
+        {
+          label: <Link to="/dashboard/offers">Offer List</Link>,
+          key: "/dashboard/offers",
+        },
+        {
+          label: <Link to="/dashboard/assigned">Assigned Offers</Link>,
+          key: "/dashboard/assigned",
+        }
+      ]
+    },
     { label: <Link to="/dashboard/settings">Settings</Link>, key: "/dashboard/settings", icon: <Settings size={18} /> },
   ];
 
@@ -47,10 +59,12 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
     dispatch(logout());
   };
 
-  const sidebarBg = isDarkMode ? "#1e293b" : "#FBFBFF";
+  const sidebarBg = isDarkMode ? "#1e293b" : "#1e293b";
   const borderColor = isDarkMode ? "#2A2E45" : "#e5e7eb";
-  const logoTextColor = isDarkMode ? "#FBFBFF" : "#191D32";
-  const toggleIconColor = isDarkMode ? "#FBFBFF" : "#4B5563";
+  // const logoTextColor = isDarkMode ? "#FBFBFF" : "#191D32";
+  const logoTextColor = isDarkMode ? "#FBFBFF" : "#FBFBFF";
+  const toggleIconColor = isDarkMode ? "#FBFBFF" : "#FBFBFF";
+  // const toggleIconColor = isDarkMode ? "#FBFBFF" : "#4B5563";
   // const sidebarBg = "#FBFBFF";
   // const borderColor = "#e5e7eb";
   // const logoTextColor = "#191D32";
@@ -60,7 +74,7 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
     <div
       className="fixed top-0 left-0 bottom-0 flex flex-col justify-between transition-all duration-300"
       style={{
-        width: collapsed ? 78 : 260,
+        width: collapsed ? 80 : 260,
         backgroundColor: sidebarBg,
         borderRight: `1px solid ${borderColor}`,
       }}
@@ -69,7 +83,7 @@ const Sidebar = ({ collapsed, setCollapsed, isDarkMode }: SidebarProps) => {
       <div className="h-16 flex items-center justify-between px-3 border-b" style={{ borderColor }}>
         <div className="flex items-center">
           {
-            collapsed && (<div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-orange-600`}>
+            collapsed && (<div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-orange-600`}>
               <>
                 <span className="text-2xl font-semibold text-blue-950">H</span>
                 <span className="text-2xl font-semibold text-white ">R</span>

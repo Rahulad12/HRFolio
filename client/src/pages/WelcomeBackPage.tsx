@@ -35,7 +35,6 @@ const WelcomeBackPage = ({ submitHandler, loading }: Props) => {
         }
     }
     return (
-        // <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-blue-400 via-blue-500 via-20% to-purple-400 p-4">
         <div>
             <div className='flex flex-col items-center justify-center'>
                 {/* Intro Header */}

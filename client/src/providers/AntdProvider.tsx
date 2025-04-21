@@ -24,7 +24,7 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
         },
         components: {
           Menu: {
-            itemColor: colorTextBase,
+            itemColor: "#ffff",
             itemHoverColor: colorPrimary,
             itemHoverBg: colorHover,
             itemSelectedColor: "#fff",

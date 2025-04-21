@@ -1,5 +1,4 @@
 import { Button, Typography, Divider, Image } from "antd";
-import { LogIn } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 interface Props {
     submitHandler: () => void;

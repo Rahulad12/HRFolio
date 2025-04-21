@@ -1,5 +1,5 @@
 import { Button, Space, Tag, Tooltip, Popconfirm, Skeleton, notification } from 'antd';
-import { Edit, Eye, Trash2 } from 'lucide-react';
+import { Edit,  Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../Hooks/hook';
 import { useDeleteCandidateMutation } from '../../services/candidateServiceApi';

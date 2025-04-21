@@ -1,4 +1,3 @@
-import { Card } from 'antd';
 import { useAppSelector } from '../../../Hooks/hook';
 import BarGraph from '../../charts/BarGraph';
 

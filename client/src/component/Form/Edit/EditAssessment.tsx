@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, Row, Select } from "antd";
+import { Button,  Col, Form, Input, Row, Select } from "antd";
 import { assessmentFormData } from "../../../types/index";
 import { motion } from "framer-motion";
 import { useGetAssessmentByIdQuery } from "../../../services/assessmentServiceApi";

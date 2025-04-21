@@ -21,7 +21,11 @@ const buttonPropsSlice = createSlice({
     initialState,
     reducers: {
         buttonState: (state, action) => {
-            return action.payload;
+            state.text = action.payload.text;
+            state.icon = action.payload.icon;
+            state.onClick = action.payload.onClick;
+            state.disabled = action.payload.disabled;
+            state.loading = action.payload.loading;
         },
     },
 });

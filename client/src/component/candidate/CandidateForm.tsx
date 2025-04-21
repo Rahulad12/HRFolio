@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, Select, Upload, Button, message, Row, Col, Typography } from "antd";
+import { Form, Input, InputNumber, Select, Upload, Button, message, Row, Col } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { MinusCircle, PlusCircle } from "lucide-react";
 import { candidateFormData } from "../../types/index";

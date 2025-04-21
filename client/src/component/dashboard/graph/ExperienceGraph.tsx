@@ -1,5 +1,4 @@
 // src/components/dashboard/ExperienceGraph.tsx
-import React from 'react';
 import LineChart from '../../charts/LineChart'
 import { useAppSelector } from '../../../Hooks/hook';
 import { Card } from 'antd';

@@ -40,6 +40,7 @@ const CandidateProfile = () => {
     references: [],
     status: 'shortlisted',
     _id: '',
+    createdAt: '',
   });
   const [api, contextHolder] = notification.useNotification();
   useEffect(() => {

@@ -36,7 +36,7 @@ const Login: React.FC = () => {
   const shouldShowWelcomeBack = localStorage.getItem('googleLogin') === 'true';
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-blue-600 from-10% via-blue-400 via-20% to-purple-400 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-bl from-purple-950 from-10% via-blue-800 via-50% to-purple-950 to-80% flex flex-col items-center justify-center p-4">
       {
         shouldShowWelcomeBack ? (
           <WelcomeBackPage submitHandler={submitHandler} loading={isLoading} />

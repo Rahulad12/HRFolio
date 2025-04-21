@@ -16,17 +16,17 @@ const CandidateByTechnology = () => {
     const counts = Object.values(techCount);
 
     return (
-        
-            <BarGraph
-                labels={labels}
-                datasets={[
-                    {
-                        label: 'Candidates',
-                        data: counts,
-                        backgroundColor: '#363062',
-                    },
-                ]}
-            />
+
+        <BarGraph
+            labels={labels}
+            datasets={[
+                {
+                    label: 'Candidates',
+                    data: counts,
+                    backgroundColor: '#363062',
+                },
+            ]}
+        />
     );
 };
 

@@ -210,7 +210,7 @@ const CandidateTable = ({ loading, error }: TableProps) => {
                         loading={loading}
                         data={data}
                         columns={columns}
-                        pageSize={5}
+                        pageSize={10}
                     />
                 </AnimatePresence>
             </motion.div>

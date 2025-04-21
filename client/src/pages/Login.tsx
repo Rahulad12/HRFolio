@@ -22,10 +22,11 @@ const Login: React.FC = () => {
     const name = queryParams.get('name');
     const picture = queryParams.get('picture');
     const googleLogin = queryParams.get('loggedIn');
+    const userId = queryParams.get('Id');
 
     if (token && email && name) {
       dispatch(setCredentials({
-        user: { username: name, email, token, picture, loggedIn: googleLogin === 'true' },
+        user: { username: name, email, token, picture, loggedIn: googleLogin === 'true', Id: userId || '' },
         success: true,
         message: "Login success",
       }));

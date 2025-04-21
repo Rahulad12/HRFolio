@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { AUTH_URL } from "../constant";
+import { globalResponse } from "../types";
 
 
 interface AuthResponse {
@@ -19,9 +20,15 @@ export const authServiceApi = api.injectEndpoints({
                 url: `${AUTH_URL}/google`,
                 method: "POST",
             }
-            )
-        })
+            ),
+        }),
+        deleteUser: builder.mutation<globalResponse, string>({
+            query: (id) => ({
+                url: `${AUTH_URL}/${id}`,
+                method: "DELETE"
+            })
+        }),
     })
 })
 
-export const { useGoogleLoginMutation } = authServiceApi
+export const { useGoogleLoginMutation, useDeleteUserMutation } = authServiceApi

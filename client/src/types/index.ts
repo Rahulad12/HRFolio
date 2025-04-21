@@ -10,7 +10,8 @@ export type user = {
     email: string;
     token: string;
     picture: string | null;
-    loggedIn:boolean;
+    loggedIn: boolean;
+    Id: string;
 }
 
 export type userFormData = {

@@ -65,7 +65,7 @@ const Dashboard = () => {
                   <Col xs={24}>
                     <CandidateByTechnology />
                   </Col>
-                  <Col xs={24}>
+                  <Col xs={24} >
                     <CandidateByStatus />
                   </Col>
                 </Row>

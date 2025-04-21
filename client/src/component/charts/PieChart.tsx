@@ -16,9 +16,11 @@ interface PieChartProps {
     data: number[];
     backgroundColor?: string[];
     title?: string;
+    height?: number;
+    width?: number;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ labels, data, backgroundColor, title }) => {
+const PieChart: React.FC<PieChartProps> = ({ labels, data, backgroundColor, title, height, width }) => {
     const { darkMode } = useTheme();
 
     const chartData = {
@@ -35,6 +37,8 @@ const PieChart: React.FC<PieChartProps> = ({ labels, data, backgroundColor, titl
                     '#60A5FA',
                 ],
                 borderWidth: 1,
+                borderColor: darkMode ? '#fff' : '#191D32',
+                hoverOffset: 4,
             },
         ],
     };
@@ -56,7 +60,12 @@ const PieChart: React.FC<PieChartProps> = ({ labels, data, backgroundColor, titl
         },
     };
 
-    return <Pie data={chartData} options={options} />;
+
+    return (
+        <div style={{ width: width || '400', height: height || '400' }} className={`chart-container ${darkMode ? 'dark-mode' : ''} w-full h-full flex items-center justify-center `}>
+            <Pie data={chartData} options={options} />
+        </div>
+    )
 };
 
 export default PieChart;

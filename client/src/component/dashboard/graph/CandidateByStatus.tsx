@@ -14,11 +14,15 @@ const CandidateByStatus = () => {
     const data = Object.values(statusCounts);
 
     return (
-            <PieChart
-                labels={labels}
-                data={data}
-                title="Candidate Status"
-            />
+        <div className="w-full h-full flex items-center justify-center">
+        <PieChart
+            labels={labels}
+            data={data}
+            title="Candidate Status"
+            width={400}
+            height={400}
+        />
+        </div>
     );
 };
 

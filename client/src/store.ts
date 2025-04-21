@@ -5,7 +5,7 @@ import candidateSliceReducer from "./slices/candidateSlices.ts"
 import setSearchSlice from "./slices/setSearchSlices.ts"
 import interviewSliceReducer from "./slices/interviewSlices.ts"
 import assessmentSlice from "./slices/assessmentSlices.ts"
-import buttonPropsSliceReducer from "./slices/ButtonPropsSlices.tsx"
+import buttonPropsSliceReducer from "./slices/ButtonPropsSlices.ts"
 
 export const store = configureStore({
     reducer: {

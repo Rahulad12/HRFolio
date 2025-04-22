@@ -1,5 +1,6 @@
 import { ConfigProvider, App as AntdApp, theme as antdTheme } from "antd";
 import { useTheme } from "../context/ThemeContext";
+import { color } from "framer-motion";
 
 const AntdProvider = ({ children }: { children: React.ReactNode }) => {
   const { darkMode } = useTheme();
@@ -24,7 +25,7 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
         },
         components: {
           Menu: {
-            itemColor: "#ffff",
+            itemColor: colorTextBase,
             itemHoverColor: colorPrimary,
             itemHoverBg: colorHover,
             itemSelectedColor: "#fff",
@@ -33,15 +34,15 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
             borderRadius: 6,
           },
           Button: {
-            colorPrimary,
+            colorPrimary: colorPrimary,
             colorPrimaryHover: "#EF5B5B",
             colorPrimaryActive: "#C62828",
           },
           Table: {
             colorText: colorTextBase,
             colorBgContainer: colorBgBase,
-            headerBg: darkMode ? "#2A2E45" : "#191D32",
-            headerColor: darkMode ? "#C0C0C0" : "#FFFF",
+            headerBg: darkMode ? "#2A2E45" : "#F9FAFB",
+            headerColor: darkMode ? "#C0C0C0" : "#191D32",
             colorTextHeading: colorPrimary,
             borderColor: darkMode ? "#2A2E45" : "#e5e7eb",
             paddingSM: 8,
@@ -53,7 +54,8 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
           Input: {
             colorBgContainer: darkMode ? "#020817" : "#ffffff",
             colorText: colorTextBase,
-            activeBorderColor: "#D3D3D3",
+            activeBorderColor: "#4d79ff",
+            hoverBorderColor: "none",
           },
           DatePicker: {
             colorBgContainer: darkMode ? "#020817" : "#ffffff",
@@ -63,8 +65,8 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
           Select: {
             colorText: colorTextBase,
             colorBgContainer: darkMode ? "#020817" : "#ffffff",
-            activeBorderColor: "#D3D3D3",
-            borderRadius: 4,
+            activeBorderColor: "#4d79ff",
+            hoverBorderColor: "none",
           },
           Dropdown: {
             colorBgContainer: darkMode ? "#020817" : "#ffffff",

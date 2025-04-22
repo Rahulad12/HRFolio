@@ -21,6 +21,9 @@ const Predefineddata = {
         { key: 13, label: "Shortlisted", value: "shortlisted" },
         { key: 14, label: "First Interview", value: "first interview" },
         { key: 15, label: "Second Interview", value: "second interview" },
+        { key: 16, label: "Third Interview", value: "third interview" },
+        { key: 17, label: "Assessment", value: "assessment" },
+        { key: 18, label: "Offered", value: "offered" },
         { key: 16, label: "Hired", value: "hired" },
         { key: 17, label: "Rejected", value: "rejected" }
     ]

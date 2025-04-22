@@ -6,6 +6,7 @@ interface Props {
 }
 const Hero = ({ title }: Props) => {
     const buttonAttributes = useAppSelector(state => state.buttonProps);
+
     console.log(buttonAttributes);
     return (
         <div className='flex items-center justify-between'>

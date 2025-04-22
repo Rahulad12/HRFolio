@@ -19,13 +19,9 @@ export const getCandidate = () => {
             refetchOnMountOrArgChange: false
         }
     );
-
     useEffect(() => {
         if (isSuccess && data?.data) {
             dispatch(storeCandidate(data.data));
         }
-        return () => {
-            dispatch(storeCandidate([]));
-        };
     }, [data]);
 }

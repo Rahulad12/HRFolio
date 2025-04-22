@@ -1,14 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { interviewData } from "../types";
-
 interface interviewState {
-    interviews: interviewData[];
+    interviews: interviewData[]; // Change this line
 }
 
 const initialState: interviewState = {
-    interviews: [],
+    interviews: [], // Start with an empty array
 };
-
 
 const interviewSlice = createSlice({
     name: "interviews",

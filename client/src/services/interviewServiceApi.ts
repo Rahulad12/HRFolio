@@ -36,6 +36,13 @@ export const interviewServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Interview"],
         }),
+        getInterviewByCandidateId: builder.query<interviewResponseById, string | undefined>({
+            query: (id) => ({
+                url: `${INTERVIEW_URL}/candidate/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Interview"],
+        }),
 
         getInterviewer: builder.query<interviewerResponse, void>({
             query: () => ({
@@ -57,4 +64,4 @@ export const interviewServiceApi = api.injectEndpoints({
     })
 })
 
-export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } = interviewServiceApi
+export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation, useGetInterviewByCandidateIdQuery } = interviewServiceApi

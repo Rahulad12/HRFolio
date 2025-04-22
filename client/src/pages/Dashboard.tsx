@@ -1,101 +1,202 @@
-import { Card, Col, Divider, Row, Typography, Space } from "antd";
-import DashboardHead from "../component/dashboard/DashboardHead";
-import { useEffect } from "react";
-import { storeCandidate } from "../action/StoreCandidate";
-import { useAppDispatch, useAppSelector } from "../Hooks/hook";
-import { useGetCandidateQuery } from "../services/candidateServiceApi";
-import RecentActivities from "../component/dashboard/RecentActivities";
-import { useGetInterviewQuery } from "../services/interviewServiceApi";
-import { storeInterview } from "../action/StoreInterview";
-import UpComingInterviews from "../component/dashboard/UpComingInterviews";
-import RecentAssessment from "../component/dashboard/RecentAssessment";
-import CandidateByTechnology from "../component/dashboard/graph/CandidateByTechnology";
-import CandidateByStatus from "../component/dashboard/graph/CandidateByStatus";
-import ExperienceGraph from "../component/dashboard/graph/ExperienceGraph";
+import React from 'react';
+import { Users, Calendar, ClipboardCheck, Award, UserPlus, FileText, Briefcase, Plus } from 'lucide-react';
+import { metricsData } from '../data/mockData';
+import MetricsCard from '../component/dashboard/MetricsCard';
+import CandidatePipeline from '../component/dashboard/CandidatePipeline';
+import RecentActivity from '../component/dashboard/RecentActivity';
+import UpcomingInterviews from '../component/dashboard/UpcomingInterviews';
+import Button from '../component/ui/Button';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useAppSelector } from '../Hooks/hook';
+import { getCandidate } from '../action/StoreCandidate';
+import { useInterview } from '../action/StoreInterview';
+import dayjs from 'dayjs';
+import PrimaryButton from '../component/ui/button/Primary';
 
-const Dashboard = () => {
-  const dispatch = useAppDispatch();
+export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
 
-  const { user } = useAppSelector(state => state.auth);
+  //storeInterview is used to store the interview data in redux
+  const { isLoading, isError } = useInterview();
+  getCandidate();
+  const { user } = useAppSelector((state) => state.auth);
 
-  const { data: candidate } = useGetCandidateQuery({
-    searchText: "",
-    status: "",
-  });
-  const { data: interview } = useGetInterviewQuery({
-    date: "",
-    status: ""
-  });
+  // Fetching data from Redux store
+  const { candidate } = useAppSelector((state) => state.candidate);
+  const { interviews } = useAppSelector((state) => state.interview);
 
-  useEffect(() => {
-    if (candidate?.data) {
-      dispatch(storeCandidate(candidate.data));
+  // Pipeline stages
+  const pipelineStages = [
+    { id: '1', name: 'New Applications', count: 18, color: '#3B82F6' },
+    { id: '2', name: 'Screening', count: 12, color: '#8B5CF6' },
+    { id: '3', name: 'Interviewing', count: 8, color: '#10B981' },
+    { id: '4', name: 'Assessment', count: 5, color: '#F59E0B' },
+    { id: '5', name: 'Offered', count: 3, color: '#EC4899' },
+  ];
+
+
+  // Mock activities
+  const recentActivities = [
+    {
+      id: '1',
+      type: 'interview' as const,
+      title: 'Interview with Michael Chen',
+      description: 'Technical interview for Data Scientist position',
+      date: 'Today',
+      time: '10:30 AM',
+    },
+    {
+      id: '2',
+      type: 'assessment' as const,
+      title: 'Frontend Coding Challenge',
+      description: 'John Doe completed the assessment',
+      date: 'Yesterday',
+      time: '4:45 PM',
+    },
+    {
+      id: '3',
+      type: 'offer' as const,
+      title: 'Offer Extended',
+      description: 'Offer letter sent to Emily Davis for Product Manager',
+      date: 'May 5, 2025',
+      time: '2:15 PM',
+    },
+    {
+      id: '4',
+      type: 'candidate' as const,
+      title: 'New Application',
+      description: 'Robert Johnson applied for Backend Developer',
+      date: 'May 4, 2025',
+      time: '9:30 AM',
     }
-    if (interview?.data) {
-      dispatch(storeInterview(interview.data));
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
     }
-  }, [candidate, interview, dispatch]);
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
+  const startWeek = dayjs().startOf('week').format('YYYY-MM-DD');
+  const endWeek = dayjs().endOf('week').format('YYYY-MM-DD');
+  const filteredInterviews = interviews.filter((interview) => {
+    const interviewDate = dayjs(interview.date).format('YYYY-MM-DD');
+    return interviewDate >= startWeek && interviewDate <= endWeek;
+  }
+  );
 
   return (
-    <div className="dashboard-container p-4">
-      {/* Welcome Header */}
-      <Space direction="vertical" size="middle">
-        <div className="flex justify-between items-center">
-          <Typography.Title level={3} className="m-4">
-            Welcome back, {user?.username}
-          </Typography.Title>
+    <div>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-blue-950">Dashboard</h1>
+          <p className="mt-1 text-sm text-blue-950">
+            Welcome back!  <span className="font-bold text-blue-950">{user.username}</span>
+          </p>
         </div>
+        <div className="mt-4 sm:mt-0 flex space-x-3">
+          <PrimaryButton
+            text='Add Candidate'
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => navigate('/dashboard/candidates/new')}
+            disabled={false}
+            loading={false}
+          />
+          <Button
+            variant="outline"
+            icon={<Calendar size={16} />}
+            onClick={() => navigate('/interviews/schedule')}
+          >
+            Schedule Interview
+          </Button>
+        </div>
+      </div>
 
-        {/* Dashboard Head/Summary Cards */}
-        <DashboardHead />
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants}>
+          <MetricsCard
+            title="Open Positions"
+            value={metricsData.openPositions}
+            icon={<Briefcase size={20} className="text-blue-700" />}
+            change={{ value: 12, trend: 'up' }}
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <MetricsCard
+            title="Active Candidates"
+            value={candidate.length}
+            icon={<Users size={20} className="text-purple-700" />}
+            change={{ value: 8, trend: 'up' }}
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <MetricsCard
+            title="Scheduled Interviews"
+            value={interviews.length}
+            icon={<Calendar size={20} className="text-green-700" />}
+            change={{ value: 5, trend: 'up' }}
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <MetricsCard
+            title="Time to Hire (days)"
+            value={metricsData.timeToHire}
+            icon={<Award size={20} className="text-amber-700" />}
+            change={{ value: 10, trend: 'down' }}
+          />
+        </motion.div>
+      </motion.div>
 
-        <Divider />
-
-        {/* Main Content Area */}
-        <Row gutter={[24, 24]}>
-          {/* Left Column */}
-          <Col xs={24} lg={12}>
-            <Space direction="vertical" size="middle" >
-              <RecentActivities />
-              <Card
-                title="Candidates Statistics"
-                className="shadow-sm border"
-              >
-                <Row gutter={[24, 24]}>
-                  <Col xs={24}>
-                    <CandidateByTechnology />
-                  </Col>
-                  <Col xs={24} >
-                    <CandidateByStatus />
-                  </Col>
-                </Row>
-              </Card>
-            </Space>
-          </Col>
-
-          {/* Right Column */}
-          <Col xs={24} lg={12}>
-            <Space direction="vertical" size="middle" >
-
-              <RecentAssessment />
-
-              <Row gutter={[24, 24]}>
-                <Col xs={24}>
-                  <Card
-                    title="Experience Distribution"
-                    className="shadow-sm"
-                  >
-                    <ExperienceGraph />
-                  </Card>
-                </Col>
-                <Col xs={24}>
-                  <UpComingInterviews />
-                </Col>
-              </Row>
-            </Space>
-          </Col>
-        </Row>
-      </Space>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div
+          className="lg:col-span-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <CandidatePipeline stages={pipelineStages} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <UpcomingInterviews
+            interviews={filteredInterviews}
+            onViewAllClick={() => navigate('/interviews')}
+            loading={isLoading}
+            error={isError ? 'Failed to load interviews' : ''}
+          />
+        </motion.div>
+        <motion.div
+          className="lg:col-span-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <RecentActivity activities={recentActivities} />
+        </motion.div>
+      </div>
     </div>
   );
 };

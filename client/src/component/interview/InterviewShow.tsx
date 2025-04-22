@@ -138,6 +138,7 @@ const InterviewShow = ({ loading }: Props) => {
                 <Card title="Interview Calendar" className="shadow-sm mb-6">
                     <Calendar
                         fullscreen={false}
+                        
                         cellRender={dateCellRender}
                         onSelect={handleDateChange}
                         value={selectedDate || dayjs()}

@@ -1,6 +1,7 @@
 import { api } from "./api";
 import { assessmentFormData, assessmentResponse, assessmentResponseById, AssignmentData, assignmentResponse, assignmentResponseById } from "../types/index"
 import { ASSESSMENT_URL } from "../constant";
+import { use } from "react";
 export const assessmentServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
         createAssessment: builder.mutation<assessmentResponse, assessmentFormData>({
@@ -29,6 +30,13 @@ export const assessmentServiceApi = api.injectEndpoints({
         getAssignedAssessment: builder.query<assignmentResponse, void>({
             query: () => ({
                 url: `${ASSESSMENT_URL}/assignment`,
+                method: "GET",
+            }),
+            providesTags: ["Assignment", "Assessment"]
+        }),
+        getAssignmentByCandidate: builder.query<assignmentResponse, string>({
+            query: (id) => ({
+                url: `${ASSESSMENT_URL}/assignment/candidate/${id}`,
                 method: "GET",
             }),
             providesTags: ["Assignment", "Assessment"]
@@ -90,5 +98,6 @@ export const {
     useUpdateAssessmentMutation,
     useUpdateAssignmnetMutation,
     useGetAssessmentByIdQuery,
-    useGetAssignmentByIdQuery
+    useGetAssignmentByIdQuery,
+    useGetAssignmentByCandidateQuery,
 } = assessmentServiceApi;

@@ -96,6 +96,8 @@ const getCandidateById = async (req, res) => {
 // }
 const getAllCandidates = async (req, res) => {
     const { searchText, status } = req.query;
+    console.log("searchText", searchText);
+    console.log("status", status);
     try {
         // If no filter is passed, you can return an error or return all
         const query = {};

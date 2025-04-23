@@ -4,6 +4,8 @@ import dayjs from "dayjs";
 import { storeSearch } from "../../action/StoreSearch";
 import { useAppDispatch } from "../../Hooks/hook";
 import { Search } from "lucide-react";
+import ExportButton from "./Export";
+import { useCandidate } from "../../action/StoreCandidate";
 
 const { Option } = Select;
 
@@ -28,6 +30,7 @@ const TableSearch = ({
 
     const [searchText, setSearchText] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("");
+    const { data: candidates } = useCandidate();
 
     // const handleSearch = () => {
     //     dispatch(storeSearch(searchText, selectedStatus, dayjs(), ""));
@@ -75,6 +78,9 @@ const TableSearch = ({
                     </Option>
                 ))}
             </Select>
+
+            <ExportButton data={candidates?.data} fileName="Candidates" />
+
         </div >
     );
 };

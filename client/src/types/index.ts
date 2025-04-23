@@ -115,6 +115,7 @@ export type assessmentFormData = {
     technology: string,
     level: string;
     file: File;
+    duration: number
 }
 
 
@@ -128,6 +129,7 @@ export type AssessmentDataResponse = {
     createdAt: string
     updatedAt: string
     __v: number
+    duration: number
 }
 
 export type assessmentResponse = {

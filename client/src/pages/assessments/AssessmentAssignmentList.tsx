@@ -13,6 +13,7 @@ import { Button, Input, Select, Modal, Form, InputNumber, message } from 'antd';
 import dayjs from 'dayjs';
 import { useCreateAssignmentScoreMutation } from '../../services/assessmentServiceApi';
 import PrimaryButton from '../../component/ui/button/Primary';
+import ExportButton from '../../component/common/Export';
 const { TextArea } = Input;
 
 const AssessmentAssignmentList: React.FC = () => {
@@ -193,7 +194,7 @@ const AssessmentAssignmentList: React.FC = () => {
               onChange={(value) => setStatusFilter(value)}
               className="w-40"
             />
-            <Button type="default" icon={<Download size={16} />} aria-label="Export">Export</Button>
+            <ExportButton data={filteredAssignments} fileName="Assessignments" />
           </div>
         </div>
 

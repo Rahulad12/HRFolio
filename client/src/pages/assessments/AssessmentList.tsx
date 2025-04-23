@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck, Search, Download, Pencil, Trash2 } from 'lucide-react';
 import Card from '../../component/ui/Card';
 import Badge from '../../component/ui/Badge';
-
-import { AssessmentDataResponse } from '../../types';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { AssessmentDataResponse, assessmentFormData } from '../../types';
 import { motion } from 'framer-motion';
 import { useAssessment } from '../../action/StoreAssessment';
 import { useAppSelector } from '../../Hooks/hook';
@@ -12,6 +13,7 @@ import CustomTable from '../../component/common/Table';
 import { Button, Popconfirm, Tooltip, Input, Select } from 'antd';
 import { makeCapitilized } from '../../utils/TextAlter';
 import PrimaryButton from '../../component/ui/button/Primary';
+import ExportButton from '../../component/common/Export';
 
 const AssessmentList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,7 +24,7 @@ const AssessmentList: React.FC = () => {
   const { assessmentLoading } = useAssessment()
   const { assessments } = useAppSelector((state) => state.assessments);
 
-  const filteredAssessments = assessments?.filter(assessment => {
+  const filteredAssessments: AssessmentDataResponse[] = assessments?.filter(assessment => {
     const matchesSearch = assessment.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = typeFilter === '' || assessment.type === typeFilter;
     return matchesSearch && matchesType;
@@ -101,6 +103,15 @@ const AssessmentList: React.FC = () => {
       )
     }
   ];
+  const exportToExcel = (data: AssessmentDataResponse[], fileName = "Candidates") => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, `${fileName}.xlsx`);
+  };
 
   return (
     <motion.div
@@ -139,7 +150,7 @@ const AssessmentList: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex space-x-2">
+          <div className="flex gap-2">
             <Select
               options={typeOptions}
               value={typeFilter}
@@ -147,13 +158,8 @@ const AssessmentList: React.FC = () => {
               className="w-40"
               showSearch
             />
-            <Button
-              type="default"
-              icon={<Download size={16} />}
-              aria-label="Export"
-            >
-              Export
-            </Button>
+
+            <ExportButton data={filteredAssessments} fileName="Assessments" />
           </div>
         </div>
         <CustomTable

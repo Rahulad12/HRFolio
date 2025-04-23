@@ -11,7 +11,9 @@ import CustomTable from '../../component/common/Table';
 import { useInterview } from '../../action/StoreInterview';
 import { useAppSelector } from '../../Hooks/hook';
 import PrimaryButton from '../../component/ui/button/Primary';
-import CustomCalendar from '../../component/ui/Calender'; // Fixed typo in component name
+import CustomCalendar from '../../component/ui/Calender';
+import ExportButton from '../../component/common/Export';
+
 
 interface StatusOption {
   value: string;
@@ -33,6 +35,8 @@ const InterviewList: React.FC = () => {
 
   const { isLoading } = useInterview(filteredStatus, selectedDate);
   const { interviews } = useAppSelector((state) => state.interview);
+
+
 
   const columns: TableColumnsType<interviewData> = [
     {
@@ -127,6 +131,8 @@ const InterviewList: React.FC = () => {
     });
   }, [interviews, searchTerm, filteredStatus, selectedDate]);
 
+
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -180,6 +186,8 @@ const InterviewList: React.FC = () => {
                 onClear={handleFilterClear}
                 options={statusOptions}
               />
+
+              <ExportButton data={filteredInterviews} fileName="Interviews" />
             </div>
 
             <div>

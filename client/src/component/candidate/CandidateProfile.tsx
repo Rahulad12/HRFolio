@@ -1,5 +1,5 @@
 import { useAppSelector } from '../../Hooks/hook';
-import { ArrowLeft, Download, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { Button } from 'antd';
@@ -25,23 +25,26 @@ const CandidateProfile = () => {
                     <div className="flex flex-wrap gap-4 mt-2 text-gray-600 text-sm">
                         <span className="flex items-center gap-2">
                             <Mail className="w-4 h-4" />
-                            {profile?.email}
+                            <a href={`mailto:${profile?.email}`}>{profile?.email}</a>
+                            {/* {profile?.email} */}
                         </span>
                         <span className="flex items-center gap-2">
                             <Phone className="w-4 h-4" />
-                            {profile?.phone}
+                            <a href={`tel:${profile?.phone}`}>
+                                {profile?.phone}
+                            </a>
                         </span>
                         {profile?.resume && (
                             <span>
                                 <span className="flex items-center gap-2">
-                                    <Download className="w-4 h-4" />
+                                    <FileText className="w-4 h-4" />
                                     <a
                                         href={profile.resume}
                                         target="_blank"
                                         download
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        Download Resume
+                                        View Resume
                                     </a>
 
                                 </span>

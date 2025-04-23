@@ -1,8 +1,10 @@
 import React, { Children } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, Calendar, ClipboardCheck, UserPlus, Briefcase, FileText, Award, BarChart2 } from 'lucide-react';
+import { Users, Calendar, ClipboardCheck, UserPlus, Briefcase, FileText, Award, BarChart2, LogOut } from 'lucide-react';
 import Logo from '../ui/Logo';
-import { Menu } from 'antd';
+import { Button, Menu } from 'antd';
+import { logout } from '../../slices/authSlices';
+import { useAppDispatch } from '../../Hooks/hook';
 interface SidebarLinkProps {
   to: string;
   icon: React.ReactNode;
@@ -32,7 +34,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive }) 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-
+  const dispatch = useAppDispatch();
 
   const links = [
     { key: '/dashboard', icon: <BarChart2 size={20} />, label: <Link to="/dashboard">Dashboard</Link> },
@@ -59,6 +61,10 @@ export const Sidebar: React.FC = () => {
     { key: '/dashboard/reports', icon: <Award size={20} />, label: <Link to="/dashboard/reports">Reports</Link> },
   ];
 
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <div className="w-55 hidden md:block bg-white h-screen shadow-sm overflow-y-auto">
       <div className="px-6 py-6">
@@ -73,6 +79,19 @@ export const Sidebar: React.FC = () => {
           items={links}
         />
 
+      </div>
+
+      {/* Logout */}
+      <div className="p-4 text-center" >
+        <Button
+          type="dashed"
+          danger
+          icon={<LogOut className="w-5 h-5" />}
+          onClick={handleLogout}
+          block
+        >
+          Logout
+        </Button>
       </div>
     </div>
   );

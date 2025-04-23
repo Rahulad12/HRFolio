@@ -9,9 +9,9 @@ export const storeCandidate = (candidate: candidateData[]) => (dispatch: AppDisp
     dispatch(setCandidate(candidate));
 }
 
-export const getCandidate = () => {
+export const useCandidate = () => {
     const dispatch = useAppDispatch();
-    const { data, isSuccess } = useGetCandidateQuery({
+    const { data, isSuccess,refetch } = useGetCandidateQuery({
         searchText: "",
         status: "",
     },
@@ -24,4 +24,5 @@ export const getCandidate = () => {
             dispatch(storeCandidate(data.data));
         }
     }, [data]);
+    return { data, isSuccess,refetch };
 }

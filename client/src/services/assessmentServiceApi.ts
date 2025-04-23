@@ -1,7 +1,6 @@
 import { api } from "./api";
-import { assessmentFormData, assessmentResponse, assessmentResponseById, AssignmentData, assignmentResponse, assignmentResponseById } from "../types/index"
+import { assessmentFormData, assessmentResponse, assessmentResponseById, AssgnmentScoreResponse, AssignmentData, assignmentResponse, assignmentResponseById, AssignmentScoreFromData } from "../types/index"
 import { ASSESSMENT_URL } from "../constant";
-import { use } from "react";
 export const assessmentServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
         createAssessment: builder.mutation<assessmentResponse, assessmentFormData>({
@@ -85,6 +84,14 @@ export const assessmentServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Assignment", "Assessment"]
         }),
+        createAssignmentScore: builder.mutation<AssgnmentScoreResponse, AssignmentScoreFromData>({
+            query: (data) => ({
+                url: `${ASSESSMENT_URL}/score`,
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Score', 'Assignment']
+        }),
     }),
 });
 
@@ -100,4 +107,5 @@ export const {
     useGetAssessmentByIdQuery,
     useGetAssignmentByIdQuery,
     useGetAssignmentByCandidateQuery,
+    useCreateAssignmentScoreMutation
 } = assessmentServiceApi;

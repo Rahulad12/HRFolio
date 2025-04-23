@@ -1,5 +1,5 @@
 import { Input, Select } from "antd";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { storeSearch } from "../../action/StoreSearch";
 import { useAppDispatch } from "../../Hooks/hook";
@@ -15,15 +15,14 @@ interface StatusOption {
 interface TableSearchProps {
     items?: StatusOption[];
     placeholder?: string;
-    onChange?: (value: string) => void;
-    onSearch?: (value: string) => void;
+
 }
 
 const TableSearch = ({
     items = [],
     placeholder = "Search",
-    onChange,
-    onSearch,
+
+
 }: TableSearchProps) => {
     const dispatch = useAppDispatch();
 
@@ -37,11 +36,12 @@ const TableSearch = ({
     const handleStatusChange = (value: string) => {
         setSelectedStatus(value);
         dispatch(storeSearch(searchText, value, dayjs(), ""));
-        onChange?.(value);
+        if (value === "") {
+            dispatch(storeSearch(searchText, "", dayjs(), ""));
+        }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
+    const handleInputChange = (value: string) => {
         setSearchText(value);
         dispatch(storeSearch(searchText, selectedStatus, dayjs(), ""));
         if (value === "") {
@@ -56,13 +56,8 @@ const TableSearch = ({
                     placeholder={placeholder}
                     allowClear
                     value={searchText}
-                    onChange={handleInputChange}
+                    onChange={(e) => handleInputChange(e.target.value)}
                     prefix={<Search size={16} className="text-gray-500" />}
-                    size="large"
-                    // onPressEnter={handleSearch}
-                    style={{
-                        padding: "8px 12px",
-                    }}
                 />
             </div>
 
@@ -71,10 +66,8 @@ const TableSearch = ({
                 value={selectedStatus}
                 onChange={handleStatusChange}
                 placeholder="Filter by status"
-                size="large"
                 className="w-50"
                 showSearch
-
             >
                 {items.map((option) => (
                     <Option key={option.value} value={option.value} className="text-sm">

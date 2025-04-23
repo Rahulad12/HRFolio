@@ -15,7 +15,7 @@ export const interviewServiceApi = api.injectEndpoints({
             invalidatesTags: ["Interview"],
         }),
 
-        getInterview: builder.query<interviewResponse, { date: Dayjs | null | string, status: string }>({
+        getInterview: builder.query<interviewResponse, { date: Dayjs | null | string, status: string | null }>({
             query: ({
                 date,
                 status

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Users, Calendar, ClipboardCheck, UserPlus, Briefcase, FileText, Award, BarChart2 } from 'lucide-react';
 import Logo from '../ui/Logo';
@@ -35,14 +35,28 @@ export const Sidebar: React.FC = () => {
 
 
   const links = [
-    { to: '/dashboard', icon: <BarChart2 size={20} />, label: 'Dashboard' },
-    { to: '/dashboard/candidates', icon: <Users size={20} />, label: 'Candidates' },
-    { to: '/dashboard/interviews', icon: <Calendar size={20} />, label: 'Interviews' },
-    { to: '/dashboard/assessments', icon: <ClipboardCheck size={20} />, label: 'Assessments' },
-    { to: '/dashboard/interviewers', icon: <UserPlus size={20} />, label: 'Interviewers' },
-    { to: '/dashboard/jobs', icon: <Briefcase size={20} />, label: 'Jobs' },
-    { to: '/dashboard/offers', icon: <FileText size={20} />, label: 'Offers' },
-    { to: '/dashboard/reports', icon: <Award size={20} />, label: 'Reports' },
+    { key: '/dashboard', icon: <BarChart2 size={20} />, label: <Link to="/dashboard">Dashboard</Link> },
+    { key: '/dashboard/candidates', icon: <Users size={20} />, label: <Link to="/dashboard/candidates">Candidates</Link> },
+    { key: '/dashboard/interviews', icon: <Calendar size={20} />, label: <Link to="/dashboard/interviews">Interviews</Link> },
+    {
+      key: 'assessments',
+      icon: <ClipboardCheck size={20} />,
+      label: 'Assessments',
+      children: [
+        {
+          key: '/dashboard/assessments',
+          label: <Link to="/dashboard/assessments">Assessments</Link>,
+        },
+        {
+          key: '/dashboard/assessments/assignments',
+          label: <Link to="/dashboard/assessments/assignments">Manage Assessment</Link>,
+        },
+      ],
+    },
+    { key: '/dashboard/interviewers', icon: <UserPlus size={20} />, label: <Link to="/dashboard/interviewers">Interviewers</Link> },
+    { key: '/dashboard/jobs', icon: <Briefcase size={20} />, label: <Link to="/dashboard/jobs">Jobs</Link> },
+    { key: '/dashboard/offers', icon: <FileText size={20} />, label: <Link to="/dashboard/offers">Offers</Link> },
+    { key: '/dashboard/reports', icon: <Award size={20} />, label: <Link to="/dashboard/reports">Reports</Link> },
   ];
 
   return (
@@ -55,11 +69,8 @@ export const Sidebar: React.FC = () => {
         <Menu
           mode="inline"
           selectedKeys={[currentPath]}
-          items={links.map(link => ({
-            key: link.to,
-            icon: link.icon,
-            label: <Link to={link.to}>{link.label}</Link>,
-          }))}
+          defaultOpenKeys={['assessments']}
+          items={links}
         />
 
       </div>

@@ -2,66 +2,70 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import Card from '../../component/ui/Card';
-import { candidates, interviewers } from '../../data/mockData';
 import { motion } from 'framer-motion';
 import { useCreateInterviewMutation } from '../../services/interviewServiceApi';
-import { Button, DatePicker, Form, Input, Select, Typography, message } from 'antd';
-import { format } from 'date-fns';
+import { Button, DatePicker, Form, Input, Select, TimePicker, Typography, message } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import { interviewData } from '../../types';
-
+import { useInterviewer } from '../../action/StoreInterview';
+import { useCandidate } from '../../action/StoreCandidate';
+import { makeCapitilized } from '../../utils/TextAlter';
 const { Option } = Select;
 const { TextArea } = Input;
 const { Title } = Typography;
 
 const InterviewSchedule: React.FC = () => {
   const navigate = useNavigate();
+  // const dispatch = useAppDispatch();
   const [form] = Form.useForm();
-  const [createInterview] = useCreateInterviewMutation();
-  const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+  const [createInterview, { isLoading: createInterviewLoading }] = useCreateInterviewMutation();
+  const { interviewers } = useInterviewer();
+  const { data: candidates } = useCandidate();
+  // const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
 
-  const [interviewerId, setInterviewerId] = useState<string>('');
+  // const [interviewerId, setInterviewerId] = useState<string>('');
 
-  const handleInterviewerChange = (value: string) => {
-    setInterviewerId(value);
-    form.setFieldsValue({ time: undefined }); // reset time when interviewer changes
-  };
+  // const handleInterviewerChange = (value: string) => {
+  //   setInterviewerId(value);
+  //   form.setFieldsValue({ time: undefined }); // reset time when interviewer changes
+  // };
 
   const handleDateChange = (date: any) => {
     setSelectedDate(dayjs(date));
     form.setFieldsValue({ date: date });
   };
 
-  // update available time slots
-  useEffect(() => {
-    if (interviewerId && selectedDate) {
-      const interviewer = interviewers.find((i) => i.id === interviewerId);
-      if (interviewer) {
-        const dayOfWeek = format(selectedDate.toDate(), 'EEEE').toLowerCase();
-        const availability = interviewer.availability.find((a) => a.day === dayOfWeek);
-        setAvailableTimes(availability?.timeSlots || []);
-      }
-    } else {
-      setAvailableTimes([]);
-    }
-  }, [interviewerId, selectedDate]);
+  // useEffect(() => {
+  //   if (interviewerId && selectedDate) {
+  //     const interviewer = interviewers?.data?.find((i) => i._id === interviewerId);
+  //     if (interviewer) {
+  //       const dayOfWeek = format(selectedDate.toDate(), 'EEEE').toLowerCase();
+  //       const availability = interviewer?.availability.find((a) => a.day === dayOfWeek);
+  //       setAvailableTimes(availability?.timeSlots || []);
+  //     }
+  //   } else {
+  //     setAvailableTimes([]);
+  //   }
+  // }, [interviewerId, selectedDate, interviewers]);
 
-  const onFinish = (values: interviewData) => {
+  const onFinish = async (values: interviewData) => {
     const payload = {
       ...values,
-      date: format(values.date.toDate(), 'yyyy-MM-dd'),
+      date: dayjs(values.date).format('YYYY-MM-DD'),
+      time: dayjs(values.time).format('h:mm A'),
 
     };
-    console.log('Interview Payload:', payload);
-
-    // Simulate API call
-    message.loading('Scheduling...', 1);
-    setTimeout(() => {
-      // Normally you'd call createInterview(payload)
-      message.success('Interview scheduled successfully');
-      navigate('/dashboard/interviews');
-    }, 1000);
+    try {
+      const response = await createInterview(payload).unwrap();
+      if (response?.success && response?.data) {
+        message.success('Interview scheduled successfully');
+        navigate('/dashboard/interviews');
+      }
+    } catch (error: any) {
+      message.error(`Failed to schedule interview: ${error.data.message}`);
+      console.error('Error scheduling interview:', error);
+    }
   };
 
   return (
@@ -93,9 +97,9 @@ const InterviewSchedule: React.FC = () => {
               rules={[{ required: true, message: 'Candidate is required' }]}
             >
               <Select placeholder="Select Candidate">
-                {candidates.map((c) => (
-                  <Option key={c.id} value={c.id}>
-                    {c.name} ({c.position})
+                {candidates?.data?.map((c) => (
+                  <Option key={c._id} value={c._id}>
+                    {makeCapitilized(c.name)} - {makeCapitilized(c.technology)} ({makeCapitilized(c.level)})
                   </Option>
                 ))}
               </Select>
@@ -106,10 +110,10 @@ const InterviewSchedule: React.FC = () => {
               name="interviewer"
               rules={[{ required: true, message: 'Interviewer is required' }]}
             >
-              <Select placeholder="Select Interviewer" onChange={handleInterviewerChange}>
-                {interviewers.map((i) => (
-                  <Option key={i.id} value={i.id}>
-                    {i.name} ({i.position})
+              <Select placeholder="Select Interviewer">
+                {interviewers?.data?.map((i) => (
+                  <Option key={i._id} value={i._id}>
+                    {i.name}
                   </Option>
                 ))}
               </Select>
@@ -125,22 +129,14 @@ const InterviewSchedule: React.FC = () => {
                 onChange={handleDateChange}
               />
             </Form.Item>
-
             <Form.Item
               label="Time Slot"
               name="time"
+              rules={[{ required: true, message: 'Time slot is required' }]}
             >
-              <Select
-                placeholder="Select Time Slot"
-                disabled={!interviewerId || availableTimes.length === 0}
-              >
-                {availableTimes.map((time) => (
-                  <Option key={time} value={time}>
-                    {time}
-                  </Option>
-                ))}
-              </Select>
+              <TimePicker format={'h:mm A'} />
             </Form.Item>
+
 
             <Form.Item
               label="Interview Type"
@@ -148,9 +144,9 @@ const InterviewSchedule: React.FC = () => {
               rules={[{ required: true, message: 'Interview type is required' }]}
             >
               <Select>
-                <Option value="video">Video Interview</Option>
+                <Option value="in-person">In-Person Interview</Option>
                 <Option value="phone">Phone Interview</Option>
-                <Option value="onsite">Onsite Interview</Option>
+                <Option value="video">Video Interview</Option>
               </Select>
             </Form.Item>
 
@@ -163,7 +159,7 @@ const InterviewSchedule: React.FC = () => {
             <Button icon={<X size={16} />} onClick={() => navigate('/dashboard/interviews')}>
               Cancel
             </Button>
-            <Button type="primary" htmlType="submit" icon={<Save size={16} />}>
+            <Button type="primary" htmlType="submit" icon={<Save size={16} />} loading={createInterviewLoading} disabled={createInterviewLoading}>
               Schedule Interview
             </Button>
           </div>

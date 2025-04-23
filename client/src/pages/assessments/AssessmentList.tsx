@@ -1,104 +1,102 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck, Search, Download, Pencil, Trash2 } from 'lucide-react';
-import { assessments } from '../../data/mockData';
 import Card from '../../component/ui/Card';
-import Button from '../../component/ui/Button';
-import Table from '../../component/ui/Table';
 import Badge from '../../component/ui/Badge';
-import Input from '../../component/ui/Input';
-import Select from '../../component/ui/Select';
-import { Assessment } from '../../types';
+
+import { AssessmentDataResponse } from '../../types';
 import { motion } from 'framer-motion';
+import { useAssessment } from '../../action/StoreAssessment';
+import { useAppSelector } from '../../Hooks/hook';
+import CustomTable from '../../component/common/Table';
+import { Button, Popconfirm, Tooltip, Input, Select } from 'antd';
+import { makeCapitilized } from '../../utils/TextAlter';
+import PrimaryButton from '../../component/ui/button/Primary';
 
 const AssessmentList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('');
   const navigate = useNavigate();
 
-  const filteredAssessments = assessments.filter(assessment => {
-    const matchesSearch = assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          assessment.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
+  const { assessmentLoading } = useAssessment()
+  const { assessments } = useAppSelector((state) => state.assessments);
+
+  const filteredAssessments = assessments?.filter(assessment => {
+    const matchesSearch = assessment.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = typeFilter === '' || assessment.type === typeFilter;
-    
     return matchesSearch && matchesType;
   });
+  console.log(filteredAssessments);
 
-  const handleEditAssessment = (assessment: Assessment, e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/assessments/edit/${assessment.id}`);
+
+  const handleEditAssessment = (id: string) => {
+    console.log(id);
+    alert(`Edit assessment with ID: ${id}`);
+
+    // navigate(`/dasboard/assessments/edit/${id}`);
   };
 
-  const handleDeleteAssessment = (assessment: Assessment, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // In a real app, we would delete the assessment here
-    alert(`Delete assessment: ${assessment.title}`);
+  const handleDeleteAssessment = (id: string) => {
+    console.log(id);
+    alert(`Delete assessment with ID: ${id}`);
+
   };
 
   const typeOptions = [
     { value: '', label: 'All Types' },
     { value: 'technical', label: 'Technical' },
     { value: 'behavioral', label: 'Behavioral' },
-    { value: 'case-study', label: 'Case Study' }
   ];
 
   const columns = [
     {
-      header: 'Title',
-      accessor: (assessment: Assessment) => (
-        <div className="font-medium text-gray-900">{assessment.title}</div>
-      )
-    },
-    {
-      header: 'Description',
-      accessor: (assessment: Assessment) => (
-        <div className="text-sm text-gray-500 truncate max-w-md" title={assessment.description}>
-          {assessment.description}
+      title: "TITLE",
+      dataIndex: "title",
+      key: "title",
+      render: (title: string) => (
+        <div className=' cursor-pointer' >
+          <span className='text-gray-900  font-medium'>{makeCapitilized(title)}</span>
         </div>
       )
     },
     {
-      header: 'Type',
-      accessor: (assessment: Assessment) => (
-        <Badge 
-          variant={
-            assessment.type === 'technical' ? 'primary' : 
-            assessment.type === 'behavioral' ? 'success' : 'warning'
-          }
-        >
-          {assessment.type.charAt(0).toUpperCase() + assessment.type.slice(1)}
-        </Badge>
-      )
+      title: "TYPE",
+      dataIndex: "type",
+      key: "type",
+      render: (type: string) => <Badge>{makeCapitilized(type)}</Badge>
     },
     {
-      header: 'Duration',
-      accessor: (assessment: Assessment) => (
-        <span>{assessment.duration} minutes</span>
-      )
+      title: "DURATION",
+      dataIndex: "duration",
+      key: "duration",
+      render: (duration: string) => <span className='text-gray-500'>{duration}</span>
     },
     {
-      header: 'Actions',
-      accessor: (assessment: Assessment) => (
+      title: "LEVEL",
+      dataIndex: "level",
+      key: "level",
+      render: (level: string) => <span className='text-gray-500'>{makeCapitilized(level)}</span>
+    },
+    {
+      title: "ACTION",
+      key: "action",
+      render: (_: any, record: AssessmentDataResponse) => (
         <div className="flex space-x-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-1"
-            onClick={(e) => handleEditAssessment(assessment, e)}
-            aria-label="Edit assessment"
-          >
-            <Pencil size={16} className="text-blue-600" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-1"
-            onClick={(e) => handleDeleteAssessment(assessment, e)}
-            aria-label="Delete assessment"
-          >
-            <Trash2 size={16} className="text-red-600" />
-          </Button>
+          <Tooltip title="Edit">
+            <Button icon={<Pencil size={14} />} onClick={() => handleEditAssessment(record._id)} />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <Popconfirm
+              title="Are you sure you want to delete this assessment?"
+              onConfirm={() => handleDeleteAssessment(record._id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button icon={<Trash2 size={14} />} danger />
+            </Popconfirm>
+          </Tooltip>
+
         </div>
       )
     }
@@ -118,19 +116,12 @@ const AssessmentList: React.FC = () => {
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
-          <Button
-            variant="primary"
+          <PrimaryButton
+            text='Create Assessment'
             icon={<ClipboardCheck size={16} />}
-            onClick={() => navigate('/assessments/new')}
-          >
-            Create Assessment
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/assessments/assignments')}
-          >
-            Manage Assignments
-          </Button>
+            onClick={() => navigate('/dashboard/assessments/new')}
+          />
+
         </div>
       </div>
 
@@ -142,10 +133,10 @@ const AssessmentList: React.FC = () => {
             </div>
             <Input
               placeholder="Search assessments..."
+              prefix={<Search size={18} className="text-gray-400" />}
               className="pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              fullWidth
             />
           </div>
           <div className="flex space-x-2">
@@ -154,9 +145,10 @@ const AssessmentList: React.FC = () => {
               value={typeFilter}
               onChange={setTypeFilter}
               className="w-40"
+              showSearch
             />
             <Button
-              variant="outline"
+              type="default"
               icon={<Download size={16} />}
               aria-label="Export"
             >
@@ -164,13 +156,13 @@ const AssessmentList: React.FC = () => {
             </Button>
           </div>
         </div>
-
-        <Table
-          columns={columns}
+        <CustomTable
           data={filteredAssessments}
-          keyExtractor={(assessment) => assessment.id}
-          emptyMessage="No assessments found. Try adjusting your filters or create a new assessment."
+          columns={columns}
+          loading={assessmentLoading}
+          pageSize={10}
         />
+
       </Card>
     </motion.div>
   );

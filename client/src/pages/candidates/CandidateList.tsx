@@ -1,5 +1,5 @@
 import { Button, Space, Tag, Tooltip, Popconfirm, Skeleton, notification } from 'antd';
-import { Edit, Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../Hooks/hook';
 import { useDeleteCandidateMutation, useGetCandidateQuery } from '../../services/candidateServiceApi';
 import { setCandidate } from '../../slices/candidateSlices';
@@ -12,6 +12,7 @@ import CustomTable from '../../component/common/Table';
 import Card from '../../component/ui/Card';
 import TableSearch from '../../component/common/TableSearch';
 import PrimaryButton from '../../component/ui/button/Primary';
+import Predefineddata from '../../data/PredefinedData';
 
 
 // interface TableProps {
@@ -21,20 +22,15 @@ import PrimaryButton from '../../component/ui/button/Primary';
 
 const statusColors: Record<string, string> = {
   shortlisted: 'blue',
-  'first interview': 'orange',
-  'second interview': 'purple',
+  first: 'orange',
+  second: 'purple',
+  third: 'yellow',
   hired: 'green',
+  assessment: "gray",
+  offerd: "green",
   rejected: 'red',
 };
 
-const statusOptions = [
-  { value: "", label: "All Status" },
-  { value: "shortlisted", label: "Shortlisted" },
-  { value: "first interview", label: "First Interview" },
-  { value: "second interview", label: "Second Interview" },
-  { value: "hired", label: "Hired" },
-  { value: "rejected", label: "Rejected" },
-];
 
 const CandidateTable = () => {
 
@@ -43,8 +39,8 @@ const CandidateTable = () => {
   // const filter = useAppSelector((state) => state.search);
   const [deleteCandidate, { isLoading: isDeleting }] = useDeleteCandidateMutation();
 
-  const searchTerms = useAppSelector((state) => state.search);
-  const { data, isLoading: candidateLoading, isError: candidateError } = useGetCandidateQuery({
+  const { candidateSearch: searchTerms } = useAppSelector((state) => state.search);
+  const { data, isLoading: candidateLoading } = useGetCandidateQuery({
     searchText: searchTerms?.text || "",
     status: searchTerms?.status || "",
   }, {
@@ -77,7 +73,7 @@ const CandidateTable = () => {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (text: string, record: candidateData) => (
+      render: (_: any, record: candidateData) => (
         <div onClick={() => navigate(`/dashboard/candidates/${record._id}`)} className=' cursor-pointer'>
           <div className="font-medium text-gray-900" >{record.name}</div>
           <div className="text-xs text-gray-500">{record.email}</div>
@@ -156,7 +152,7 @@ const CandidateTable = () => {
               <Button
                 type="text"
                 icon={<Pencil className="w-4 h-4" />}
-                onClick={() => navigate(`/dashboard/candidate/edit/${record._id}`)}
+                onClick={() => navigate(`/dashboard/candidates/edit/${record._id}`)}
                 className="text-green-500 hover:bg-green-50"
               />
             </Tooltip>
@@ -228,7 +224,7 @@ const CandidateTable = () => {
         {contextHolder}
         <div className="flex justify-between items-center mb-4">
           <TableSearch
-            items={statusOptions}
+            items={Predefineddata?.Status || []}
             placeholder="Search by name, level, technology"
           />
         </div>
@@ -245,8 +241,7 @@ const CandidateTable = () => {
               data={data?.data || []}
               columns={columns}
               pageSize={10}
-              scroll={{ x: 800, y: 400 }}
-              rowKey="_id"
+              key="candidateTable"
             />
           </AnimatePresence>
         </motion.div>

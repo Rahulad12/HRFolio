@@ -5,10 +5,13 @@ import session from 'express-session';
 import "./config/passport.js";
 import logger from "./utils/logger.js";
 import connectDB from './config/db.js';
+import { EventEmitter } from 'events';
+
 import "dotenv/config";
 const app = express();
 
 
+EventEmitter.defaultMaxListeners = 20;
 // session (if needed for passport)
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
 
@@ -28,12 +31,14 @@ import candidateRouter from './routes/candidateRoutes.js';
 import interviewRouter from './routes/interviewRoutes.js';
 import interviewerRouter from './routes/interviewerRoutes.js';
 import assessmentRouter from './routes/assessmentRoutes.js';
-
+import uploadRouter from './routes/uploadRoutes.js';
 app.use('/api/auth', authRouter);
 app.use('/api/candidate', candidateRouter);
 app.use('/api/interview', interviewRouter);
 app.use('/api/interviewer', interviewerRouter);
 app.use('/api/assessment', assessmentRouter);
+app.use("/uploads", express.static("uploads"));
+app.use("/api/uploads", uploadRouter);
 
 app.get('/', (req, res) => {
     logger.info("Server is running");

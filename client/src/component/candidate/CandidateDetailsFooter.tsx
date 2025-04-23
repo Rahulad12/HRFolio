@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useAppSelector } from '../../Hooks/hook'
 import { Badge, Button, Card, Tabs } from 'antd'
 import { Clock, Phone, CheckCircle } from 'lucide-react'
@@ -19,7 +19,7 @@ const CandidateDetailsFooter = () => {
         status: 'interviewing',
     }
 
-    const candidateInterviews: interviewData = interviews || []
+    const candidateInterviews: interviewData[] = interviews || []
     const candidateAssessments: any[] = []
 
     return (

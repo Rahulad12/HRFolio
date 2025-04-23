@@ -9,7 +9,7 @@ import Button from '../component/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '../Hooks/hook';
-import { getCandidate } from '../action/StoreCandidate';
+import { useCandidate } from '../action/StoreCandidate';
 import { useInterview } from '../action/StoreInterview';
 import dayjs from 'dayjs';
 import PrimaryButton from '../component/ui/button/Primary';
@@ -19,7 +19,7 @@ export const Dashboard: React.FC = () => {
 
   //storeInterview is used to store the interview data in redux
   const { isLoading, isError } = useInterview();
-  getCandidate();
+  const { data } = useCandidate();
   const { user } = useAppSelector((state) => state.auth);
 
   // Fetching data from Redux store
@@ -120,7 +120,7 @@ export const Dashboard: React.FC = () => {
           <Button
             variant="outline"
             icon={<Calendar size={16} />}
-            onClick={() => navigate('/interviews/schedule')}
+            onClick={() => navigate('/dashboard/interviews/schedule')}
           >
             Schedule Interview
           </Button>

@@ -10,18 +10,31 @@ const assessmentAssignmentSchema = new mongoose.Schema({
         ref: "assessments"
     },
     date: {
-        type: Date,
+        type: String,
         required: true
+    },
+    score: {
+        type: Number
+
     },
     status: {
         type: String,
-        enum: ["Assigned", "pending", "completed"],
-        default: "Assigned",
+        enum: ["assigned", "pending", "completed"],
+        default: "assigned",
         required: true
     },
 }, {
     timestamps: true
 });
+
+assessmentAssignmentSchema.pre('save', function (next) {
+    const now = new Date();
+    if (this, this.status === "assigned" && this.date < now) {
+        this.status = "pending";
+    };
+    next();
+}
+)
 
 const AssessmentAssignment = mongoose.model("assessmentAssignments", assessmentAssignmentSchema);
 export default AssessmentAssignment;

@@ -6,104 +6,58 @@ import Card from '../../component/ui/Card';
 import { motion } from 'framer-motion';
 import { Button, Col, DatePicker, Form, Input, InputNumber, message, Row, Select, Typography, Upload, } from 'antd';
 import { candidateFormData } from '../../types';
-import {
-  useCreateCandidateMutation, useGetCandidateByIdQuery,
-  useUpdateCandidateMutation,
-} from '../../services/candidateServiceApi';
+import { useCreateCandidateMutation } from '../../services/candidateServiceApi';
 import { makeCapitilized } from '../../utils/TextAlter';
 import Predefineddata from '../../data/PredefinedData';
 import dayjs from 'dayjs';
-import { useUploadResumeMutation } from '../../services/uploadFileService';
 const { Title } = Typography;
 
 const CandidateForm: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  // const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [createCandidate, { isLoading: createLoading }] = useCreateCandidateMutation();
-  const [updateCandidate, { isLoading: updateLoading }] = useUpdateCandidateMutation();
-  const { data: candidate } = useGetCandidateByIdQuery(id, { skip: !id });
-  const [uploadResume] = useUploadResumeMutation();
-  const [isEditing, setIsEditing] = useState(false);
-  const [resumeUrl, setResumeUrl] = useState('');
-
-  console.log(resumeUrl);
-  useEffect(() => {
-    if (id && candidate?.data) {
-      setIsEditing(true);
-      form.setFieldsValue({
-        name: candidate.data.name,
-        email: candidate.data.email,
-        phone: candidate.data.phone,
-        level: candidate.data.level,
-        technology: candidate.data.technology,
-        experience: candidate.data.experience,
-        expectedsalary: candidate.data.expectedsalary,
-        applieddate: dayjs(candidate.data.applieddate),
-      });
-    }
-  }, [id, candidate, form]);
-
-  const handleResumeUpload = async (options: any) => {
-    const { onSuccess, onError, file } = options;
-
-    const formData = new FormData();
-    formData.append('resume', file);
+  const [createCandidate, { isLoading: loading }] = useCreateCandidateMutation();
 
 
-    try {
-      const response = await uploadResume(formData).unwrap();
-      console.log(response);
-      if (response?.success) {
-        setResumeUrl(response.url);
-        onSuccess(response, file);
-        message.success(response.message);
-      } else {
-        onError("Failed to upload resume");
-        message.error(response.message);
-      }
-    } catch (error: any) {
-      console.error('Error uploading resume:', error);
-      onError(error);
-      message.error('Failed to upload resume');
-    }
-  }
+
+  // useEffect(() => {
+  //   if (isEditing) {
+  //     const candidate = candidates.find(c => c.id === id);
+  //     if (candidate) {
+  //       setFormData({
+  //         name: candidate.name,
+  //         email: candidate.email,
+  //         phone: candidate.phone,
+  //         position: candidate.position,
+  //         status: candidate.status,
+  //         resume: candidate.resume,
+  //         notes: candidate.notes
+  //       });
+  //     }
+  //   }
+  // }, [id, isEditing]);
 
   const onFinish = async (formData: candidateFormData) => {
-    if (!resumeUrl) {
-      message.error("Please upload a resume before submitting.");
-      return;
-    }
-
     const filterFormData = {
       ...formData,
       name: formData.name.trim().toLowerCase(),
       email: formData.email.trim().toLowerCase(),
       experience: Number(formData.experience),
       expectedsalary: Number(formData.expectedsalary),
-      applieddate: dayjs(formData.applieddate).format('YYYY-MM-DD'),
-      resume: resumeUrl
+      applieddate: formData.applieddate
     };
     try {
-      if (isEditing) {
-        const res = await updateCandidate({ id: id || '', data: filterFormData }).unwrap();
-        if (res.success) {
-          message.success(res.message);
-          navigate('/dashboard/candidates');
-          return;
-        }
-      } else {
-        const res = await createCandidate(filterFormData).unwrap();
-        if (res.success) {
-          message.success(res.message);
-          form.resetFields();
-        }
+      const res = await createCandidate(filterFormData).unwrap();
+      if (res.success) {
+        message.success(res?.message);
+        form.resetFields();
       }
     } catch (err: any) {
-      const resErr: string = err?.data?.message || 'Something went wrong';
+      const resErr: string = err.data.message;
       message.error(resErr);
     }
   };
+  const normFile = (e: any) => Array.isArray(e) ? e : e?.fileList;
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -118,8 +72,7 @@ const CandidateForm: React.FC = () => {
             className="mr-3"
             onClick={() => navigate('/dashboard/candidates')}
           />
-          <Title level={3}>{
-            isEditing ? 'Edit Candidate' : 'Add New Candidate'}</Title>
+          <Title level={3}>Create Candidates</Title>
         </div>
 
         {/* <h1 className="text-2xl font-bold text-gray-900">
@@ -259,13 +212,18 @@ const CandidateForm: React.FC = () => {
 
             <Col span={8}>
               <Form.Item
+                name="resume"
                 label="CV Upload"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                rules={[{ required: true, message: "Please upload CV" }]}
+                className="col-span-2"
               >
                 <Upload
                   maxCount={1}
+                  beforeUpload={() => false}
                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  customRequest={handleResumeUpload}
-                  showUploadList={true}
+                  className="w-full"
                 >
                   <Button
                     icon={<UploadOutlined />}
@@ -352,10 +310,10 @@ const CandidateForm: React.FC = () => {
             <Button
               type="primary"
               htmlType="submit"
-              loading={createLoading || updateLoading}
-              disabled={createLoading || updateLoading}
+              loading={loading}
+              disabled={loading}
             >
-              {isEditing ? 'Edit Candidate' : 'Submit Candidate'}
+              Submit Application
             </Button>
           </div>
         </Form>

@@ -119,7 +119,7 @@ const InterviewerList: React.FC = () => {
           variant="primary"
           icon={<UserPlus size={16} />}
           className="mt-4 sm:mt-0"
-          onClick={() => navigate('/interviewers/new')}
+          onClick={() => navigate('/dashboard/interviewers/new')}
         >
           Add Interviewer
         </Button>

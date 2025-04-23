@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Steps, Select, notification } from 'antd';
 import { useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../../services/candidateServiceApi';
-import { candidateData } from '../../types/index';
+import { candidateData, candidateFormData } from '../../types/index';
 import CandidateProfileLoading from '../../component/Loding/CandidateProfileLoading';
 import { makeCapitilized } from '../../utils/TextAlter';
 import Predefineddata from '../../data/PredefinedData';
@@ -13,8 +13,9 @@ import { storeCandidate } from '../../action/StoreCandidate';
 import CandidateProfile from '../../component/candidate/CandidateProfile';
 import { candidateStatus } from '../../types/index';
 import CandidateInfo from '../../component/candidate/CandidateInfo';
-import CandidateDetailsFooter from '../../component/candidate/candidateDetailsFooter';
+import CandidateDetailsFooter from '../../component/candidate/CandidateDetailsFooter';
 const { Option } = Select;
+
 
 
 const CandidateDetails = () => {
@@ -26,27 +27,30 @@ const CandidateDetails = () => {
     refetchOnMountOrArgChange: true,
   });
 
-  const [candidate, setCandidate] = useState<candidateData>({
+
+  const [candidate, setCandidate] = useState<candidateFormData>({
+    name: "",
+    email: "",
     phone: 0,
-    email: '',
-    name: '',
-    technology: '',
-    level: '',
+    status: "shortlisted",
+    applieddate: "",
+    technology: "",
+    level: "",
     experience: 0,
     expectedsalary: 0,
     references: [],
-    status: 'shortlisted',
-    _id: '',
-    createdAt: '',
-  });
+    resume: "",
+  })
   const [api, contextHolder] = notification.useNotification();
   useEffect(() => {
     if (data?.data) {
       setCandidate(data.data);
-      dispatch(storeCandidate(Array(data.data)));
+      const candidateList = Array.isArray(data.data) ? data.data : [data.data];
+      dispatch(storeCandidate(candidateList));
     }
     if (interviewData?.success && interviewData?.data) {
-      dispatch(storeInterview(interviewData.data));
+      const interviewList = Array.isArray(interviewData.data) ? interviewData.data : [interviewData.data];
+      dispatch(storeInterview(interviewList));
     }
   }, [data, interviewData]);
 
@@ -55,7 +59,7 @@ const CandidateDetails = () => {
     setCandidate({ ...candidate, status: newStatus });
 
     try {
-      const res = await updateCandidate({ id: candidate._id, data: { status: newStatus } }).unwrap();
+      const res = await updateCandidate({ id: id || '', data: { ...candidate, status: newStatus } }).unwrap();
       if (res.success) {
         api.success({
           message: res.message,
@@ -73,7 +77,7 @@ const CandidateDetails = () => {
     }
   };
 
-  const interviewSteps = ['shortlisted', 'first interview', 'second interview', 'third interview', 'assessment', 'offered', 'hired', 'rejected'];
+  const interviewSteps = ['shortlisted', 'first', 'second', 'third', 'assessment', 'offered', 'hired', 'rejected'];
   const currentStep = interviewSteps.indexOf(candidate.status);
 
   if (isLoading) return <CandidateProfileLoading />;

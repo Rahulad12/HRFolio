@@ -18,6 +18,9 @@ const scoreSchema = new mongoose.Schema({
         default: "pending",
         required: true
     },
+    note: {
+        type: String
+    }
 }, {
     timestamps: true
 });

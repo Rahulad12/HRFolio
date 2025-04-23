@@ -10,23 +10,29 @@ import dayLocaleData from 'dayjs/plugin/localeData';
 
 dayjs.extend(dayLocaleData);
 interface CustomCalenderProps {
-    fullscreen?: boolean;
-    widht?: number;
+    screen?: boolean;
+    width?: number; // corrected from widht
+    onChange?: (value: Dayjs) => void;
 }
-const CustomCalender: React.FC = ({
-    fullscreen = false,
-    widht = 300,
+
+const CustomCalender = ({
+    screen = false,
+    width = 300,
     onChange = () => { },
 
 }: CustomCalenderProps) => {
     const { token } = theme.useToken();
 
-    const onPanelChange = (value: Dayjs, mode: CalendarProps<Dayjs>['mode']) => {
-        onChange(value, mode);
+    // const onPanelChange = (value: Dayjs, mode: CalendarProps<Dayjs>['mode']) => {
+    //     onClick(value, mode);
+    //     console.log('onPanelChange', value, mode);
+    // };
+    const handleDateChange = (value: Dayjs) => {
+        onChange(value);
+        console.log("date", value);
     };
-
     const wrapperStyle: React.CSSProperties = {
-        width: widht,
+        width: width,
         border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: token.borderRadiusLG,
     };
@@ -34,7 +40,7 @@ const CustomCalender: React.FC = ({
     return (
         <div style={wrapperStyle}>
             <Calendar
-                fullscreen={fullscreen}
+                fullscreen={screen}
                 headerRender={({ value, type, onChange, onTypeChange }) => {
                     const start = 0;
                     const end = 12;
@@ -110,7 +116,7 @@ const CustomCalender: React.FC = ({
                         </div>
                     );
                 }}
-                onPanelChange={onPanelChange}
+                onSelect={handleDateChange}
             />
         </div>
     );

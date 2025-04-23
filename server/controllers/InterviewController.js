@@ -23,10 +23,10 @@ const createInterview = async (req, res) => {
 
 const getAllInterviews = async (req, res) => {
     const { date, status } = req.query;
+    console.log("date", date);
+    console.log("status", status);
     try {
-
         const query = {};
-
         if (date) {
             query.date = date;
         }
@@ -55,6 +55,7 @@ const getAllInterviews = async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
+        console.log("get interview error", error);
     }
 }
 

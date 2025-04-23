@@ -2,9 +2,9 @@ import Assessment from "../model/Assessment.js";
 import AssessmentAssignment from "../model/AssessmentAssignment.js";
 import Score from "../model/ScoreModle.js";
 const createAssessment = async (req, res) => {
-    const { title, type, technology, level } = req.body
+    const { title, type, technology, level, duration } = req.body
     try {
-        const createdAssessment = await Assessment.create({ title, type, technology, level });
+        const createdAssessment = await Assessment.create({ title, type, technology, level, duration });
         if (!createdAssessment) {
             return res.status(400).json({ success: false, message: "Assessment not created" });
         }
@@ -178,18 +178,51 @@ const getAssignmentById = async (req, res) => {
 }
 
 const createScore = async (req, res) => {
-    const { candidate, assessment, score } = req.body;
+    const { candidate, assessment, score, note } = req.body;
+
     try {
-        if (score < 0 || score > 100) return res.status(400).json({ success: false, message: "Score must be between 0 and 100" });
-        const createdScore = await Score.create({ candidate, assessment, score, status: score >= 40 ? "Passed" : "Failed" });
+        if (score < 0 || score > 100) {
+            return res.status(400).json({ success: false, message: "Score must be between 0 and 100" });
+        }
+
+        const existingScore = await Score.findOne({
+            candidate,
+            assessment
+        });
+        if (existingScore) {
+            return res.status(400).json({ success: false, message: "Score already exists" });
+        }
+        const createdScore = await Score.create({
+            candidate,
+            assessment,
+            score,
+            status: score >= 40 ? "Passed" : "Failed",
+            note
+        });
+
         if (!createdScore) {
             return res.status(400).json({ success: false, message: "Score not created" });
         }
-        return res.status(200).json({ success: true, message: "Score created successfully", data: createdScore });
+
+        // Update the assignment status to 'evaluated' and attach score
+        const assignment = await AssessmentAssignment.findOne({ candidate, assessment });
+
+        if (assignment) {
+            assignment.score = score;
+            assignment.status = "completed";
+            await assignment.save();
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Score created successfully",
+            data: createdScore
+        });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
-}
+};
+
 const getScoreById = async (req, res) => {
     try {
         const score = await Score.find({ candidate: req.params.id }).select("-createdAt -updatedAt -__v").populate({

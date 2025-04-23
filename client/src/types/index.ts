@@ -34,7 +34,10 @@ export type candidateFormData = {
     level: string;
     experience: number;
     expectedsalary: number;
-    reference: referenceData;
+    references: referenceData[];
+    applieddate: string | null;
+    resume: string | null;
+    status: candidateStatus
 }
 
 export type candidateFilter = {
@@ -60,8 +63,10 @@ export type candidateData = {
     expectedsalary: number;
     references: referenceResponse[];
     status: candidateStatus;
-    _id: string
-    createdAt: string
+    _id: string;
+    createdAt: string;
+    applieddate: string;
+    resume: string;
 }
 export type candidateResponse = {
     success: boolean;
@@ -76,7 +81,7 @@ export type interviewer = {
 export type interviewData = {
     candidate: candidateData;
     interviewer: interviewer;
-    date: Dayjs;
+    date: string;
     time: string;
     type: 'phone' | 'video' | 'in-person';
     feedback: string;
@@ -138,7 +143,7 @@ export type assessmentResponseById = {
 export type AssignmentData = {
     candidate: string[] | Key[];
     assessment: string;
-    date: Dayjs;
+    date: string;
 }
 
 export type AssignmentDataResponse = {
@@ -167,6 +172,40 @@ export type assignmentResponseById = {
     message: string;
     data: AssignmentDataResponse;
 }
+
+export type AssignmentScoreFromData = {
+    candidate: string;
+    assessment: string;
+    score: number;
+    status: string;
+    note: string;
+}
+export type AssignmentScoreResponse = {
+    candidate: candidateData;
+    assessment: assessmentFormData;
+    score: number;
+    status: string;
+    note: string;
+}
+export type AssgnmentScoreResponse = {
+    success: boolean;
+    message: string;
+    data: AssignmentScoreResponse[];
+}
+
+
+
+export type UploadFileResponse = {
+    success: boolean;
+    message: string;
+    url: string;
+}
+
+export type UploadFileRequest = {
+    file: File;
+}
+
+//mmmmmmmmmmmmmmmm
 export interface Assessment {
     id: string;
     title: string;

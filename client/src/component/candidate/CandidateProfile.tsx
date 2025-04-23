@@ -1,8 +1,8 @@
 import { useAppSelector } from '../../Hooks/hook';
-import Button from '../ui/Button';
-import { ArrowLeft, Calendar, Mail, Phone, User } from 'lucide-react';
+import { ArrowLeft, Download, Mail, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { makeCapitilized } from '../../utils/TextAlter';
+import { Button } from 'antd';
 
 const CandidateProfile = () => {
     const navigate = useNavigate();
@@ -13,9 +13,9 @@ const CandidateProfile = () => {
         <div className="space-y-6">
             <div className="flex items-center mb-4">
                 <Button
-                    variant="ghost"
-                    size="sm"
+                    type="text"
                     className="mr-2"
+                    size='small'
                     icon={<ArrowLeft size={18} />}
                     onClick={() => navigate('/dashboard/candidates')}
                     aria-label="Back"
@@ -31,10 +31,26 @@ const CandidateProfile = () => {
                             <Phone className="w-4 h-4" />
                             {profile?.phone}
                         </span>
+                        {profile?.resume && (
+                            <span>
+                                <span className="flex items-center gap-2">
+                                    <Download className="w-4 h-4" />
+                                    <a
+                                        href={profile.resume}
+                                        target="_blank"
+                                        download
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        Download Resume
+                                    </a>
+
+                                </span>
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -11,7 +11,7 @@ const interviewSchema = new mongoose.Schema({
         ref: "interviewers"
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     },
     time: {

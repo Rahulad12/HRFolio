@@ -5,7 +5,7 @@ const createCandidate = async (req, res) => {
     const {
         name, email, phone,
         technology, level, experience,
-        expectedsalary, references
+        expectedsalary, references, applieddate, resume
     } = req.body;
     try {
         const existingCandidate = await Candidate.findOne({ email });
@@ -20,7 +20,7 @@ const createCandidate = async (req, res) => {
         const newCandidate = new Candidate({
             name, email, phone,
             technology, level, experience,
-            expectedsalary
+            expectedsalary, applieddate, resume
         })
 
         const savedCandidate = await newCandidate.save();
@@ -96,8 +96,7 @@ const getCandidateById = async (req, res) => {
 // }
 const getAllCandidates = async (req, res) => {
     const { searchText, status } = req.query;
-    console.log("searchText", searchText);
-    console.log("status", status);
+
     try {
         // If no filter is passed, you can return an error or return all
         const query = {};

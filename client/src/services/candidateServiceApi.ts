@@ -1,6 +1,6 @@
 import { CANDIDATE_URL } from "../constant";
 import { api } from "./api";
-import { candidateResponse, candidateFormData, globalResponse, candidateData, candidateFilter } from "../types";
+import { candidateResponse, candidateFormData, globalResponse, candidateData, candidateFilter, candidateStatus } from "../types";
 
 interface candidateIdResposne {
     success: boolean,
@@ -39,7 +39,7 @@ export const candidateServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Candidate"],
         }),
-        updateCandidate: builder.mutation<candidateIdResposne, { id: string, data: { status: string } }>({
+        updateCandidate: builder.mutation<candidateIdResposne, { id: string | null, data: candidateFormData }>({
             query: ({ id, data }) => ({
                 url: `${CANDIDATE_URL}/${id}`,
                 method: "PUT",

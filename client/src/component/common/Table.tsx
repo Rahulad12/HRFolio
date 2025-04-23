@@ -9,8 +9,6 @@ interface AnimatedTableProps {
     columns: any[];
     pageSize?: number;
     className?: string;
-    scroll?: { x: number; y: number };
-    rowKey?: string;
 }
 
 const AnimatedRow = ({ children, ...props }: any) => (
@@ -31,8 +29,6 @@ const CustomTable = ({
     data,
     columns,
     pageSize = 2,
-    scroll = { x: 0, y: 0 },
-    rowKey = '_id',
 }: AnimatedTableProps) => {
     const { darkMode } = useTheme();
 
@@ -50,7 +46,7 @@ const CustomTable = ({
             loading={loading}
             size="large"
             sortDirections={['ascend', 'descend', 'ascend']}
-            scroll={scroll}
+            scroll={{ x: 'max-content' }}
             pagination={false}
             footer={() => {
                 return (

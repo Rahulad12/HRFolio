@@ -56,9 +56,23 @@ export const Sidebar: React.FC = () => {
       ],
     },
     { key: '/dashboard/interviewers', icon: <UserPlus size={20} />, label: <Link to="/dashboard/interviewers">Interviewers</Link> },
-    { key: '/dashboard/jobs', icon: <Briefcase size={20} />, label: <Link to="/dashboard/jobs">Jobs</Link> },
-    { key: '/dashboard/offers', icon: <FileText size={20} />, label: <Link to="/dashboard/offers">Offers</Link> },
-    { key: '/dashboard/reports', icon: <Award size={20} />, label: <Link to="/dashboard/reports">Reports</Link> },
+    // { key: '/dashboard/jobs', icon: <Briefcase size={20} />, label: <Link to="/dashboard/jobs">Jobs</Link> },
+    {
+      key: 'offers',
+      icon: <FileText size={20} />,
+      label: 'Offers',
+      children: [
+        {
+          key: '/dashboard/email-templates',
+          label: <Link to="dashboard/email-templates">Manage Templates</Link>,
+        },
+        {
+          key: '/dashboard/offers',
+          label: <Link to="/dashboard/offers">New Offer</Link>,
+        },
+      ],
+    },
+    // { key: '/dashboard/reports', icon: <Award size={20} />, label: <Link to="/dashboard/reports">Reports</Link> },
   ];
 
   const handleLogout = () => {

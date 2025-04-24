@@ -18,7 +18,7 @@ export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   //storeInterview is used to store the interview data in redux
-  const { isLoading, isError } = useInterview();
+  const { isLoading, isError } = useInterview(null, null);
   const { data } = useCandidate();
   const { user } = useAppSelector((state) => state.auth);
 
@@ -183,7 +183,7 @@ export const Dashboard: React.FC = () => {
         >
           <UpcomingInterviews
             interviews={filteredInterviews}
-            onViewAllClick={() => navigate('/interviews')}
+            onViewAllClick={() => navigate('/dashboard/interviews')}
             loading={isLoading}
             error={isError ? 'Failed to load interviews' : ''}
           />

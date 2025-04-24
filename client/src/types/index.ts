@@ -106,11 +106,11 @@ export type interviewResponseById = {
     data: interviewData;
 }
 
-export type interviewerResponse = {
-    success?: boolean;
-    message?: string;
-    data?: interviewer[]
-}
+// export type interviewerResponse = {
+//     success?: boolean;
+//     message?: string;
+//     data?: interviewer[]
+// }
 
 //assessmet types
 export type assessmentFormData = {
@@ -199,8 +199,6 @@ export type AssgnmentScoreResponse = {
     data: AssignmentScoreResponse[];
 }
 
-
-
 export type UploadFileResponse = {
     success: boolean;
     message: string;
@@ -211,7 +209,75 @@ export type UploadFileRequest = {
     file: File;
 }
 
-//mmmmmmmmmmmmmmmm
+export type interviewerData = {
+    _id: string;
+    _v: number;
+    name: string;
+    email: string;
+    department: string;
+    position: string;
+    availability: [
+        {
+            id: string;
+            day: string;
+            timeSlots: string[]
+        }
+    ]
+}
+
+export type interviewerResponse = {
+    success: boolean;
+    message: string;
+    data: interviewerData[];
+}
+export type interviewerResponseId = {
+    success: boolean;
+    message: string;
+    data: interviewerData;
+}
+
+export type allowedVariables = [
+    'candidateName',
+    'position',
+    'salary',
+    'startDate',
+    'interviewDate',
+    'interviewTime',
+    'assessmentDate',
+    'assessmentTime',
+    'rejectionReason',
+    'rejectionDate',
+    'rejectionTime',
+    'offerDate',
+    'offerTime',
+    'duration',
+    'technology',
+    'benefits',
+    'stockOptions',
+    'responseDeadline'
+];
+export type emailTemplateData = {
+    _id: string;
+    name: string;
+    subject: string;
+    body: string;
+    type: 'offer' | 'interview' | 'assessment' | 'rejection' | 'other'
+    createdAt: string;
+    updatedAt: string;
+    variables: allowedVariables
+}
+
+export type emailTemplateResponse = {
+    success: boolean;
+    message: string;
+    data: emailTemplateData[]
+}
+export type emailTemplateResponseById = {
+    success: boolean;
+    message: string;
+    data: emailTemplateData;
+}
+//mmmmmmmmmmmmmmmm--------------------------------------------------//////////////////////////////////////////////
 export interface Assessment {
     id: string;
     title: string;

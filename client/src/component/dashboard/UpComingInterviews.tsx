@@ -90,7 +90,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
                 </Badge>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-xs text-gray-500">With: {interview?.interviewer?.name}</span>
-                  <span className="text-xs font-medium text-blue-600">{dayjs(interview?.time).format('hh:mm A')}</span>
+                  <span className="text-xs font-medium text-blue-600">{interview?.time}</span>
                 </div>
               </div>
             </div>

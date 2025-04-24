@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X, Send } from 'lucide-react';
-import Card from '../../component/ui/Card';
-import Input from '../../component/ui/Input';
-import Select from '../../component/ui/Select';
-import Button from '../../component/ui/Button';
 import { candidates, offerLetters, emailTemplates } from '../../data/mockData';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
+import { Form, Button, Select, Input, Card, DatePicker, message } from 'antd';
+import dayjs, { Dayjs } from 'dayjs';
+import SecondaryButton from '../../component/ui/button/Secondary';
+import { useGetAllEmailTemplateQuery } from '../../services/emailService';
+
 
 const OfferForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const isEditing = !!id;
-  
+
   const [formData, setFormData] = useState({
     candidateId: '',
     position: '',
@@ -24,11 +25,13 @@ const OfferForm: React.FC = () => {
     emailTemplateId: '',
     status: 'draft'
   });
-  
-  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState('');
-
+  const handleSaveAsDraft = () => {
+    message.success('Draft saved successfully!');
+    navigate('/dashboard/offers');
+  }
   const candidateOptions = candidates
     .filter(candidate => candidate.status === 'interviewing' || candidate.status === 'assessment')
     .map(candidate => ({
@@ -64,7 +67,7 @@ const OfferForm: React.FC = () => {
     if (formData.candidateId && formData.emailTemplateId) {
       const template = emailTemplates.find(t => t.id === formData.emailTemplateId);
       const candidate = candidates.find(c => c.id === formData.candidateId);
-      
+
       if (template && candidate) {
         // Simple template variable replacement
         let previewText = template.body
@@ -73,7 +76,7 @@ const OfferForm: React.FC = () => {
           .replace(/{{salary}}/g, formData.salary)
           .replace(/{{startDate}}/g, format(formData.startDate, 'MMMM d, yyyy'))
           .replace(/{{responseDeadline}}/g, format(new Date(formData.startDate.getTime() - 7 * 24 * 60 * 60 * 1000), 'MMMM d, yyyy'));
-        
+
         setPreview(previewText);
       } else {
         setPreview('');
@@ -83,91 +86,11 @@ const OfferForm: React.FC = () => {
     }
   }, [formData]);
 
-  const handleDateChange = (date: Date) => {
-    setFormData(prev => ({ ...prev, startDate: date }));
-  };
 
-  const handleSelectChange = (name: string) => (value: string) => {
-    setFormData(prev => {
-      const newData = {
-        ...prev,
-        [name]: value
-      };
-      
-      // If candidate changes, update position
-      if (name === 'candidateId') {
-        const candidate = candidates.find(c => c.id === value);
-        if (candidate) {
-          newData.position = candidate.position;
-        }
-      }
-      
-      return newData;
-    });
-    
-    // Clear error when field is updated
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when field is updated
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.candidateId) {
-      newErrors.candidateId = 'Candidate is required';
-    }
-    
-    if (!formData.position) {
-      newErrors.position = 'Position is required';
-    }
-    
-    if (!formData.salary) {
-      newErrors.salary = 'Salary is required';
-    }
-    
-    if (!formData.startDate) {
-      newErrors.startDate = 'Start date is required';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent, shouldSend = false) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, we would save the offer here
-      setIsSubmitting(false);
-      navigate('/offers');
-    }, 1000);
+  const handleSubmit = (value: any) => {
+    console.log(value);
+    message.success('Offer letter send successfully');
   };
 
   return (
@@ -178,11 +101,11 @@ const OfferForm: React.FC = () => {
     >
       <div className="mb-6 flex items-center">
         <Button
-          variant="ghost"
-          size="sm"
+          type="text"
+          size="small"
           className="mr-3"
           icon={<ArrowLeft size={18} />}
-          onClick={() => navigate('/offers')}
+          onClick={() => navigate('/dashboard/offers')}
           aria-label="Back"
         />
         <h1 className="text-2xl font-bold text-gray-900">
@@ -193,99 +116,89 @@ const OfferForm: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <Card>
-            <form onSubmit={(e) => handleSubmit(e, false)}>
+            <Form onFinish={handleSubmit} form={form} layout='vertical'>
               <div className="space-y-6">
                 <div>
-                  <Select
+                  <Form.Item
                     label="Candidate"
                     name="candidateId"
-                    options={candidateOptions}
-                    value={formData.candidateId}
-                    onChange={handleSelectChange('candidateId')}
-                    error={errors.candidateId}
-                    fullWidth
-                    required
-                  />
+                    rules={[{ required: true, message: 'Candidate is required' }]}
+                  >
+                    <Select
+                      options={candidateOptions}
+                      value={formData.candidateId}
+                    />
+                  </Form.Item>
+
                 </div>
                 <div>
-                  <Input
+                  <Form.Item
                     label="Position"
                     name="position"
-                    value={formData.position}
-                    onChange={handleInputChange}
-                    error={errors.position}
-                    fullWidth
-                    required
-                  />
+                    rules={[{ required: true, message: 'Position is required' }]}
+                  >
+                    <Input placeholder='e.g. Software Engineer' />
+                  </Form.Item>
+
                 </div>
                 <div>
-                  <Input
+                  <Form.Item
                     label="Salary"
                     name="salary"
-                    value={formData.salary}
-                    onChange={handleInputChange}
-                    error={errors.salary}
-                    placeholder="e.g. $80,000"
-                    fullWidth
-                    required
-                  />
+                    rules={[{ required: true, message: 'Salary is required' }]}
+                  >
+                    <Input
+                      placeholder="e.g. $80,000"
+                    />
+                  </Form.Item>
+
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date
-                  </label>
-                  <DatePicker
-                    selected={formData.startDate}
-                    onChange={handleDateChange}
-                    minDate={new Date()}
-                    className={`
-                      appearance-none block w-full px-3 py-2 border rounded-md shadow-sm 
-                      placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm
-                      ${errors.startDate ? 'border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'}
-                    `}
-                  />
-                  {errors.startDate && <p className="mt-1 text-sm text-red-600">{errors.startDate}</p>}
+                  <Form.Item
+                    label="Start Date"
+                    name="startDate"
+                    rules={[{ required: true, message: 'Start date is required' }]}
+                  >
+                    <DatePicker width={'100%'} />
+                  </Form.Item>
                 </div>
                 <div>
-                  <Select
+                  <Form.Item
                     label="Email Template"
                     name="emailTemplateId"
-                    options={templateOptions}
-                    value={formData.emailTemplateId}
-                    onChange={handleSelectChange('emailTemplateId')}
-                    fullWidth
-                  />
+                    rules={[{ required: true, message: 'Email template is required' }]}
+                  >
+                    <Select
+                      options={templateOptions}
+                    />
+                  </Form.Item>
                 </div>
               </div>
-
               <div className="mt-8 flex justify-end space-x-3">
                 <Button
-                  variant="outline"
+                  type="default"
                   icon={<X size={16} />}
-                  onClick={() => navigate('/offers')}
+                  onClick={() => navigate('/dashboard/offers')}
                   disabled={isSubmitting}
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
+                <SecondaryButton
+                  htmlType='button'
+                  text='Save as Draft'
                   icon={<Save size={16} />}
-                  isLoading={isSubmitting}
-                >
-                  Save as Draft
-                </Button>
+                  loading={isSubmitting}
+                  onClick={handleSaveAsDraft}
+                />
                 <Button
-                  type="button"
-                  variant="success"
+                  htmlType="submit"
+                  type="primary"
                   icon={<Send size={16} />}
-                  onClick={(e) => handleSubmit(e, true)}
-                  disabled={isSubmitting || !formData.emailTemplateId}
                 >
                   Send Offer
                 </Button>
               </div>
-            </form>
+            </Form>
           </Card>
         </div>
 

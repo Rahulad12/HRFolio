@@ -1,7 +1,7 @@
-import { 
-  Candidate, 
-  Interview, 
-  Assessment, 
+import {
+  Candidate,
+  Interview,
+  Assessment,
   AssessmentAssignment,
   Interviewer,
   OfferLetter,

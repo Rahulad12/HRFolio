@@ -1,46 +1,50 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Search, Pencil, Trash2, Copy } from 'lucide-react';
-import { emailTemplates } from '../../data/mockData';
-import Card from '../../component/ui/Card';
-import Button from '../../component/ui/Button';
-import Table from '../../component/ui/Table';
-import Badge from '../../component/ui/Badge';
-import Input from '../../component/ui/Input';
-import Select from '../../component/ui/Select';
-import { EmailTemplate } from '../../types';
+import { emailTemplateData } from '../../types';
 import { motion } from 'framer-motion';
-
+import { Button, Card, Select, Input, Tag, message, Popconfirm, Tooltip } from 'antd';
+import PrimaryButton from '../../component/ui/button/Primary';
+import CustomTable from '../../component/common/Table';
+import { useDeleteEmailTemplateMutation, useGetAllEmailTemplateQuery } from '../../services/emailService';
 const EmailTemplateList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('');
   const navigate = useNavigate();
+  const { data: emailTemplates, refetch, isLoading } = useGetAllEmailTemplateQuery()
+  const [deleteEmailTemplate, { isLoading: deleteEmailTemplateLoading }] = useDeleteEmailTemplateMutation();
 
-  const filteredTemplates = emailTemplates.filter(template => {
-    const matchesSearch = 
+  const filteredTemplates = emailTemplates?.data?.filter(template => {
+    const matchesSearch =
       template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       template.subject.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesType = typeFilter === '' || template.type === typeFilter;
-    
+
     return matchesSearch && matchesType;
   });
 
-  const handleEditTemplate = (template: EmailTemplate, e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/email-templates/edit/${template.id}`);
+  const handleEditTemplate = (template: emailTemplateData) => {
+    navigate(`/dashboard/email-templates/edit/${template._id}`);
   };
 
-  const handleDeleteTemplate = (template: EmailTemplate, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // In a real app, we would delete the template here
-    alert(`Delete template: ${template.name}`);
+  const handleDeleteTemplate = async (template: emailTemplateData) => {
+    try {
+      const res = await deleteEmailTemplate(template._id).unwrap();
+      if (res?.success) {
+        message.success(res?.message);
+        refetch();
+      }
+    } catch (error: any) {
+      console.error('Failed to delete template', error);
+      message.error(error?.data?.message);
+    }
   };
 
-  const handleDuplicateTemplate = (template: EmailTemplate, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDuplicateTemplate = (template: emailTemplateData) => {
+
     // In a real app, we would duplicate the template here
-    alert(`Duplicate template: ${template.name}`);
+    alert(`Duplicate template: ${template._id}`);
   };
 
   const typeOptions = [
@@ -52,73 +56,102 @@ const EmailTemplateList: React.FC = () => {
     { value: 'other', label: 'Other' }
   ];
 
-  const getTypeBadge = (type: EmailTemplate['type']) => {
+  const getTypeBadge = (type: string) => {
     switch (type) {
       case 'offer':
-        return <Badge variant="success">Offer Letter</Badge>;
+        return <Tag color='blue'>Offer Letter</Tag>;
       case 'interview':
-        return <Badge variant="primary">Interview</Badge>;
+        return <Tag color='orange'>Interview</Tag>;
       case 'assessment':
-        return <Badge variant="secondary">Assessment</Badge>;
+        return <Tag color='green'>Assessment</Tag>;
       case 'rejection':
-        return <Badge variant="error">Rejection</Badge>;
+        return <Tag color='red'>Rejection</Tag>;
       case 'other':
-        return <Badge variant="info">Other</Badge>;
+        return <Tag color='gray'>Other</Tag>;
       default:
         return null;
     }
   };
 
+
   const columns = [
     {
-      header: 'Name',
-      accessor: (template: EmailTemplate) => (
-        <div className="font-medium text-gray-900">{template.name}</div>
+      title: 'Name',
+      dataIndex: 'name',
+      render: (text: string) => (
+        <div className="font-medium text-gray-900 capitalize">{text}</div>
       )
     },
     {
-      header: 'Subject',
-      accessor: (template: EmailTemplate) => (
-        <div className="text-sm text-gray-500 truncate max-w-md" title={template.subject}>
-          {template.subject}
+      title: 'Subject',
+      dataIndex: 'subject',
+      render: (text: string) => (
+        <div className="text-sm text-gray-500 truncate max-w-md">
+          {text}
         </div>
       )
     },
     {
-      header: 'Type',
-      accessor: (template: EmailTemplate) => getTypeBadge(template.type)
+      title: 'Type',
+      dataIndex: 'type',
+      render: (text: string) => (
+        <div>
+          {getTypeBadge(text)}
+        </div>
+      )
     },
     {
-      header: 'Actions',
-      accessor: (template: EmailTemplate) => (
+      title: 'Actions',
+      render: (_: any, record: emailTemplateData) => (
         <div className="flex space-x-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-1"
-            onClick={(e) => handleEditTemplate(template, e)}
-            aria-label="Edit template"
+          <Tooltip
+            title="Edit"
           >
-            <Pencil size={16} className="text-blue-600" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-1"
-            onClick={(e) => handleDuplicateTemplate(template, e)}
-            aria-label="Duplicate template"
+            <Button
+              type="text"
+              size="small"
+              className="p-1"
+              onClick={() => handleEditTemplate(record)}
+              aria-label="Edit template"
+              icon={<Pencil size={16} />}
+            />
+          </Tooltip>
+
+          <Tooltip
+            title="Duplicate"
           >
-            <Copy size={16} className="text-purple-600" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-1"
-            onClick={(e) => handleDeleteTemplate(template, e)}
-            aria-label="Delete template"
+            <Button
+              type="text"
+              size="small"
+              className="p-1"
+              onClick={() => handleDuplicateTemplate(record)}
+              aria-label="Duplicate template"
+              icon={<Copy size={16} />}
+            />
+
+          </Tooltip>
+
+          <Tooltip
+            title="Delete"
           >
-            <Trash2 size={16} className="text-red-600" />
-          </Button>
+            <Popconfirm
+              title="Delete this template?"
+              description="Are you sure you want to delete this template?"
+              onConfirm={() => handleDeleteTemplate(record)}
+              okText="Yes"
+              cancelText="No"
+              okButtonProps={{ loading: deleteEmailTemplateLoading }}
+            >
+              <Button
+                type="text"
+                size="small"
+                className="p-1"
+                danger
+                aria-label="Delete template"
+                icon={<Trash2 size={16} />}
+              />
+            </Popconfirm>
+          </Tooltip>
         </div>
       )
     }
@@ -137,28 +170,27 @@ const EmailTemplateList: React.FC = () => {
             Manage email templates for various recruitment communications
           </p>
         </div>
-        <Button
-          variant="primary"
+        <PrimaryButton
+          text="Create Template"
           icon={<FileText size={16} />}
-          className="mt-4 sm:mt-0"
-          onClick={() => navigate('/email-templates/new')}
-        >
-          Create Template
-        </Button>
+          onClick={() => navigate('/dashboard/email-templates/new')}
+          loading={false}
+        />
+
+
       </div>
 
       <Card>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
           <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-gray-400" />
             </div>
             <Input
               placeholder="Search templates..."
               className="pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              fullWidth
+              prefix={<Search size={18} className='text-gray-400' />}
             />
           </div>
           <Select
@@ -169,11 +201,11 @@ const EmailTemplateList: React.FC = () => {
           />
         </div>
 
-        <Table
+        <CustomTable
+          data={filteredTemplates || []}
           columns={columns}
-          data={filteredTemplates}
-          keyExtractor={(template) => template.id}
-          emptyMessage="No templates found. Try adjusting your filters or create a new template."
+          loading={isLoading}
+          pageSize={10}
         />
       </Card>
     </motion.div>

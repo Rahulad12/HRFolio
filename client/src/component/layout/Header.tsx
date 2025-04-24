@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Bell, Menu, Search, User, X } from 'lucide-react';
-import Button from '../ui/Button';
-import { useAppSelector } from '../../Hooks/hook';
-import { Avatar, Image } from 'antd';
+import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
+import { Avatar, Dropdown, Image, Button } from 'antd';
+import type { MenuProps } from 'antd';
+import { logout } from '../../slices/authSlices';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -12,14 +13,25 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const [showSearch, setShowSearch] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const items: MenuProps['items'] = [
+    {
+      label: 'Sign out',
+      key: 'logout',
+    },
+
+  ];
+  const handleMenuClick = () => {
+    dispatch(logout());
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
+        <div className="flex justify-end h-16">
+          {/* <div className="flex">
             <Button
-              variant="ghost"
+              type="text"
               className="md:hidden"
               onClick={onMenuToggle}
               aria-label="Menu"
@@ -27,9 +39,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
               <Menu size={20} />
             </Button>
             <div className="hidden md:ml-6 md:flex md:space-x-8">
-              {/* Desktop navigation items can go here */}
+
             </div>
-          </div>
+          </div> */}
 
           <div className="flex items-center">
             {showSearch ? (
@@ -48,8 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <Button
-                    variant="ghost"
-                    className="p-1"
+                    type="text"
                     onClick={() => setShowSearch(false)}
                     aria-label="Close search"
                   >
@@ -59,8 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
               </div>
             ) : (
               <Button
-                variant="ghost"
-                className="p-2"
+                type="text"
                 onClick={() => setShowSearch(true)}
                 aria-label="Search"
               >
@@ -69,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
             )}
 
             <Button
-              variant="ghost"
+              type="text"
               className="ml-2 p-2 relative"
               aria-label="Notifications"
             >
@@ -78,20 +88,26 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
             </Button>
 
             <div className="ml-3 relative">
-              <div className="flex items-center">
-                <Button
-                  variant="ghost"
-                  className="flex items-center p-1"
-                  aria-label="User menu"
-                >
-                  <div className="h-8 w-8 flex items-center justify-center">
-                    <Avatar src={user?.picture || ''} alt="User Avatar" size={40} />
-                  </div>
-                  <span className="hidden md:flex ml-2 text-sm font-medium">
-                    {user?.username || 'User'}
-                  </span>
-                </Button>
-              </div>
+              <Dropdown
+                menu={{ items, onClick: handleMenuClick }}
+                trigger={['click']}
+                placement="bottomRight"
+              >
+                <div className="flex items-center cursor-pointer">
+                  <Button
+                    type="text"
+                    className="flex items-center p-1"
+                    aria-label="User menu"
+                  >
+                    <div className="h-8 w-8 flex items-center justify-center">
+                      <Avatar src={user?.picture || ''} alt="User Avatar" size={40} />
+                    </div>
+                    <span className="hidden md:flex ml-2 text-sm font-medium">
+                      {user?.username || 'User'}
+                    </span>
+                  </Button>
+                </div>
+              </Dropdown>
             </div>
           </div>
         </div>

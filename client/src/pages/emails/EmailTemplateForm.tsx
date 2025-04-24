@@ -1,108 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import Card from '../../component/ui/Card';
-import Input from '../../component/ui/Input';
-import Select from '../../component/ui/Select';
-import Textarea from '../../component/ui/Textarea';
-import Button from '../../component/ui/Button';
-import { emailTemplates } from '../../data/mockData';
 import { motion } from 'framer-motion';
+import { Button, Input, Select, Form, message } from 'antd';
+const { TextArea } = Input;
+import { useCreateEmailTemplateMutation, useGetEmailTemplateByIdQuery, useUpdateEmailTemplateMutation } from '../../services/emailService';
+import { emailTemplateData } from '../../types';
 
 const EmailTemplateForm: React.FC = () => {
+  const [form] = Form.useForm();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = !!id;
 
-  const [formData, setFormData] = useState({
-    name: '',
-    subject: '',
-    body: '',
-    type: 'offer'
-  });
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createEmailTemplate, { isLoading: createemailTemplateLoading }] = useCreateEmailTemplateMutation();
+  const { data: emailTemplates, isLoading: emailTemplateLoading } = useGetEmailTemplateByIdQuery(id || "", { skip: !id });
+  const [updateEmailTemplate, { isLoading: updateEmailTemplateLoading }] = useUpdateEmailTemplateMutation();
 
   useEffect(() => {
-    if (isEditing) {
-      const template = emailTemplates.find(t => t.id === id);
-      if (template) {
-        setFormData({
-          name: template.name,
-          subject: template.subject,
-          body: template.body,
-          type: template.type
-        });
+    if (isEditing && emailTemplates?.data) {
+      form.setFieldsValue({
+        name: emailTemplates?.data?.name,
+        subject: emailTemplates?.data?.subject,
+        body: emailTemplates?.data?.body,
+        type: emailTemplates?.data?.type
+      });
+    }
+  }, [emailTemplates, isEditing]);
+
+  const handleSubmit = async (value: emailTemplateData) => {
+    try {
+      if (isEditing) {
+        const res = await updateEmailTemplate({ id: id || '', data: value }).unwrap();
+        if (res.success) {
+          message.success(res.message);
+          navigate('/dashboard/email-templates');
+          return;
+        }
       }
+      else {
+        const res = await createEmailTemplate(value).unwrap();
+        if (res?.success && res?.data) {
+          message.success(res?.message);
+          form.resetFields();
+        }
+      }
+
+    } catch (error: any) {
+      console.error('Submission failed', error);
+      message.error(error?.data?.message);
     }
-  }, [id, isEditing]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error when field is updated
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const handleSelectChange = (name: string) => (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error when field is updated
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Template name is required';
-    }
-
-    if (!formData.subject.trim()) {
-      newErrors.subject = 'Email subject is required';
-    }
-
-    if (!formData.body.trim()) {
-      newErrors.body = 'Email body is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, we would save the template here
-      setIsSubmitting(false);
-      navigate('/email-templates');
-    }, 1000);
   };
 
   const typeOptions = [
@@ -133,11 +81,11 @@ const EmailTemplateForm: React.FC = () => {
     >
       <div className="mb-6 flex items-center">
         <Button
-          variant="ghost"
-          size="sm"
+          type="text"
+          size="small"
           className="mr-3"
           icon={<ArrowLeft size={18} />}
-          onClick={() => navigate('/email-templates')}
+          onClick={() => navigate('/dashboard/email-templates')}
           aria-label="Back"
         />
         <h1 className="text-2xl font-bold text-gray-900">
@@ -148,80 +96,75 @@ const EmailTemplateForm: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card>
-            <form onSubmit={handleSubmit}>
+            <Form onFinish={handleSubmit} layout='vertical' form={form}>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <Input
+                    <Form.Item
                       label="Template Name"
                       name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      error={errors.name}
-                      placeholder="e.g. Standard Offer Letter"
-                      fullWidth
-                      required
-                    />
+                      rules={[{ required: true, message: 'Please enter a template name' }]}
+                    >
+                      <Input placeholder='e.g. Standard Offer Letter' />
+                    </Form.Item>
                   </div>
                   <div>
-                    <Select
+                    <Form.Item
                       label="Template Type"
                       name="type"
-                      options={typeOptions}
-                      value={formData.type}
-                      onChange={handleSelectChange('type')}
-                      error={errors.type}
-                      fullWidth
-                      required
-                    />
+                      rules={[{ required: true, message: 'Please select a template type' }]}
+                    >
+                      <Select
+                        options={typeOptions}
+                      />
+
+                    </Form.Item>
+
                   </div>
                 </div>
                 <div>
-                  <Input
+                  <Form.Item
                     label="Email Subject"
                     name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    error={errors.subject}
-                    placeholder="e.g. Your Offer from {{companyName}}"
-                    fullWidth
-                    required
-                  />
+                    rules={[{ required: true, message: 'Please enter an email subject' }]}
+                  >
+                    <Input placeholder='e.g. Your Offer from {{companyName}}' />
+                  </Form.Item>
                 </div>
                 <div>
-                  <Textarea
+                  <Form.Item
                     label="Email Body"
                     name="body"
-                    value={formData.body}
-                    onChange={handleChange}
-                    error={errors.body}
-                    rows={12}
-                    placeholder="Add your email content here. Use {{variableName}} for dynamic content."
-                    fullWidth
-                    required
-                  />
+                    rules={[{ required: true, message: 'Please enter an email body' }]}
+                  >
+                    <TextArea
+                      rows={12}
+                      placeholder="Add your email content here. Use {{variableName}} for dynamic content."
+                    />
+                  </Form.Item>
+
                 </div>
               </div>
-
               <div className="mt-8 flex justify-end space-x-3">
                 <Button
-                  variant="outline"
+                  type="default"
                   icon={<X size={16} />}
-                  onClick={() => navigate('/email-templates')}
-                  disabled={isSubmitting}
+                  onClick={() => navigate('/dashboard/email-templates')}
+                  disabled={emailTemplateLoading || createemailTemplateLoading}
                 >
                   Cancel
                 </Button>
                 <Button
-                  type="submit"
-                  variant="primary"
+                  htmlType="submit"
+                  type="primary"
                   icon={<Save size={16} />}
-                  isLoading={isSubmitting}
+                  loading={updateEmailTemplateLoading || createemailTemplateLoading}
+                  disabled={updateEmailTemplateLoading || createemailTemplateLoading}
                 >
                   {isEditing ? 'Update Template' : 'Save Template'}
                 </Button>
               </div>
-            </form>
+            </Form>
           </Card>
         </div>
 

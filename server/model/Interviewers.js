@@ -9,6 +9,28 @@ const interviewerSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    department: {
+        type: String,
+        required: true
+    },
+    position: {
+        type: String,
+        required: true
+    },
+    availability: [{
+        id: {
+            type: String,
+            required: true
+        },
+        day: {
+            type: String,
+            required: true
+        },
+        timeSlots: [{
+            type: String,
+            required: true
+        }]
+    }]
 }, {
     timestamps: true
 });

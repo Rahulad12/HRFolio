@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, MinusCircle, PlusCircle, Save, X } from 'lucide-react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, MinusCircle, PlusCircle, X } from 'lucide-react';
 import { UploadOutlined } from "@ant-design/icons";
 import Card from '../../component/ui/Card';
 import { motion } from 'framer-motion';
@@ -17,6 +17,8 @@ import { useUploadResumeMutation } from '../../services/uploadFileService';
 const { Title } = Typography;
 
 const CandidateForm: React.FC = () => {
+  const location = useLocation();
+  console.log(location.state);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();

@@ -53,6 +53,7 @@ export type referenceResponse = {
 
 }
 export type candidateStatus = 'shortlisted' | 'first' | 'second' | 'third' | 'assessment' | 'offered' | 'hired' | 'rejected';
+export type interviewStatus = 'scheduled' | 'completed' | 'cancelled'
 export type candidateData = {
     name: string;
     email: string;
@@ -85,10 +86,13 @@ export type interviewData = {
     time: string;
     type: 'phone' | 'video' | 'in-person';
     feedback: string;
+    rating: number;
     notes: string;
-    status: 'scheduled' | 'cancelled' | 'completed';
+    status: interviewStatus;
     _id: string;
     __v: number;
+    createdAt: string;
+    updatedAt: string
 }
 
 export type interviewResponse = {

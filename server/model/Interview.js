@@ -36,6 +36,9 @@ const interviewSchema = new mongoose.Schema({
     feedback: {
         type: String,
     },
+    rating:{
+        type: Number
+    }
 }, {
     timestamps: true
 });

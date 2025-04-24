@@ -14,7 +14,6 @@ const PrimaryButton = ({ text, icon, onClick, disabled, loading }: Props) => {
         <ConfigProvider
             theme={{
                 token: {
-                    colorPrimary: "#1F3B61",
                     colorPrimaryHover: "#2E3354",
                     colorPrimaryActive: "#1F3B61",
                     borderRadius: 6,
@@ -30,9 +29,6 @@ const PrimaryButton = ({ text, icon, onClick, disabled, loading }: Props) => {
                 onClick={onClick}
                 disabled={disabled}
                 loading={loading}
-                style={{
-                    height: "40px",
-                }}
                 className="flex items-center justify-center gap-2"
             >
                 {text}

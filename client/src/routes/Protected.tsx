@@ -4,7 +4,7 @@ import Dashboard from '../pages/Dashboard';
 import CandidateList from '../pages/candidates/CandidateList';
 import CandidateDetail from '../pages/candidates/CandidateDetail';
 import CandidateForm from '../pages/candidates/CandidateForm';
-import InterviewList from '../pages/interviews/InterviewList';
+import InterviewList from '../../depreceate/InterviewList';
 import InterviewSchedule from '../pages/interviews/InterviewSchedule';
 import AssessmentList from '../pages/assessments/AssessmentList';
 import AssessmentForm from '../pages/assessments/AssessmentForm';
@@ -17,6 +17,7 @@ import EmailTemplateList from '../pages/emails/EmailTemplateList';
 import EmailTemplateForm from '../pages/emails/EmailTemplateForm';
 import NotFound from '../pages/NotFound';
 import AssignAssessment from '../pages/assessments/AssignAssessment';
+import Interviews from '../pages/interviews/Interviews';
 const Protected = () => {
     const isAuth = useAppSelector(state => state.auth.user.token);
     if (!isAuth) return <Navigate to="/" replace />
@@ -34,7 +35,8 @@ const Protected = () => {
 
             {/* Interviews */}
             <Route path="interviews">
-                <Route index element={<InterviewList />} />
+                {/* <Route index element={<InterviewList />} /> */}
+                <Route index element={<Interviews />} />
                 <Route path="schedule" element={<InterviewSchedule />} />
             </Route>
 

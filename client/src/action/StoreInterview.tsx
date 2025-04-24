@@ -26,7 +26,6 @@ export const useInterview = (status: string | null, date: Dayjs | null) => {
             refetchOnMountOrArgChange: false
         }
     );
-    console.log(interview, "interview data");
     useEffect(() => {
         if (interview?.success && interview?.data) {
             const interviewList = Array.isArray(interview.data) ? interview.data : [interview.data];

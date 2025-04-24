@@ -5,14 +5,14 @@ import { motion } from 'framer-motion';
 import { Input, Select, TableColumnsType } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 
-import Card from '../../component/ui/Card';
-import { candidateData, interviewData, interviewer } from '../../types';
-import CustomTable from '../../component/common/Table';
-import { useInterview } from '../../action/StoreInterview';
-import { useAppSelector } from '../../Hooks/hook';
-import PrimaryButton from '../../component/ui/button/Primary';
-import CustomCalendar from '../../component/ui/Calender';
-import ExportButton from '../../component/common/Export';
+import Card from '../src/component/ui/Card';
+import { candidateData, interviewData, interviewer } from '../src/types';
+import CustomTable from '../src/component/common/Table';
+import { useInterview } from '../src/action/StoreInterview';
+import { useAppSelector } from '../src/Hooks/hook';
+import PrimaryButton from '../src/component/ui/button/Primary';
+import CustomCalendar from '../src/component/ui/Calender';
+import ExportButton from '../src/component/common/Export';
 
 
 interface StatusOption {

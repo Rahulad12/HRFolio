@@ -6,7 +6,7 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
   const { darkMode } = useTheme();
 
   const colorBgBase = darkMode ? "#020817" : "#FFFFFF";
-  const colorPrimary = "#363062";
+  const colorPrimary = "#1A365D";
   const colorTextBase = darkMode ? "#FBFBFF" : "#191D32";
   const colorHover = darkMode ? "#3f3f55" : "#f0f0f0"; // Hover color for menu items
 
@@ -17,25 +17,25 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
           ? antdTheme.darkAlgorithm
           : antdTheme.defaultAlgorithm,
         token: {
-          colorPrimary,
-          colorBgBase,
-          colorTextBase,
-          colorText: colorTextBase,
+          colorPrimary: '#1A365D',
+          colorSuccess: '#52C41A',
+          colorWarning: '#FAAD14',
+          colorError: '#FF4D4F',
+          colorInfo: '#1A365D',
           borderRadius: 6,
         },
         components: {
           Menu: {
             itemColor: colorTextBase,
-            itemHoverColor: colorPrimary,
+            itemHoverColor: "#1A365D",
             itemHoverBg: colorHover,
             itemSelectedColor: "#fff",
-            itemSelectedBg: colorPrimary,
+            itemSelectedBg: "#1A365D",
             activeBarBorderWidth: 0,
             borderRadius: 6,
           },
           Button: {
-            colorPrimary: colorPrimary,
-            colorPrimaryHover: "#EF5B5B",
+            colorPrimaryHover: "#F54A00",
             colorPrimaryActive: "#C62828",
           },
           Table: {

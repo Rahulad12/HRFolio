@@ -23,8 +23,6 @@ const createInterview = async (req, res) => {
 
 const getAllInterviews = async (req, res) => {
     const { date, status } = req.query;
-    console.log("date", date);
-    console.log("status", status);
     try {
         const query = {};
         if (date) {
@@ -42,7 +40,7 @@ const getAllInterviews = async (req, res) => {
         }).populate({
             path: 'interviewer',
             select: '-createdAt -updatedAt -__v'
-        }).select('-createdAt -updatedAt -__v');
+        }).select(' -__v');
 
         if (interviews.length === 0) {
             return res.status(404).json({ success: false, message: "No interviews found" });
@@ -54,8 +52,8 @@ const getAllInterviews = async (req, res) => {
             data: interviews
         });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
         console.log("get interview error", error);
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 
@@ -63,6 +61,9 @@ const getInterviewById = async (req, res) => {
     try {
         const interview = await Interview.findById(req.params.id).populate({
             path: "interviewer",
+            select: '-createdAt -updatedAt -__v'
+        }).populate({
+            path: "candidate",
             select: '-createdAt -updatedAt -__v'
         })
         if (!interview) {

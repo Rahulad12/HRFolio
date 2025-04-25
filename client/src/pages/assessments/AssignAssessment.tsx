@@ -51,7 +51,6 @@ const AssignAssessment = () => {
                 date: dayjs(values.dueDate).format('YYYY-MM-DD'),
             };
             const res = await createAssignAssessment(payload).unwrap();
-            console.log(res)
             if (res?.success && res?.data) {
                 message.success(res.message);
                 assignForm.resetFields();

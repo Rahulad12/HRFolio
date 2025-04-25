@@ -1,51 +1,74 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Search, Filter, Download, Eye, Pencil, Send, } from 'lucide-react';
-import { offerLetters, candidates } from '../../data/mockData';
-import { OfferLetter } from '../../types';
+import { offerLetter } from '../../types';
 import { motion } from 'framer-motion';
 import PrimaryButton from '../../component/ui/button/Primary';
-import { Button, Card, Badge, Input, Select } from 'antd';
+import { Button, Card, Input, message, Select } from 'antd';
 import CustomTable from '../../component/common/Table';
+import { useUpdateOfferLetterMutation, useGetOfferLetterQuery } from '../../services/offerService';
+import Badge from '../../component/ui/Badge';
 
 const OfferList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [sendingOfferId, setSendingOfferId] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Combine offer data with candidate names
-  const offersWithNames = offerLetters.map(offer => {
-    const candidate = candidates.find(c => c.id === offer.candidateId);
+  const { data: offerLetters, isLoading: isLoadingOfferLetter, refetch } = useGetOfferLetterQuery();
+  const [updateOfferLetter, { isLoading: offerSending }] = useUpdateOfferLetterMutation();
 
-    return {
-      ...offer,
-      candidateName: candidate?.name || 'Unknown',
-      email: candidate?.email || 'unknown@example.com'
-    };
-  });
 
-  const filteredOffers = offersWithNames.filter(offer => {
+  const filteredOffers = offerLetters?.data?.filter(offer => {
     const matchesSearch =
-      offer.candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      offer.position.toLowerCase().includes(searchTerm.toLowerCase());
+      offer?.candidate?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      offer?.position?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === '' || offer.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
 
-  const handleViewCandidate = (offer: typeof offersWithNames[0]) => {
-    navigate(`/dashboard/candidates/${offer.candidateId}`);
+  const handleViewCandidate = (offer: offerLetter) => {
+    navigate(`/dashboard/candidates/${offer?.candidate?._id}`);
   };
 
-  const handleEditOffer = (offer: typeof offersWithNames[0]) => {
-    navigate(`/dashboard/offers/edit/${offer.id}`);
+  const handleEditOffer = (offer: offerLetter) => {
+    navigate(`/dashboard/offers/edit/${offer?._id}`);
   };
 
-  const handleSendOffer = (offer: typeof offersWithNames[0], e: React.MouseEvent) => {
-    e.stopPropagation();
-    // In a real app, we would send the offer here
-    alert(`Send offer to: ${offer.candidateName}`);
+  const handleSendOffer = async (offer: offerLetter) => {
+
+    if (!offer.position || !offer.salary || !offer.startDate || !offer.responseDeadline || !offer.email) {
+      message.warning("Incomplete offer. Please edit and complete the draft first.");
+      return;
+    }
+    setSendingOfferId(offer._id);
+    const payload = {
+      candidate: offer?.candidate?._id,
+      email: offer?.email,
+      position: offer?.position,
+      salary: offer?.salary,
+      startDate: offer?.startDate,
+      responseDeadline: offer?.responseDeadline,
+      status: 'sent' as offerLetter['status']
+    }
+    try {
+      const res = await updateOfferLetter({
+        id: offer?._id,
+        data: payload
+      }).unwrap();
+      if (res?.success) {
+        message.success(res?.message);
+        refetch();
+      }
+    } catch (error: any) {
+      console.error('Failed to send offer', error);
+      message.error(error?.data?.message);
+    }
+    finally {
+      setSendingOfferId(null);
+    }
   };
 
   const statusOptions = [
@@ -57,18 +80,16 @@ const OfferList: React.FC = () => {
     { value: 'negotiating', label: 'Negotiating' }
   ];
 
-  const getStatusBadge = (status: OfferLetter['status']) => {
+  const getStatusBadge = (status: offerLetter['status']) => {
     switch (status) {
       case 'draft':
-        return <Badge typeof='warning'>Draft</Badge>;
+        return <Badge variant='warning'>Draft</Badge>;
       case 'sent':
-        return <Badge typeof="info">Sent</Badge>;
+        return <Badge variant="info">Sent</Badge>;
       case 'accepted':
-        return <Badge typeof="success">Accepted</Badge>;
+        return <Badge variant="success">Accepted</Badge>;
       case 'rejected':
-        return <Badge typeof="error">Rejected</Badge>;
-      case 'negotiating':
-        return <Badge typeof="warning">Negotiating</Badge>;
+        return <Badge variant="error">Rejected</Badge>;
       default:
         return null;
     }
@@ -77,10 +98,10 @@ const OfferList: React.FC = () => {
   const columns = [
     {
       title: 'Candidate',
-      render: (offer: typeof offersWithNames[0]) => (
+      render: (_: any, record: offerLetter) => (
         <div>
-          <div className="font-medium text-gray-900">{offer.candidateName}</div>
-          <div className="text-xs text-gray-500">{offer.email}</div>
+          <div className="font-medium text-gray-900 capitalize">{record?.candidate?.name}</div>
+          <div className="text-xs text-gray-500 capitalize">{record?.candidate?.email}</div>
         </div>
       )
     },
@@ -101,21 +122,22 @@ const OfferList: React.FC = () => {
     },
     {
       title: 'Status',
-      render: (offer: typeof offersWithNames[0]) => getStatusBadge(offer.status)
+      render: (offer: offerLetter) => getStatusBadge(offer?.status as offerLetter['status'])
     },
     {
       title: 'Actions',
-      render: (offer: typeof offersWithNames[0]) => (
+      render: (_: any, offer: offerLetter) => (
         <div className="flex space-x-2">
           <Button
             type="text"
             size='small'
             onClick={() => handleViewCandidate(offer)}
             aria-label="View candidate"
+            disabled={offerSending}
           >
             <Eye size={16} className="text-blue-600" />
           </Button>
-          {offer.status === 'draft' && (
+          {offer?.status === 'draft' && (
             <>
               <Button
                 type='text'
@@ -123,6 +145,7 @@ const OfferList: React.FC = () => {
                 className="p-1"
                 onClick={() => handleEditOffer(offer)}
                 aria-label="Edit offer"
+                disabled={offerSending}
               >
                 <Pencil size={16} className="text-blue-600" />
               </Button>
@@ -130,8 +153,9 @@ const OfferList: React.FC = () => {
                 type="text"
                 size="small"
                 className="p-1"
-                onClick={(e) => handleSendOffer(offer, e)}
+                onClick={() => handleSendOffer(offer)}
                 aria-label="Send offer"
+                loading={sendingOfferId === offer._id}
               >
                 <Send size={16} className="text-green-600" />
               </Button>
@@ -202,9 +226,9 @@ const OfferList: React.FC = () => {
         </div>
 
         <CustomTable
-          data={filteredOffers}
+          data={filteredOffers || []}
           columns={columns}
-          loading={false}
+          loading={isLoadingOfferLetter}
           pageSize={5}
         />
       </Card>

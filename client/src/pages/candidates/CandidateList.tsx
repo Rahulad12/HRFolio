@@ -76,7 +76,7 @@ const CandidateTable = () => {
       render: (text: string, record: candidateData) => (
         <div onClick={() => navigate(`/dashboard/candidates/${record._id}`)} className=' cursor-pointer flex items-center'>
           <div className="h-10 w-10 rounded-full bg-blue-950 flex items-center justify-center text-white mr-3 text-lg font-medium">
-            <span>{text.charAt(0)}</span>
+            <span>{makeCapitilized(text.charAt(0))}</span>
           </div>
           <div>
             <div className="font-medium">{text}</div>

@@ -33,12 +33,14 @@ import interviewerRouter from './routes/interviewerRoutes.js';
 import assessmentRouter from './routes/assessmentRoutes.js';
 import uploadRouter from './routes/uploadRoutes.js';
 import emailRouter from "./routes/emailRoutes.js";
+import offerRouter from "./routes/offerRoutes.js";
 app.use('/api/auth', authRouter);
 app.use('/api/candidate', candidateRouter);
 app.use('/api/interview', interviewRouter);
 app.use('/api/interviewer', interviewerRouter);
 app.use('/api/assessment', assessmentRouter);
 app.use('/api/email', emailRouter);
+app.use('/api/offer', offerRouter);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/uploads", uploadRouter);
 

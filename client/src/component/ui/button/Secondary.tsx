@@ -15,7 +15,7 @@ const SecondaryButton = ({ text, icon, onClick, disabled, loading, htmlType }: P
         <ConfigProvider
             theme={{
                 token: {
-                    colorPrimary: "#F54A00",
+                    colorPrimary: "#2665c9",
                     colorPrimaryHover: "#1A365D",
                     colorPrimaryActive: "#1F3B61",
                     borderRadius: 6,

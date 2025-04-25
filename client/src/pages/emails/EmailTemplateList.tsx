@@ -126,7 +126,7 @@ const EmailTemplateList: React.FC = () => {
               className="p-1"
               onClick={() => handleDuplicateTemplate(record)}
               aria-label="Duplicate template"
-              icon={<Copy size={16} />}
+              icon={<Copy size={16} color='#1890ff' />}
             />
 
           </Tooltip>

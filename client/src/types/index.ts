@@ -68,6 +68,7 @@ export type candidateData = {
     createdAt: string;
     applieddate: string;
     resume: string;
+    updatedAt: string
 }
 export type candidateResponse = {
     success: boolean;
@@ -265,6 +266,7 @@ export type emailTemplateData = {
     createdAt: string;
     updatedAt: string;
     variables: allowedVariables
+    __v: number
 }
 
 export type emailTemplateResponse = {
@@ -277,109 +279,37 @@ export type emailTemplateResponseById = {
     message: string;
     data: emailTemplateData;
 }
-//mmmmmmmmmmmmmmmm--------------------------------------------------//////////////////////////////////////////////
-export interface Assessment {
-    id: string;
-    title: string;
-    description: string;
-    type: 'technical' | 'behavioral' | 'case-study';
-    duration: number; // in minutes
-}
 
-export interface Interview {
-    id: string;
-    candidateId: string;
-    interviewerId: string;
-    date: string;
-    time: string;
-    type: 'phone' | 'video' | 'onsite';
-    status: 'scheduled' | 'completed' | 'cancelled';
-    feedback?: string;
-    rating?: number;
-}
-
-// Type definitions for the recruitment dashboard
-
-
-
-export interface Candidate {
-    id: string;
-    name: string;
+export type offerLetter = {
+    _id: string;
+    candidate: candidateData;
     email: string;
-    phone: string;
-    position: string;
-    status: candidateStatus;
-    resume: string;
-    appliedDate: string;
-    notes: string;
-}
-
-export interface Interview {
-    id: string;
-    candidateId: string;
-    interviewerId: string;
-    date: string;
-    time: string;
-    type: 'phone' | 'video' | 'onsite';
-    status: 'scheduled' | 'completed' | 'cancelled';
-    feedback?: string;
-    rating?: number;
-}
-
-export interface Assessment {
-    id: string;
-    title: string;
-    description: string;
-    type: 'technical' | 'behavioral' | 'case-study';
-    duration: number; // in minutes
-}
-
-export interface AssessmentAssignment {
-    id: string;
-    candidateId: string;
-    assessmentId: string;
-    assignedDate: string;
-    dueDate: string;
-    status: 'assigned' | 'completed' | 'evaluated';
-    score?: number;
-    feedback?: string;
-}
-
-export interface Interviewer {
-    id: string;
-    name: string;
-    email: string;
-    department: string;
-    position: string;
-    availability: Array<{
-        day: string;
-        timeSlots: string[];
-    }>;
-}
-
-export interface OfferLetter {
-    id: string;
-    candidateId: string;
     position: string;
     salary: string;
     startDate: string;
-    status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'negotiating';
-    sentDate?: string;
-    responseDate?: string;
+    responseDeadline: string;
+    status: 'draft' | 'sent' | 'accepted' | 'rejected';
+    createdAt: string;
+    updatedAt: string;
 }
 
-export interface EmailTemplate {
-    id: string;
-    name: string;
-    subject: string;
-    body: string;
-    type: 'offer' | 'interview' | 'assessment' | 'rejection' | 'other';
+export type offerLetterResponse = {
+    success: boolean;
+    message: string;
+    data: offerLetter[]
 }
 
-export interface MetricsData {
-    openPositions: number;
-    activeCandidates: number;
-    interviewsScheduled: number;
-    offersExtended: number;
-    timeToHire: number;
+export type offerLetterResponseById = {
+    success: boolean;
+    message: string;
+    data: offerLetter
+}
+
+export type offerLetterPostData = {
+    candidate: string
+    email: string
+    position: string
+    salary: string
+    startDate: string
+    responseDeadline: string
 }

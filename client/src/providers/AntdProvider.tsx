@@ -1,6 +1,6 @@
 import { ConfigProvider, App as AntdApp, theme as antdTheme } from "antd";
 import { useTheme } from "../context/ThemeContext";
-import { color } from "framer-motion";
+
 
 const AntdProvider = ({ children }: { children: React.ReactNode }) => {
   const { darkMode } = useTheme();

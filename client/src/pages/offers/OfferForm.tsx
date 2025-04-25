@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X, Send } from 'lucide-react';
-import { candidates, offerLetters, emailTemplates } from '../../data/mockData';
-import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Form, Button, Select, Input, Card, DatePicker, message } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import {
+  Form,
+  Button,
+  Select,
+  Input,
+  Card,
+  DatePicker,
+  message,
+  Row,
+  Col
+} from 'antd';
+import dayjs from 'dayjs';
+
 import SecondaryButton from '../../component/ui/button/Secondary';
 import { useGetAllEmailTemplateQuery } from '../../services/emailService';
-
+import {
+  useCreateOfferLetterMutation,
+  useGetOfferByIdQuery,
+  useUpdateOfferLetterMutation
+} from '../../services/offerService';
+import { useCandidate } from '../../action/StoreCandidate';
+import { makeCapitilized } from '../../utils/TextAlter';
+import { offerLetter } from '../../types';
 
 const OfferForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,88 +33,96 @@ const OfferForm: React.FC = () => {
   const navigate = useNavigate();
   const isEditing = !!id;
 
-  const [formData, setFormData] = useState({
-    candidateId: '',
-    position: '',
-    salary: '',
-    startDate: new Date(),
-    emailTemplateId: '',
-    status: 'draft'
+  const [preview, setPreview] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [createOfferLetter, { isLoading: offerSending }] = useCreateOfferLetterMutation();
+  const [updateOfferLetter, { isLoading: offerUpdating }] = useUpdateOfferLetterMutation();
+  const { data: offerLetterData } = useGetOfferByIdQuery(id || '', { skip: !id });
+  const { data: emailTemplatesData } = useGetAllEmailTemplateQuery();
+  const { data: candidatesData } = useCandidate();
+
+  useEffect(() => {
+    if (isEditing && offerLetterData?.data) {
+      form.setFieldsValue({
+        candidate: offerLetterData.data.candidate,
+        email: offerLetterData.data.email,
+        position: offerLetterData.data.position,
+        salary: offerLetterData.data.salary,
+        startDate: dayjs(offerLetterData.data.startDate),
+        responseDeadline: dayjs(offerLetterData.data.responseDeadline),
+      });
+    }
+  }, [isEditing, offerLetterData, form]);
+
+  const buildPayload = (values: offerLetter, status: offerLetter['status']) => ({
+    ...values,
+    startDate: dayjs(values.startDate).format('YYYY-MM-DD'),
+    responseDeadline: dayjs(values.responseDeadline).format('YYYY-MM-DD'),
+    status
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [preview, setPreview] = useState('');
-  const handleSaveAsDraft = () => {
-    message.success('Draft saved successfully!');
-    navigate('/dashboard/offers');
-  }
-  const candidateOptions = candidates
-    .filter(candidate => candidate.status === 'interviewing' || candidate.status === 'assessment')
-    .map(candidate => ({
-      value: candidate.id,
-      label: `${candidate.name} (${candidate.position})`
-    }));
+  const handleSaveAsDraft = async () => {
+    try {
+      const values = await form.validateFields();
+      const payload = buildPayload(values, 'draft');
 
-  const templateOptions = emailTemplates
-    .filter(template => template.type === 'offer')
-    .map(template => ({
-      value: template.id,
-      label: template.name
-    }));
+      const res = isEditing
+        ? await updateOfferLetter({ id: id || '', data: payload }).unwrap()
+        : await createOfferLetter(payload).unwrap();
 
-  useEffect(() => {
-    if (isEditing) {
-      const offer = offerLetters.find(o => o.id === id);
-      if (offer) {
-        setFormData({
-          candidateId: offer.candidateId,
-          position: offer.position,
-          salary: offer.salary,
-          startDate: new Date(offer.startDate),
-          emailTemplateId: '',
-          status: offer.status
-        });
+      if (res?.success) {
+        message.success('Offer saved as draft');
+        navigate('/dashboard/offers');
+        form.resetFields();
       }
+    } catch (err) {
+      message.error('Failed to save draft');
     }
-  }, [id, isEditing]);
+  };
 
-  useEffect(() => {
-    // Generate preview when template and candidate are selected
-    if (formData.candidateId && formData.emailTemplateId) {
-      const template = emailTemplates.find(t => t.id === formData.emailTemplateId);
-      const candidate = candidates.find(c => c.id === formData.candidateId);
+  const handleOfferSend = async (values: offerLetter) => {
+    setIsSubmitting(true);
+    const payload = buildPayload(values, 'sent');
 
-      if (template && candidate) {
-        // Simple template variable replacement
-        let previewText = template.body
-          .replace(/{{candidateName}}/g, candidate.name)
-          .replace(/{{position}}/g, formData.position || candidate.position)
-          .replace(/{{salary}}/g, formData.salary)
-          .replace(/{{startDate}}/g, format(formData.startDate, 'MMMM d, yyyy'))
-          .replace(/{{responseDeadline}}/g, format(new Date(formData.startDate.getTime() - 7 * 24 * 60 * 60 * 1000), 'MMMM d, yyyy'));
+    try {
+      const res = isEditing
+        ? await updateOfferLetter({ id: id || '', data: payload }).unwrap()
+        : await createOfferLetter(payload).unwrap();
 
-        setPreview(previewText);
-      } else {
-        setPreview('');
+      if (res?.success) {
+        message.success(res.message);
+        navigate('/dashboard/offers');
+        form.resetFields();
       }
+    } catch (err: any) {
+      message.error(err?.data?.message || 'Failed to send offer');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePreviewUpdate = () => {
+    const values = form.getFieldsValue();
+    const template = emailTemplatesData?.data?.find(t => t._id === values.email);
+    const candidate = candidatesData?.data?.find(c => c._id === values.candidate);
+
+    if (template && candidate) {
+      const preview = template.body
+        .replace(/{{candidateName}}/g, candidate.name)
+        .replace(/{{position}}/g, values.position || candidate.level)
+        .replace(/{{salary}}/g, values.salary)
+        .replace(/{{startDate}}/g, values.startDate ? format(dayjs(values.startDate).toDate(), 'MMMM d, yyyy') : '')
+        .replace(/{{responseDeadline}}/g, values.responseDeadline ? format(dayjs(values.responseDeadline).toDate(), 'MMMM d, yyyy') : '');
+
+      setPreview(preview);
     } else {
       setPreview('');
     }
-  }, [formData]);
-
-
-
-  const handleSubmit = (value: any) => {
-    console.log(value);
-    message.success('Offer letter send successfully');
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <div className="mb-6 flex items-center">
         <Button
           type="text"
@@ -114,105 +138,99 @@ const OfferForm: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div>
-          <Card>
-            <Form onFinish={handleSubmit} form={form} layout='vertical'>
-              <div className="space-y-6">
-                <div>
-                  <Form.Item
-                    label="Candidate"
-                    name="candidateId"
-                    rules={[{ required: true, message: 'Candidate is required' }]}
-                  >
-                    <Select
-                      options={candidateOptions}
-                      value={formData.candidateId}
-                    />
-                  </Form.Item>
+        <Card>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleOfferSend}
+            onValuesChange={handlePreviewUpdate}
+          >
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item label="Candidate" name="candidate" rules={[{ required: true, message: 'Candidate is required' }]}>
+                  <Select
+                    options={candidatesData?.data?.map(c => ({ value: c._id, label: makeCapitilized(c.name) }))}
+                    placeholder="Select a candidate"
+                    showSearch
+                    allowClear
+                  />
+                </Form.Item>
+              </Col>
 
-                </div>
-                <div>
-                  <Form.Item
-                    label="Position"
-                    name="position"
-                    rules={[{ required: true, message: 'Position is required' }]}
-                  >
-                    <Input placeholder='e.g. Software Engineer' />
-                  </Form.Item>
+              <Col xs={24} md={12}>
+                <Form.Item label="Email Template" name="email" rules={[{ required: true, message: 'Email template is required' }]}>
+                  <Select
+                    options={emailTemplatesData?.data?.map(t => ({ value: t._id, label: t.name }))}
+                    placeholder="Select email template"
+                    showSearch
+                    allowClear
+                  />
+                </Form.Item>
+              </Col>
 
-                </div>
-                <div>
-                  <Form.Item
-                    label="Salary"
-                    name="salary"
-                    rules={[{ required: true, message: 'Salary is required' }]}
-                  >
-                    <Input
-                      placeholder="e.g. $80,000"
-                    />
-                  </Form.Item>
+              <Col xs={24} md={12}>
+                <Form.Item label="Position" name="position" rules={[{ required: true, message: 'Position is required' }]}>
+                  <Input placeholder="e.g. Software Engineer" />
+                </Form.Item>
+              </Col>
 
-                </div>
-                <div>
-                  <Form.Item
-                    label="Start Date"
-                    name="startDate"
-                    rules={[{ required: true, message: 'Start date is required' }]}
-                  >
-                    <DatePicker width={'100%'} />
-                  </Form.Item>
-                </div>
-                <div>
-                  <Form.Item
-                    label="Email Template"
-                    name="emailTemplateId"
-                    rules={[{ required: true, message: 'Email template is required' }]}
-                  >
-                    <Select
-                      options={templateOptions}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-              <div className="mt-8 flex justify-end space-x-3">
-                <Button
-                  type="default"
-                  icon={<X size={16} />}
-                  onClick={() => navigate('/dashboard/offers')}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <SecondaryButton
-                  htmlType='button'
-                  text='Save as Draft'
-                  icon={<Save size={16} />}
-                  loading={isSubmitting}
-                  onClick={handleSaveAsDraft}
-                />
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  icon={<Send size={16} />}
-                >
-                  Send Offer
-                </Button>
-              </div>
-            </Form>
-          </Card>
-        </div>
+              <Col xs={24} md={12}>
+                <Form.Item label="Salary" name="salary" rules={[{ required: true, message: 'Salary is required' }]}>
+                  <Input placeholder="e.g. $80,000" />
+                </Form.Item>
+              </Col>
 
-        <div>
-          <Card title="Email Preview">
-            {preview ? (
-              <div className="whitespace-pre-line">{preview}</div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                <p>Select a candidate and email template to see the preview</p>
-              </div>
-            )}
-          </Card>
-        </div>
+              <Col xs={24} md={12}>
+                <Form.Item label="Start Date" name="startDate" rules={[{ required: true, message: 'Start date is required' }]}>
+                  <DatePicker className="w-full" />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} md={12}>
+                <Form.Item label="Response Deadline" name="responseDeadline" rules={[{ required: true, message: 'Response deadline is required' }]}>
+                  <DatePicker className="w-full" />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <div className="mt-8 flex flex-wrap justify-end gap-3">
+              <Button
+                type="default"
+                icon={<X size={16} />}
+                onClick={() => navigate('/dashboard/offers')}
+                disabled={offerSending}
+              >
+                Cancel
+              </Button>
+              <SecondaryButton
+                htmlType="button"
+                text="Save as Draft"
+                icon={<Save size={16} />}
+                loading={offerSending}
+                onClick={handleSaveAsDraft}
+                disabled={offerSending}
+              />
+              <Button
+                htmlType="submit"
+                type="primary"
+                icon={<Send size={16} />}
+                loading={isSubmitting || offerSending || offerUpdating}
+              >
+                Send Offer
+              </Button>
+            </div>
+          </Form>
+        </Card>
+
+        <Card title="Email Preview">
+          {preview ? (
+            <div className="whitespace-pre-line">{preview}</div>
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              <p>Select a candidate and email template to see the preview</p>
+            </div>
+          )}
+        </Card>
       </div>
     </motion.div>
   );

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import Candidate from "./Candidate.js";
 const assessmentAssignmentSchema = new mongoose.Schema({
     candidate: {
         type: mongoose.Schema.Types.ObjectId,
@@ -9,7 +9,11 @@ const assessmentAssignmentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "assessments"
     },
-    date: {
+    emailTemplate: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "emailtemplates"
+    },
+    dueDate: {
         type: String,
         required: true
     },
@@ -23,15 +27,26 @@ const assessmentAssignmentSchema = new mongoose.Schema({
         default: "assigned",
         required: true
     },
+
 }, {
     timestamps: true
 });
 
-assessmentAssignmentSchema.pre('save', function (next) {
+assessmentAssignmentSchema.pre('save', async function (next) {
     const now = new Date();
     if (this, this.status === "assigned" && this.date < now) {
         this.status = "pending";
     };
+
+    if (this.status === "assigned") {
+        const candidate = await Candidate.findById(this.candidate);
+        if (candidate && candidate.status !== 'assessment') {
+            candidate.status = 'assessment';
+            await candidate.save();
+        }
+        candidate.status = "assessment";
+        await candidate.save();
+    }
     next();
 }
 )

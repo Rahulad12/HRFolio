@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Download, Eye, CheckCircle, Clock, AlertCircle, X, Check } from 'lucide-react';
+import { Search, Eye, CheckCircle, Clock, AlertCircle, X, Check } from 'lucide-react';
 import Card from '../../component/ui/Card';
 import Badge from '../../component/ui/Badge';
 import { AssessmentDataResponse, AssignmentDataResponse, candidateData, AssignmentScoreFromData } from '../../types';

@@ -18,7 +18,8 @@ const allowedVariables = [
     'technology',
     'benefits',
     'stockOptions',
-    'responseDeadline'
+    'responseDeadline',
+    'assessmentLink'
 ];
 
 const emailTemplateSchema = new mongoose.Schema({

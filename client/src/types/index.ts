@@ -119,7 +119,7 @@ export type assessmentFormData = {
     type: "behavioural" | "technical";
     technology: string,
     level: string;
-    file: File;
+    assessmentLink: string;
     duration: number
 }
 
@@ -135,6 +135,7 @@ export type AssessmentDataResponse = {
     updatedAt: string
     __v: number
     duration: number
+    assessmentLink: string
 }
 
 export type assessmentResponse = {
@@ -150,7 +151,9 @@ export type assessmentResponseById = {
 export type AssignmentData = {
     candidate: string[] | Key[];
     assessment: string;
-    date: string;
+    dueDate: string;
+    status: 'Assigned' | 'pending' | 'completed';
+    emailTemplate: string;
 }
 
 export type AssignmentDataResponse = {
@@ -161,11 +164,13 @@ export type AssignmentDataResponse = {
         type: "behavioural" | "technical";
         technology: string,
         level: string
+        assessmentLink: string;
     }
     date: Dayjs;
     status: 'Assigned' | 'pending' | 'completed';
     _id: string;
     __v: number;
+    emailTemplate: string;
 }
 
 export type assignmentResponse = {

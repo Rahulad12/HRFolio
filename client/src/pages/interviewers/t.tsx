@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X, Plus, Trash2 } from 'lucide-react';
-import { interviewers } from '../../data/mockData';
 import { nanoid } from 'nanoid';
 import { motion } from 'framer-motion';
 import { Button, Card, Form, Input, message, Select } from 'antd';
-import { interviewerData } from '../../types';
-import { useCreateInterviewerMutation, useGetInterviewerByIdQuery } from '../../services/interviewServiceApi';
+import { useCreateInterviewerMutation } from '../../services/interviewServiceApi';
 
 const InterviewerForm: React.FC = () => {
-  const { interviewerform } = Form.useForm();
+  const [interviewerform] = Form.useForm();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = !!id;
@@ -29,24 +27,24 @@ const InterviewerForm: React.FC = () => {
   });
 
 
-  useEffect(() => {
-    if (isEditing) {
-      const interviewer = interviewers.find(i => i.id === id);
-      if (interviewer) {
-        setFormData({
-          name: interviewer.name,
-          email: interviewer.email,
-          department: interviewer.department,
-          position: interviewer.position,
-          availability: interviewer.availability.map(avail => ({
-            id: nanoid(),
-            day: avail.day,
-            timeSlots: [...avail.timeSlots]
-          }))
-        });
-      }
-    }
-  }, [id, isEditing]);
+  // useEffect(() => {
+  //   if (isEditing) {
+  //     const interviewer = interviewers.find(i => i.id === id);
+  //     if (interviewer) {
+  //       setFormData({
+  //         name: interviewer.name,
+  //         email: interviewer.email,
+  //         department: interviewer.department,
+  //         position: interviewer.position,
+  //         availability: interviewer.availability.map(avail => ({
+  //           id: nanoid(),
+  //           day: avail.day,
+  //           timeSlots: [...avail.timeSlots]
+  //         }))
+  //       });
+  //     }
+  //   }
+  // }, [id, isEditing]);
   const [createInterviewer, { isLoading: interviewerLoading }] = useCreateInterviewerMutation();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

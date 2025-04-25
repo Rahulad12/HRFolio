@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { UserPlus, Search, Pencil, Trash2 } from 'lucide-react';
 import { interviewerData } from '../../types';
 import { motion } from 'framer-motion';
-import { Button, Card, Input, Popconfirm, Select, Tooltip } from 'antd';
+import { Button, Card, Input, message, Popconfirm, Select, Tooltip } from 'antd';
 import CustomTable from '../../component/common/Table';
-import { useGetInterviewerQuery } from '../../services/interviewServiceApi';
+import { useGetInterviewerQuery, useDeleteInterviewerMutation } from '../../services/interviewServiceApi';
 import ExportButton from '../../component/common/Export';
 
 const InterviewerList: React.FC = () => {
@@ -13,7 +13,8 @@ const InterviewerList: React.FC = () => {
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
   const navigate = useNavigate();
 
-  const { data: interviewers, isLoading: interviewerLoading } = useGetInterviewerQuery()
+  const { data: interviewers, isLoading: interviewerLoading, refetch } = useGetInterviewerQuery()
+  const [deleteInterviewer] = useDeleteInterviewerMutation();
 
   const filteredInterviewers = interviewers?.data?.filter(interviewer => {
     const matchesSearch =
@@ -30,8 +31,20 @@ const InterviewerList: React.FC = () => {
     navigate(`/dashboard/interviewers/edit/${interviewer._id}`);
   };
 
-  const handleDeleteInterviewer = (interviewer: interviewerData) => {
-    alert(`Delete interviewer: ${interviewer.name}`);
+  const handleDeleteInterviewer = async (interviewer: interviewerData) => {
+    try {
+      const result = await deleteInterviewer(interviewer._id);
+      if (result?.data?.success) {
+        message.success(result?.data?.message);
+        refetch();
+      }
+    } catch (error: any) {
+      console.error('Error deleting interviewer:', error);
+      message.error(error?.data?.message);
+    }
+    finally {
+      refetch();
+    }
   };
 
   // Get unique departments for filter

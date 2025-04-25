@@ -41,7 +41,7 @@ export const Sidebar: React.FC = () => {
         },
         {
           key: '/dashboard/offers',
-          label: <Link to="/dashboard/offers">New Offer</Link>,
+          label: <Link to="/dashboard/offers">Offer</Link>,
         },
       ],
     },

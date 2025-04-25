@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button, Card, Form, Input, message } from 'antd';
+import { Button, Card, Form, Input, message, Typography } from 'antd';
 import { interviewerData } from '../../types';
-import { useCreateInterviewerMutation, useGetInterviewerByIdQuery } from '../../services/interviewServiceApi';
-
+import { useCreateInterviewerMutation, useGetInterviewerByIdQuery, useUpdateInterviewerMutation } from '../../services/interviewServiceApi';
+const { Title } = Typography;
 const InterviewerForm: React.FC = () => {
   const [form] = Form.useForm();
 
@@ -27,17 +27,28 @@ const InterviewerForm: React.FC = () => {
 
       }
     }
-  }, [id, isEditing, form]);
+  }, [id, isEditing, form, interviewerData]);
 
   const [createInterviewer, { isLoading: interviewerLoading }] = useCreateInterviewerMutation();
+  const [updateInterviewer, { isLoading: interviewerUpdating }] = useUpdateInterviewerMutation();
+
   const handleSubmit = async (values: interviewerData) => {
     try {
-      const res = await createInterviewer(values).unwrap();
 
-      if (res?.success && res?.data) {
-        message.success(res?.message);
-        form.resetFields();
+      if (isEditing) {
+        const res = await updateInterviewer({ id: id || '', data: values }).unwrap();
+        if (res?.success && res?.data) {
+          message.success(res?.message);
+        }
       }
+      else {
+        const res = await createInterviewer(values).unwrap();
+        if (res?.success && res?.data) {
+          message.success(res?.message);
+          form.resetFields();
+        }
+      }
+
     } catch (error: any) {
       console.error('Submission failed', error);
       message.error(error.data.message);
@@ -60,9 +71,9 @@ const InterviewerForm: React.FC = () => {
           onClick={() => navigate('/dashboard/interviewers')}
           aria-label="Back"
         />
-        <h1 className="text-2xl font-bold text-gray-900">
+        <Title level={3}>
           {isEditing ? 'Edit Interviewer' : 'Add Interviewer'}
-        </h1>
+        </Title>
       </div>
 
       <Card>
@@ -124,8 +135,8 @@ const InterviewerForm: React.FC = () => {
               type='primary'
               htmlType="submit"
               icon={<Save size={16} />}
-              loading={interviewerLoading}
-              disabled={interviewerLoading}
+              loading={interviewerLoading || interviewerUpdating}
+              disabled={interviewerLoading || interviewerUpdating}
             >
               {isEditing ? 'Update Interviewer' : 'Save Interviewer'}
             </Button>

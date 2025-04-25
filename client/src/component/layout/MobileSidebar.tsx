@@ -43,7 +43,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose })
       />
 
       <div className="fixed inset-y-0 left-0 flex z-30 md:hidden">
-        <div className="relative flex-1 flex flex-col w-72 max-w-sm bg-white">
+        <div className="relative flex-1 flex flex-col w-72 max-w-sm ">
           <div className="absolute top-0 right-0 p-1">
             <Button
               variant="ghost"

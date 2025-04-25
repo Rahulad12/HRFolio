@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 
 import { Calendar, Col, Radio, Row, Select, theme } from 'antd';
-import type { CalendarProps } from 'antd';
 import type { Dayjs } from 'dayjs';
 import dayLocaleData from 'dayjs/plugin/localeData';
 

@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from 'react';
+import React, { useRef } from 'react';
 import { X } from 'lucide-react';
 import Button from './Button';
 

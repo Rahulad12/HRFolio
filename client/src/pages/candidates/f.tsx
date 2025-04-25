@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, MinusCircle, PlusCircle, Save, X } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, MinusCircle, PlusCircle, X } from 'lucide-react';
 import { UploadOutlined } from "@ant-design/icons";
 import Card from '../../component/ui/Card';
 import { motion } from 'framer-motion';
@@ -9,7 +9,6 @@ import { candidateFormData } from '../../types';
 import { useCreateCandidateMutation } from '../../services/candidateServiceApi';
 import { makeCapitilized } from '../../utils/TextAlter';
 import Predefineddata from '../../data/PredefinedData';
-import dayjs from 'dayjs';
 const { Title } = Typography;
 
 const CandidateForm: React.FC = () => {

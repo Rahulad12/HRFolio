@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardCheck, Search, Download, Pencil, Trash2 } from 'lucide-react';
+import { ClipboardCheck, Search, Pencil, Trash2 } from 'lucide-react';
 import Card from '../../component/ui/Card';
 import Badge from '../../component/ui/Badge';
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { AssessmentDataResponse, assessmentFormData } from '../../types';
+import { AssessmentDataResponse } from '../../types';
 import { motion } from 'framer-motion';
 import { useAssessment } from '../../action/StoreAssessment';
 import { useAppSelector } from '../../Hooks/hook';
 import CustomTable from '../../component/common/Table';
-import { Button, Popconfirm, Tooltip, Input, Select } from 'antd';
+import { Button, Popconfirm, Tooltip, Input, Select, message } from 'antd';
 import { makeCapitilized } from '../../utils/TextAlter';
 import PrimaryButton from '../../component/ui/button/Primary';
 import ExportButton from '../../component/common/Export';
+import { useDeleteAssessmentMutation } from '../../services/assessmentServiceApi';
 
 const AssessmentList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,27 +20,34 @@ const AssessmentList: React.FC = () => {
   const navigate = useNavigate();
 
 
-  const { assessmentLoading } = useAssessment()
+  const { assessmentLoading, refetch } = useAssessment()
   const { assessments } = useAppSelector((state) => state.assessments);
+  const [deleteAssessment, { isLoading: deleteLoading }] = useDeleteAssessmentMutation();
 
   const filteredAssessments: AssessmentDataResponse[] = assessments?.filter(assessment => {
     const matchesSearch = assessment.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = typeFilter === '' || assessment.type === typeFilter;
     return matchesSearch && matchesType;
   });
-  console.log(filteredAssessments);
 
 
   const handleEditAssessment = (id: string) => {
-    console.log(id);
-    alert(`Edit assessment with ID: ${id}`);
-
-    // navigate(`/dasboard/assessments/edit/${id}`);
+    navigate(`/dashboard/assessments/edit/${id}`);
   };
 
-  const handleDeleteAssessment = (id: string) => {
-    console.log(id);
-    alert(`Delete assessment with ID: ${id}`);
+  const handleDeleteAssessment = async (id: string) => {
+    try {
+      const res = await deleteAssessment(id).unwrap();
+      if (res?.success) {
+        message.success(res.message);
+      }
+    } catch (error: any) {
+      console.error('Failed to delete assessment', error);
+      message.error(error?.data?.message);
+    }
+    finally {
+      refetch();
+    }
 
   };
 
@@ -58,7 +64,7 @@ const AssessmentList: React.FC = () => {
       key: "title",
       render: (title: string) => (
         <div className=' cursor-pointer' >
-          <span className='text-gray-900  font-medium'>{makeCapitilized(title)}</span>
+          <span className='text-gray-900  font-medium capitalize'>{title}</span>
         </div>
       )
     },
@@ -81,12 +87,28 @@ const AssessmentList: React.FC = () => {
       render: (level: string) => <span className='text-gray-500'>{makeCapitilized(level)}</span>
     },
     {
+      title: "TECHNOLOGY",
+      dataIndex: "technology",
+      key: "technology",
+      render: (technology: string) => <span className='text-gray-500'>{makeCapitilized(technology)}</span>
+    },
+    {
+      title: "ASSESSMENT LINK",
+      dataIndex: "assessmentLink",
+      key: "assessmentLink",
+      render: (assessmentLink: string) => (
+        <a href={assessmentLink} target="_blank" rel="noopener noreferrer">
+          <Button type="link" icon={<ClipboardCheck size={14} />} > View Assessment</Button>
+        </a>
+      )
+    },
+    {
       title: "ACTION",
       key: "action",
       render: (_: any, record: AssessmentDataResponse) => (
         <div className="flex space-x-2">
           <Tooltip title="Edit">
-            <Button icon={<Pencil size={14} />} onClick={() => handleEditAssessment(record._id)} />
+            <Button type="text" icon={<Pencil size={14} />} onClick={() => handleEditAssessment(record._id)} />
           </Tooltip>
           <Tooltip title="Delete">
             <Popconfirm
@@ -95,7 +117,7 @@ const AssessmentList: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button icon={<Trash2 size={14} />} danger />
+              <Button type="text" icon={<Trash2 size={14} />} danger loading={deleteLoading} />
             </Popconfirm>
           </Tooltip>
 
@@ -103,15 +125,7 @@ const AssessmentList: React.FC = () => {
       )
     }
   ];
-  const exportToExcel = (data: AssessmentDataResponse[], fileName = "Candidates") => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, `${fileName}.xlsx`);
-  };
 
   return (
     <motion.div

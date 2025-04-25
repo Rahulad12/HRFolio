@@ -1,22 +1,59 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import Card from '../../component/ui/Card';
-import { UploadOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import { Col, Form, Row, Button, Input, Select, Upload, message, InputNumber } from 'antd';
+import { Col, Form, Row, Button, Input, Select, message, InputNumber, Typography } from 'antd';
 import Predefineddata from '../../data/PredefinedData';
-import { useCreateAssessmentMutation } from '../../services/assessmentServiceApi';
+import { useCreateAssessmentMutation, useGetAssessmentByIdQuery, useUpdateAssessmentMutation } from '../../services/assessmentServiceApi';
 import { assessmentFormData } from '../../types';
+const { Title } = Typography;
 
 const AssessmentForm: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [form] = Form.useForm();
+  const isEditing = !!id;
+
   const [createAssessment, { isLoading }] = useCreateAssessmentMutation();
+  const { data: assessmentData } = useGetAssessmentByIdQuery(id || "", {
+    skip: !id
+  });
+
+  console.log(assessmentData, "assessmentData");
+
+  const [updateAssessment, { isLoading: updatingAssessment }] = useUpdateAssessmentMutation();
+
+  useEffect(() => {
+    if (isEditing) {
+      if (assessmentData) {
+        form.setFieldsValue({
+          title: assessmentData?.data?.title,
+          type: assessmentData?.data?.type,
+          technology: assessmentData?.data?.technology,
+          level: assessmentData?.data?.level,
+          duration: assessmentData?.data?.duration,
+          assessmentLink: assessmentData?.data?.assessmentLink
+        });
+      }
+    }
+  }, [isEditing, form, assessmentData, id]);
+
   const onFinish = async (value: assessmentFormData) => {
     try {
-      const res = await createAssessment(value).unwrap();
-      if (res.success) {
-        message.success(res.message);
+      if (isEditing) {
+        const res = await updateAssessment({ id: id || '', data: value }).unwrap();
+        if (res.success) {
+          message.success(res.message);
+          navigate('/dashboard/assessments');
+        }
+      }
+      else {
+        const res = await createAssessment(value).unwrap();
+        if (res.success) {
+          message.success(res.message);
+          navigate('/dashboard/assessments');
+        }
       }
     } catch (error: any) {
       console.error(error);
@@ -37,6 +74,9 @@ const AssessmentForm: React.FC = () => {
           onClick={() => navigate('/dashboard/assessments')}
           aria-label="Back"
         />
+        <Title level={3}>
+          {isEditing ? 'Edit Assessment' : 'Create Assessment'}
+        </Title>
 
       </div>
 
@@ -45,6 +85,7 @@ const AssessmentForm: React.FC = () => {
           onFinish={onFinish}
           layout='vertical'
           autoComplete='off'
+          form={form}
         >
           <Row gutter={24}>
             <Col xs={24} md={12}>
@@ -136,13 +177,14 @@ const AssessmentForm: React.FC = () => {
                 transition={{ delay: 0.2 }}
               >
                 <Form.Item
-                  name="file"
-                  label="Assessment File"
-                  rules={[{ required: true, message: "Assessment File is Required" }]}
+                  name="assessmentLink"
+                  label="Assessment Link"
+                  rules={[
+                    { required: true, message: 'Please enter Google Form URL' },
+                    { type: 'url', message: 'Please enter a valid URL' }
+                  ]}
                 >
-                  <Upload maxCount={1} beforeUpload={() => false}>
-                    <Button icon={<UploadOutlined />}>Upload File</Button>
-                  </Upload>
+                  <Input placeholder="https://docs.google.com/forms/..." />
                 </Form.Item>
               </motion.div>
             </Col>
@@ -168,7 +210,7 @@ const AssessmentForm: React.FC = () => {
               <Button type='default' icon={<X />} onClick={() => navigate('/dashboard/assessments')}>
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" loading={isLoading} disabled={isLoading} icon={<Save size={16} />}>
+              <Button type="primary" htmlType="submit" loading={isLoading || updatingAssessment} disabled={isLoading || updatingAssessment} icon={<Save size={16} />}>
                 Save Assessment
               </Button>
             </Col>

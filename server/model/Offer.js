@@ -37,17 +37,38 @@ const offerSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+// This works only on .save()
 offerSchema.pre('save', async function (next) {
     try {
         if (this.status === 'sent') {
             const candidate = await Candidate.findById(this.candidate);
-            if (!candidate) {
-                return next(new Error('Candidate not found'));
-            }
-
-            if (candidate.status !== 'offered') {
+            if (candidate && candidate.status !== 'offered') {
                 candidate.status = 'offered';
                 await candidate.save();
+            }
+        }
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// This works on .findOneAndUpdate()
+offerSchema.pre('findOneAndUpdate', async function (next) {
+    try {
+        const update = this.getUpdate();
+        const status = update?.status;
+
+        if (status === 'sent') {
+            const offer = await this.model.findOne(this.getQuery()).lean();
+            const candidateId = offer?.candidate;
+
+            if (candidateId) {
+                const candidate = await Candidate.findById(candidateId);
+                if (candidate && candidate.status !== 'offered') {
+                    candidate.status = 'offered';
+                    await candidate.save();
+                }
             }
         }
         next();

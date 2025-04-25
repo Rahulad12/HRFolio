@@ -1,10 +1,14 @@
 import Assessment from "../model/Assessment.js";
 import AssessmentAssignment from "../model/AssessmentAssignment.js";
 import Score from "../model/ScoreModle.js";
+import sendEmail from "../utils/sendEmail.js";
+import EmailTemplate from "../model/EmailTemplate.js";
+import Candidate from "../model/Candidate.js";
+
 const createAssessment = async (req, res) => {
-    const { title, type, technology, level, duration } = req.body
+    const { title, type, technology, level, duration, assessmentLink } = req.body
     try {
-        const createdAssessment = await Assessment.create({ title, type, technology, level, duration });
+        const createdAssessment = await Assessment.create({ title, type, technology, level, duration, assessmentLink });
         if (!createdAssessment) {
             return res.status(400).json({ success: false, message: "Assessment not created" });
         }
@@ -16,34 +20,97 @@ const createAssessment = async (req, res) => {
     }
 }
 
+
 const assignAssessment = async (req, res) => {
-    let { candidate, assessment, date } = req.body
+    let { candidate, assessment, dueDate, emailTemplate, status } = req.body;
+    console.log(candidate, assessment, dueDate, emailTemplate, status);
 
     if (!Array.isArray(candidate)) {
         candidate = [candidate];
     }
+
     try {
-        const existingAssignment = await AssessmentAssignment.find({ candidate: { $in: candidate }, assessment, date });
+        const existingAssignment = await AssessmentAssignment.find({
+            candidate: { $in: candidate },
+            assessment,
+            dueDate,
+        });
 
         if (existingAssignment.length > 0) {
-            return res.status(400).json({ success: false, message: `Candidate ${candidate.indexOf(existingAssignment[0].candidate)} already assigned to assessment on ${new Date(date).toLocaleDateString()}` });
+            return res.status(400).json({
+                success: false,
+                message: `Candidate ${candidate.indexOf(existingAssignment[0].candidate)} already assigned to assessment on ${new Date(dueDate).toLocaleDateString()}`,
+            });
+        }
+
+        const assessmentDetails = await Assessment.findById(assessment);
+        if (!assessmentDetails) {
+            return res.status(404).json({ success: false, message: 'Assessment not found' });
+        }
+
+        const template = await EmailTemplate.findById(emailTemplate);
+        if (!template) {
+            return res.status(404).json({ success: false, message: 'Email template not found' });
         }
 
         const assignments = await Promise.all(
             candidate.map(async (candidateId) => {
-                return await AssessmentAssignment.create({
+                const createdAssignment = await AssessmentAssignment.create({
                     candidate: candidateId,
                     assessment,
-                    date
+                    dueDate,
+                    emailTemplate,
+                    status,
                 });
-            })
-        )
 
-        return res.status(200).json({ success: true, message: "Assessment Assigned successfully", data: assignments });
+                // Send email after assignment
+                if (status === 'assigned') {
+                    const candidateInfo = await Candidate.findById(candidateId);
+                    if (candidateInfo) {
+                        const assessmentTime = new Date(createdAssignment.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        });
+                        const assessmentDate = new Date(createdAssignment.createdAt).toLocaleDateString();
+
+                        const html = template.body
+                            .replace(/{{candidateName}}/g, candidateInfo.name)
+                            .replace(/{{technology}}/g, assessmentDetails.technology || '')
+                            .replace(/{{assessmentDate}}/g, assessmentDate)
+                            .replace(/{{assessmentTime}}/g, assessmentTime)
+                            .replace(/{{assessmentLink}}/g, assessmentDetails.assessmentLink || '')
+                            .replace(/{{duration}}/g, assessmentDetails.duration || '')
+                            .replace(/{{level}}/g, assessmentDetails.level || '')
+                            .replace(/{{deueDate}}/g, dueDate)
+                            .replace(/{{type}}/g, assessmentDetails.type || '');
+
+                        const subject = template.subject.replace(/{{technology}}/g, assessmentDetails.technology || 'Assessment');
+
+                        await sendEmail({
+                            to: candidateInfo.email,
+                            subject,
+                            html,
+                        });
+                    }
+                }
+
+                return createdAssignment;
+            })
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: 'Assessment(s) assigned successfully',
+            data: assignments,
+        });
     } catch (error) {
+        console.error('Assignment Error:', error);
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+
+export default assignAssessment;
+
 
 const getAssessment = async (req, res) => {
     try {

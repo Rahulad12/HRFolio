@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Steps, Select, notification } from 'antd';
 import { useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../../services/candidateServiceApi';
-import { candidateData, candidateFormData } from '../../types/index';
+import {  candidateFormData } from '../../types/index';
 import CandidateProfileLoading from '../../component/Loding/CandidateProfileLoading';
 import { makeCapitilized } from '../../utils/TextAlter';
 import Predefineddata from '../../data/PredefinedData';

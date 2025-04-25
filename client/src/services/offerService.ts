@@ -1,11 +1,11 @@
 import { api } from "./api";
-import { offerLetter, offerLetterResponse, offerLetterResponseById, offerLetterPostData } from "../types";
+import { offerLetterResponse, offerLetterResponseById, offerLetterPostData } from "../types";
 import { OFFER_URL } from "../constant";
 
 export const offerServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
 
-        createOfferLetter: builder.mutation<offerLetterResponse, offerLetter>({
+        createOfferLetter: builder.mutation<offerLetterResponse, offerLetterPostData>({
             query: (data) => ({
                 url: `${OFFER_URL}`,
                 method: "POST",

@@ -7,6 +7,7 @@ export const googleLoginRedirect = passport.authenticate("google", {
     scope: ["profile", "email"],
 });
 
+
 // After Google auth redirects here
 export const googleCallback = (req, res, next) => {
     logger.info("Google callback");
@@ -14,12 +15,12 @@ export const googleCallback = (req, res, next) => {
     passport.authenticate("google", { session: false }, (err, user, info) => {
         if (err || !user) {
             logger.error("Error or no user", err || info);
-            return res.redirect(`http://localhost:5173/error?error=${encodeURIComponent(err?.message || "User not found")}`);
+            return res.redirect(`${process.env.FRONTEND_URL}/error?error=${encodeURIComponent(err?.message || "User not found")}`);
         }
 
         if (user.status === "inactive") {
             logger.warn("User is banned");
-            return res.redirect(`http://localhost:5173/error?error=${encodeURIComponent("Your account is banned")}`);
+            return res.redirect(`${process.env.FRONTEND_URL}/error?error=${encodeURIComponent("Your account is banned")}`);
         }
 
         const token = jwt.sign(
@@ -29,7 +30,7 @@ export const googleCallback = (req, res, next) => {
         );
 
         logger.info("Redirecting to frontend with token");
-        res.redirect(`http://localhost:5173/?token=${token}&email=${user.email}&name=${user.name}&picture=${user.picture}&loggedIn=${user.isLoggedIn}&Id=${user._id}`);
+        res.redirect(`${process.env.FRONTEND_URL}/?token=${token}&email=${user.email}&name=${user.name}&picture=${user.picture}&loggedIn=${user.isLoggedIn}&Id=${user._id}`);
     })(req, res, next);
 };
 

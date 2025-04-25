@@ -12,7 +12,8 @@ import {
   DatePicker,
   message,
   Row,
-  Col
+  Col,
+  Typography
 } from 'antd';
 import dayjs from 'dayjs';
 
@@ -25,7 +26,9 @@ import {
 } from '../../services/offerService';
 import { useCandidate } from '../../action/StoreCandidate';
 import { makeCapitilized } from '../../utils/TextAlter';
-import { offerLetter } from '../../types';
+import { offerLetter, offerLetterPostData } from '../../types';
+
+const { Title, Text } = Typography;
 
 const OfferForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +58,7 @@ const OfferForm: React.FC = () => {
     }
   }, [isEditing, offerLetterData, form]);
 
-  const buildPayload = (values: offerLetter, status: offerLetter['status']) => ({
+  const buildPayload = (values: offerLetterPostData, status: offerLetter['status']) => ({
     ...values,
     startDate: dayjs(values.startDate).format('YYYY-MM-DD'),
     responseDeadline: dayjs(values.responseDeadline).format('YYYY-MM-DD'),
@@ -81,7 +84,7 @@ const OfferForm: React.FC = () => {
     }
   };
 
-  const handleOfferSend = async (values: offerLetter) => {
+  const handleOfferSend = async (values: offerLetterPostData) => {
     setIsSubmitting(true);
     const payload = buildPayload(values, 'sent');
 
@@ -132,9 +135,9 @@ const OfferForm: React.FC = () => {
           onClick={() => navigate('/dashboard/offers')}
           aria-label="Back"
         />
-        <h1 className="text-2xl font-bold text-gray-900">
+        <Title level={3}>
           {isEditing ? 'Edit Offer Letter' : 'Create Offer Letter'}
-        </h1>
+        </Title>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

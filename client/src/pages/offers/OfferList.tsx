@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import PrimaryButton from '../../component/ui/button/Primary';
 import { Button, Card, Input, message, Select } from 'antd';
 import CustomTable from '../../component/common/Table';
-import { useUpdateOfferLetterMutation, useGetOfferLetterQuery } from '../../services/offerService';
+import { useGetOfferLetterQuery, useCreateOfferLetterMutation } from '../../services/offerService';
 import Badge from '../../component/ui/Badge';
 
 const OfferList: React.FC = () => {
@@ -16,7 +16,7 @@ const OfferList: React.FC = () => {
   const navigate = useNavigate();
 
   const { data: offerLetters, isLoading: isLoadingOfferLetter, refetch } = useGetOfferLetterQuery();
-  const [updateOfferLetter, { isLoading: offerSending }] = useUpdateOfferLetterMutation();
+  const [createOfferLetter, { isLoading: offerSending }] = useCreateOfferLetterMutation();
 
 
   const filteredOffers = offerLetters?.data?.filter(offer => {
@@ -43,7 +43,6 @@ const OfferList: React.FC = () => {
       message.warning("Incomplete offer. Please edit and complete the draft first.");
       return;
     }
-    setSendingOfferId(offer._id);
     const payload = {
       candidate: offer?.candidate?._id,
       email: offer?.email,
@@ -51,13 +50,10 @@ const OfferList: React.FC = () => {
       salary: offer?.salary,
       startDate: offer?.startDate,
       responseDeadline: offer?.responseDeadline,
-      status: 'sent' as offerLetter['status']
+      status: 'sent'
     }
     try {
-      const res = await updateOfferLetter({
-        id: offer?._id,
-        data: payload
-      }).unwrap();
+      const res = await createOfferLetter(payload).unwrap();
       if (res?.success) {
         message.success(res?.message);
         refetch();

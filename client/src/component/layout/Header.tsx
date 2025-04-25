@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Bell, Menu, Search, User, X } from 'lucide-react';
+import { Bell, Search, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
-import { Avatar, Dropdown, Image, Button } from 'antd';
+import { Avatar, Dropdown, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import { logout } from '../../slices/authSlices';
 

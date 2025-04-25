@@ -10,7 +10,7 @@ import {
     Transfer,
 } from 'antd';
 import { Key, useState } from 'react';
-import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useCreateAssignAssessmentMutation } from '../../services/assessmentServiceApi';
 import { useAppSelector } from '../../Hooks/hook';
 import { useAssessment } from '../../action/StoreAssessment';
@@ -18,13 +18,15 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCandidate } from '../../action/StoreCandidate';
-import dayjs from 'dayjs';
+import { useGetAllEmailTemplateQuery } from '../../services/emailService';
+import { AssignmentData } from '../../types';
 
 
 const AssignAssessment = () => {
     const navigate = useNavigate();
     const [assignForm] = Form.useForm();
     const [selectedCandidates, setSelectedCandidates] = useState<Key[]>([]);
+    const [preview, setPreview] = useState('');
 
     const { refetch: refetchAssessment } = useAssessment();
     const { refetch: refetchCandidate } = useCandidate();
@@ -33,12 +35,42 @@ const AssignAssessment = () => {
     const candidates = useAppSelector((state) => state.candidate.candidate);
 
     const [createAssignAssessment, { isLoading }] = useCreateAssignAssessmentMutation();
+    const { data: emailTemplates } = useGetAllEmailTemplateQuery();
+
+    const handlePreview = () => {
+        const values = assignForm.getFieldsValue();
+        const selectedTemplate = emailTemplates?.data?.find(t => t._id === values.emailTemplate);
+        const selectedAssessment = assessments?.find(a => a._id === values.assessment);
+
+        if (!selectedTemplate || !selectedAssessment) {
+            setPreview('');
+            return;
+        }
+
+        // Just preview for 1st selected candidate
+        const candidateInfo = candidates.find(c => selectedCandidates.includes(c._id));
+        if (!candidateInfo) {
+            setPreview('');
+            return;
+        }
+
+        const html = selectedTemplate.body
+            .replace(/{{candidateName}}/g, candidateInfo.name)
+            .replace(/{{technology}}/g, selectedAssessment.technology || '')
+            .replace(/{{duration}}/g, selectedAssessment?.duration.toString() || "")
+            .replace(/{{assessmentDate}}/g, selectedAssessment.createdAt ? dayjs(selectedAssessment.createdAt).format('MMMM D, YYYY') : '')
+            .replace(/{{assessmentTime}}/g, selectedAssessment.createdAt ? dayjs(selectedAssessment.createdAt).format('hh:mm A') : '')
+            .replace(/{{level}}/g, selectedAssessment.level || '')
+            .replace(/{{assessmentLink}}/g, selectedAssessment.assessmentLink || '');
+
+        setPreview(html);
+    }
 
     const handleTranseferChange = (targetKeys: Key[]): void => {
         setSelectedCandidates(targetKeys);
     };
 
-    const handleAssign = async (values: { assessmentId: string; dueDate: Dayjs }) => {
+    const handleAssign = async (values: AssignmentData) => {
         if (selectedCandidates.length === 0) {
             message.warning('Please select at least one candidate.');
             return;
@@ -46,9 +78,11 @@ const AssignAssessment = () => {
 
         try {
             const payload = {
-                assessment: values.assessmentId,
+                assessment: values.assessment,
                 candidate: selectedCandidates,
-                date: dayjs(values.dueDate).format('YYYY-MM-DD'),
+                dueDate: dayjs(values.dueDate).format('YYYY-MM-DD'),
+                status: 'assigned' as AssignmentData['status'],
+                emailTemplate: values.emailTemplate
             };
             const res = await createAssignAssessment(payload).unwrap();
             if (res?.success && res?.data) {
@@ -85,81 +119,115 @@ const AssignAssessment = () => {
                 />
                 <h2 className="ml-2 text-lg font-semibold">Assign Assessment</h2>
             </div>
+            <Row gutter={16}>
+                <Col xs={24} md={12} lg={14}>
+                    <Card>
+                        <Form
+                            form={assignForm}
+                            layout="vertical"
+                            onFinish={handleAssign}
+                            onChange={handlePreview}
+                        >
+                            <Row gutter={16}>
+                                <Col xs={24} md={12}>
+                                    <Form.Item
+                                        name="assessment"
+                                        label="Select Assessment"
+                                        rules={[{ required: true, message: 'Please select an assessment' }]}
+                                    >
+                                        <Select placeholder="Select assessment" allowClear >
+                                            {assessments?.map((assessment) => (
+                                                <Select.Option key={assessment._id} value={assessment._id} className="capitalize">
+                                                    {assessment.title}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
 
-            <Card>
-                <Form
-                    form={assignForm}
-                    layout="vertical"
-                    onFinish={handleAssign}
-                >
-                    <Row gutter={16}>
-                        <Col xs={24} md={12}>
+                                <Col xs={24} md={12}>
+                                    <Form.Item
+                                        name="dueDate"
+                                        label="Due Date"
+                                        rules={[{ required: true, message: 'Please select a due date' }]}
+                                    >
+                                        <DatePicker style={{ width: '100%' }} />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col xs={24} md={12}>
+                                    <Form.Item
+                                        name="emailTemplate"
+                                        label="Email Template"
+                                        rules={[{ required: true, message: 'Please select an email template' }]}
+                                    >
+                                        <Select placeholder="Select email template" allowClear >
+                                            {emailTemplates?.data?.map((template) => (
+                                                <Select.Option key={template._id} value={template._id} className="capitalize">
+                                                    {template.name}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
                             <Form.Item
-                                name="assessmentId"
-                                label="Select Assessment"
-                                rules={[{ required: true, message: 'Please select an assessment' }]}
+                                label="Select Candidates"
+                                required
                             >
-                                <Select placeholder="Select assessment" allowClear >
-                                    {assessments?.map((assessment) => (
-                                        <Select.Option key={assessment._id} value={assessment._id} className="capitalize">
-                                            {assessment.title}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
+                                <Transfer
+                                    dataSource={transferData}
+                                    titles={['Available', 'Selected']}
+                                    targetKeys={selectedCandidates}
+                                    onChange={handleTranseferChange}
+                                    render={(item) => `${item.name} (${item.technology} - ${item.level})`}
+                                    listStyle={{ width: 300, height: 300 }}
+                                    rowKey={(item) => item.key}
+                                    showSearch
+                                />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} md={12}>
-                            <Form.Item
-                                name="dueDate"
-                                label="Due Date"
-                                rules={[{ required: true, message: 'Please select a due date' }]}
-                            >
-                                <DatePicker style={{ width: '100%' }} />
+                            <Form.Item>
+                                <Row justify="end" gutter={12}>
+                                    <Col>
+                                        <Button
+                                            type="default"
+                                            icon={<X size={16} />}
+                                            onClick={() => navigate('/dashboard/assessments/assignments')}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </Col>
+                                    <Col>
+                                        <Button
+                                            type="primary"
+                                            htmlType="submit"
+                                            loading={isLoading}
+                                        >
+                                            Assign
+                                        </Button>
+                                    </Col>
+
+                                </Row>
                             </Form.Item>
-                        </Col>
-                    </Row>
+                        </Form>
+                    </Card>
+                </Col>
+                <Col xs={24} lg={10}>
+                    <Card title="Email Preview">
+                        {preview ? (
+                            <div className="whitespace-pre-line">{preview}</div>
+                        ) : (
+                            <div className="text-center text-gray-500 py-6">
+                                <p>Select a candidate, assessment, and email template to preview</p>
+                            </div>
+                        )}
+                    </Card>
+                </Col>
+            </Row>
 
-                    <Form.Item
-                        label="Select Candidates"
-                        required
-                    >
-                        <Transfer
-                            dataSource={transferData}
-                            titles={['Available', 'Selected']}
-                            targetKeys={selectedCandidates}
-                            onChange={handleTranseferChange}
-                            render={(item) => `${item.name} (${item.technology} - ${item.level})`}
-                            listStyle={{ width: 300, height: 300 }}
-                            rowKey={(item) => item.key}
-                            showSearch
-                        />
-                    </Form.Item>
-
-                    <Form.Item>
-                        <Row justify="end" gutter={12}>
-                            <Col>
-                                <Button
-                                    type="default"
-                                    icon={<X size={16} />}
-                                    onClick={() => navigate('/dashboard/assessments/assignments')}
-                                >
-                                    Cancel
-                                </Button>
-                            </Col>
-                            <Col>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    loading={isLoading}
-                                >
-                                    Assign
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form.Item>
-                </Form>
-            </Card>
         </motion.div>
     );
 };

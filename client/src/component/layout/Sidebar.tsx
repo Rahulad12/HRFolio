@@ -4,8 +4,10 @@ import { Users, Calendar, ClipboardCheck, UserPlus, FileText, BarChart2 } from '
 import Logo from '../ui/Logo';
 import { Menu } from 'antd';
 
-
-export const Sidebar: React.FC = () => {
+interface sideBarProsp {
+  isMobile: boolean
+}
+export const Sidebar: React.FC<sideBarProsp> = ({ isMobile = false }) => {
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -29,7 +31,6 @@ export const Sidebar: React.FC = () => {
       ],
     },
     { key: '/dashboard/interviewers', icon: <UserPlus size={20} />, label: <Link to="/dashboard/interviewers">Interviewers</Link> },
-    // { key: '/dashboard/jobs', icon: <Briefcase size={20} />, label: <Link to="/dashboard/jobs">Jobs</Link> },
     {
       key: 'offers',
       icon: <FileText size={20} />,
@@ -45,11 +46,10 @@ export const Sidebar: React.FC = () => {
         },
       ],
     },
-    // { key: '/dashboard/reports', icon: <Award size={20} />, label: <Link to="/dashboard/reports">Reports</Link> },
   ];
 
   return (
-    <div className="w-55 hidden md:block bg-white h-screen shadow-sm overflow-y-auto">
+    <div className={`${isMobile ? 'w-full' : 'w-55 hidden md:block'} bg-white h-screen shadow-sm overflow-y-auto`}>
       <div className="px-6 py-6">
         <Logo />
         <p className="text-sm text-gray-500 mt-1">Recruitment Manager</p>

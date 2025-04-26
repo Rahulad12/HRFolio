@@ -114,7 +114,7 @@ export default assignAssessment;
 
 const getAssessment = async (req, res) => {
     try {
-        const assessment = await Assessment.find({}).select("-createdAt -updatedAt -__v");
+        const assessment = await Assessment.find({}).select(" -__v");
         if (assessment.length === 0) {
             return res.status(404).json({ success: false, message: "No assessment found" });
         }
@@ -126,12 +126,12 @@ const getAssessment = async (req, res) => {
 
 const getAssignment = async (req, res) => {
     try {
-        const assignment = await AssessmentAssignment.find({}).select("-createdAt -updatedAt -__v").populate({
+        const assignment = await AssessmentAssignment.find({}).select(" -__v").populate({
             path: "candidate",
-            select: "-createdAt -updatedAt -__v"
+            select: "-__v"
         }).populate({
             path: "assessment",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         });
         if (assignment.length === 0) {
             return res.status(404).json({ success: false, message: "No assignment found" });
@@ -158,10 +158,10 @@ const deleteAssignment = async (req, res) => {
     try {
         const assignment = await AssessmentAssignment.findByIdAndDelete(req.params.id).populate({
             path: "candidate",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         }).populate({
             path: "assessment",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         });
         if (!assignment) {
             return res.status(404).json({ success: false, message: "Assignment not found" });
@@ -198,7 +198,7 @@ const updateAssignmnet = async (req, res) => {
 
 const getAssessmentById = async (req, res) => {
     try {
-        const assessment = await Assessment.findById(req.params.id).select("-createdAt -updatedAt -__v");
+        const assessment = await Assessment.findById(req.params.id).select(" -__v");
         if (!assessment) {
             return res.status(404).json({ success: false, message: "Assessment not found" });
         }
@@ -210,12 +210,12 @@ const getAssessmentById = async (req, res) => {
 
 const getAssignmentByCandidateId = async (req, res) => {
     try {
-        const assignment = await AssessmentAssignment.find({ candidate: req.params.id }).select("-createdAt -updatedAt -__v").populate({
+        const assignment = await AssessmentAssignment.find({ candidate: req.params.id }).select(" -__v").populate({
             path: "candidate",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         }).populate({
             path: "assessment",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         });
         if (assignment.length === 0) {
             return res.status(404).json({ success: false, message: "No assignment found" });
@@ -228,12 +228,12 @@ const getAssignmentByCandidateId = async (req, res) => {
 
 const getAssignmentById = async (req, res) => {
     try {
-        const assignment = await AssessmentAssignment.findById(req.params.id).select("-createdAt -updatedAt -__v").populate({
+        const assignment = await AssessmentAssignment.findById(req.params.id).select(" -__v").populate({
             path: "candidate",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         }).populate({
             path: "assessment",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         });
         if (!assignment) {
             return res.status(404).json({ success: false, message: "Assignment not found" });
@@ -292,12 +292,12 @@ const createScore = async (req, res) => {
 
 const getScoreById = async (req, res) => {
     try {
-        const score = await Score.find({ candidate: req.params.id }).select("-createdAt -updatedAt -__v").populate({
+        const score = await Score.find({ candidate: req.params.id }).select(" -__v").populate({
             path: "candidate",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         }).populate({
             path: "assessment",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         });
         if (score.length === 0) {
             return res.status(404).json({ success: false, message: "No score found" });
@@ -310,12 +310,12 @@ const getScoreById = async (req, res) => {
 
 const getScore = async (req, res) => {
     try {
-        const score = await Score.find({}).select("-createdAt -updatedAt -__v").populate({
+        const score = await Score.find({}).select(" -__v").populate({
             path: "candidate",
-            select: "-createdAt -updatedAt -__v"
+            select: "- -__v"
         }).populate({
             path: "assessment",
-            select: "-createdAt -updatedAt -__v"
+            select: " -__v"
         });
         if (score.length === 0) {
             return res.status(404).json({ success: false, message: "No score found" });

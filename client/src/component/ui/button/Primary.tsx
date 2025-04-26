@@ -29,6 +29,7 @@ const PrimaryButton = ({ text, icon, onClick, disabled, loading }: Props) => {
                 onClick={onClick}
                 disabled={disabled}
                 loading={loading}
+                size="middle"
                 className="flex items-center justify-center gap-2"
             >
                 {text}

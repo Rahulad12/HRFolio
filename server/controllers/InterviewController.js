@@ -88,7 +88,7 @@ const getAllInterviewsByCandidate = async (req, res) => {
         }).populate({
             path: 'interviewer',
             select: '-createdAt -updatedAt -__v'
-        }).select('-createdAt -updatedAt -__v');
+        }).select(' -__v');
         if (interviews.length === 0) {
             return res.status(404).json({ success: false, message: "No interviews found" });
         }

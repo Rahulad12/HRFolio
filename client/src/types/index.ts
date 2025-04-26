@@ -78,7 +78,12 @@ export type candidateResponse = {
 export type interviewer = {
     _id: string;
     name: string;
-    email: string
+    email: string;
+    department: string;
+    availability: string;
+    position: string
+    createdAt: string;
+    updatedAt: string
 }
 export type interviewData = {
     candidate: candidateData;
@@ -165,12 +170,17 @@ export type AssignmentDataResponse = {
         technology: string,
         level: string
         assessmentLink: string;
+        duration: number
+        createdAt: string;
+        updatedAt: string
     }
     date: Dayjs;
     status: 'Assigned' | 'pending' | 'completed';
     _id: string;
     __v: number;
     emailTemplate: string;
+    createdAt: string;
+    updatedAt: string
 }
 
 export type assignmentResponse = {
@@ -198,6 +208,9 @@ export type AssignmentScoreResponse = {
     score: number;
     status: string;
     note: string;
+    _id: string;
+    createdAt: string;
+    updatedAt: string
 }
 export type AssgnmentScoreResponse = {
     success: boolean;
@@ -217,7 +230,6 @@ export type UploadFileRequest = {
 
 export type interviewerData = {
     _id: string;
-    _v: number;
     name: string;
     email: string;
     department: string;
@@ -229,6 +241,8 @@ export type interviewerData = {
             timeSlots: string[]
         }
     ]
+    createdAt: string;
+    updatedAt: string
 }
 
 export type interviewerResponse = {

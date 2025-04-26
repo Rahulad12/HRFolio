@@ -46,13 +46,13 @@ const getActivityLabel = (type: Activity['type']) => {
   }
 };
 
-export const RecentActivity: React.FC<RecentActivityProps> = ({
+export const RecentActivity: React.FC<RecentActivityProps> = ({ 
   activities,
   className = '',
 }) => {
   return (
-    <Card
-      title="Recent Activity"
+    <Card 
+      title="Recent Activity" 
       className={className}
     >
       <div className="space-y-6">
@@ -67,8 +67,8 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
                   <h4 className="text-sm font-medium text-gray-900">{activity.title}</h4>
                   <Badge variant={
                     activity.type === 'interview' ? 'primary' :
-                      activity.type === 'assessment' ? 'secondary' :
-                        activity.type === 'offer' ? 'success' : 'warning'
+                    activity.type === 'assessment' ? 'secondary' :
+                    activity.type === 'offer' ? 'success' : 'warning'
                   }>
                     {getActivityLabel(activity.type)}
                   </Badge>

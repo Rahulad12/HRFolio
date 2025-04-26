@@ -2,7 +2,7 @@ import Interviewers from "../model/Interviewers.js";
 
 const getInterviewer = async (req, res) => {
     try {
-        const interviewer = await Interviewers.find().select('-createdAt -updatedAt -__v');
+        const interviewer = await Interviewers.find().select(' -__v');
         if (interviewer.length === 0) {
             return res.status(404).json({ success: false, message: "Interviewer not found" });
         }

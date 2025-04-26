@@ -87,7 +87,6 @@ const InterviewListView = ({
                     status
                 }
             });
-            console.log(res);
             if (res?.data?.success) {
                 api.success({
                     message: res?.data?.message,
@@ -194,7 +193,7 @@ const InterviewListView = ({
                                     <div className="flex items-center">
                                         <Clock size={14} className="mr-1 text-gray-500" />
                                         <Text type="secondary">
-                                            {dayjs(interview?.date).format('h:mm A')} ({60} min)
+                                            {interview?.time} ({60} min)
                                         </Text>
                                     </div>
                                     <div className="flex items-center">

@@ -102,7 +102,7 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
             label={<div className="flex items-center"><Clock size={14} className="mr-2" />Time</div>}
             span={1}
           >
-            {dayjs(interviewData?.date).format('h:mm A')} ({60} minutes)
+            {(interviewData?.time)} ({60} minutes)
           </Descriptions.Item>
           <Descriptions.Item
             label={<div className="flex items-center"><Users size={14} className="mr-2" />Interviewers</div>}

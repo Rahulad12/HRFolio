@@ -1,11 +1,9 @@
 import React from 'react';
-import { Users, Calendar, ClipboardCheck, Award, UserPlus, FileText, Briefcase, Plus } from 'lucide-react';
-import { metricsData } from '../data/mockData';
+import { Users, Calendar, Plus, FileCheck, FileText } from 'lucide-react';
 import MetricsCard from '../component/dashboard/MetricsCard';
-import CandidatePipeline from '../component/dashboard/CandidatePipeline';
+import CandidateByStatus from '../component/dashboard/CandidateByStatus';
 import RecentActivity from '../component/dashboard/RecentActivity';
 import UpcomingInterviews from '../component/dashboard/UpcomingInterviews';
-import Button from '../component/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '../Hooks/hook';
@@ -13,30 +11,35 @@ import { useCandidate } from '../action/StoreCandidate';
 import { useInterview } from '../action/StoreInterview';
 import dayjs from 'dayjs';
 import PrimaryButton from '../component/ui/button/Primary';
+import { Col, Row, Space, Button } from 'antd';
+import RecentActivityLog from '../component/dashboard/RecentActivitiesLog';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
-  //storeInterview is used to store the interview data in redux
   const { isLoading, isError } = useInterview(null, null);
   const { data } = useCandidate();
   const { user } = useAppSelector((state) => state.auth);
 
-  // Fetching data from Redux store
   const { candidate } = useAppSelector((state) => state.candidate);
   const { interviews } = useAppSelector((state) => state.interview);
 
-  // Pipeline stages
+  const shortListed = candidate.filter((item) => item.status === 'shortlisted');
+
+  const assessment = candidate.filter((item) => item.status === 'assessment');
+  const offered = candidate.filter((item) => item.status === 'offered');
+  const rejected = candidate.filter((item) => item.status === 'rejected');
+  const hired = candidate.filter((item) => item.status === 'hired');
+
   const pipelineStages = [
-    { id: '1', name: 'New Applications', count: 18, color: '#3B82F6' },
-    { id: '2', name: 'Screening', count: 12, color: '#8B5CF6' },
-    { id: '3', name: 'Interviewing', count: 8, color: '#10B981' },
-    { id: '4', name: 'Assessment', count: 5, color: '#F59E0B' },
-    { id: '5', name: 'Offered', count: 3, color: '#EC4899' },
+    { id: '1', name: 'New Applications', count: shortListed.length, color: '#3B82F6' },
+    { id: '2', name: 'Assessment', count: assessment.length, color: '#8B5CF6' },
+    { id: '3', name: 'Interviewing', count: interviews.length, color: '#10B981' },
+    { id: '4', name: 'Offered', count: offered.length, color: '#F59E0B' },
+    { id: '5', name: 'Hired', count: hired.length, color: '#EC4899' },
+    { id: '6', name: 'Rejected', count: rejected.length, color: '#EF4444' },
   ];
 
-
-  // Mock activities
   const recentActivities = [
     {
       id: '1',
@@ -69,17 +72,15 @@ export const Dashboard: React.FC = () => {
       description: 'Robert Johnson applied for Backend Developer',
       date: 'May 4, 2025',
       time: '9:30 AM',
-    }
+    },
   ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
+      transition: { staggerChildren: 0.1 },
+    },
   };
 
   const itemVariants = {
@@ -87,116 +88,143 @@ export const Dashboard: React.FC = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        duration: 0.5
-      }
-    }
+      transition: { duration: 0.5 },
+    },
   };
+
   const startWeek = dayjs().startOf('week').format('YYYY-MM-DD');
   const endWeek = dayjs().endOf('week').format('YYYY-MM-DD');
   const filteredInterviews = interviews.filter((interview) => {
     const interviewDate = dayjs(interview.date).format('YYYY-MM-DD');
     return interviewDate >= startWeek && interviewDate <= endWeek;
-  }
-  );
+  });
 
   return (
     <div>
+      {/* Top Section */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-blue-950">Dashboard</h1>
           <p className="mt-1 text-sm text-blue-950">
-            Welcome back!  <span className="font-bold text-blue-950">{user.username}</span>
+            Welcome back! <span className="font-bold">{user.username}</span>
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 flex space-x-3">
+        <Space className="mt-4 sm:mt-0">
           <PrimaryButton
-            text='Add Candidate'
+            text="Add Candidate"
             icon={<Plus className="w-4 h-4" />}
             onClick={() => navigate('/dashboard/candidates/new')}
             disabled={false}
             loading={false}
           />
           <Button
-            variant="outline"
+            type="default"
             icon={<Calendar size={16} />}
             onClick={() => navigate('/dashboard/interviews/schedule')}
           >
             Schedule Interview
           </Button>
-        </div>
+        </Space>
       </div>
 
+      {/* Metrics Cards */}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <motion.div variants={itemVariants}>
-          <MetricsCard
-            title="Open Positions"
-            value={metricsData.openPositions}
-            icon={<Briefcase size={20} className="text-blue-700" />}
-            change={{ value: 12, trend: 'up' }}
-          />
-        </motion.div>
-        <motion.div variants={itemVariants}>
-          <MetricsCard
-            title="Active Candidates"
-            value={candidate.length}
-            icon={<Users size={20} className="text-purple-700" />}
-            change={{ value: 8, trend: 'up' }}
-          />
-        </motion.div>
-        <motion.div variants={itemVariants}>
-          <MetricsCard
-            title="Scheduled Interviews"
-            value={interviews.length}
-            icon={<Calendar size={20} className="text-green-700" />}
-            change={{ value: 5, trend: 'up' }}
-          />
-        </motion.div>
-        <motion.div variants={itemVariants}>
-          <MetricsCard
-            title="Time to Hire (days)"
-            value={metricsData.timeToHire}
-            icon={<Award size={20} className="text-amber-700" />}
-            change={{ value: 10, trend: 'down' }}
-          />
-        </motion.div>
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={6}>
+            <motion.div variants={itemVariants}>
+              <MetricsCard
+                title="Active Candidates"
+                value={candidate?.length}
+                icon={<Users size={20} className="text-purple-700" />}
+              />
+            </motion.div>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <motion.div variants={itemVariants}>
+              <MetricsCard
+                title="Active Assessment"
+                value={assessment?.length}
+                icon={<FileCheck size={20} className="mr-2 text-orange-500" />}
+              />
+            </motion.div>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <motion.div variants={itemVariants}>
+              <MetricsCard
+                title="Scheduled Interviews"
+                value={interviews?.length}
+                icon={<Calendar size={20} className="text-green-700" />}
+              />
+            </motion.div>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <motion.div variants={itemVariants}>
+              <MetricsCard
+                title="Offer Sent"
+                value={offered?.length}
+                icon={<FileText size={20} className="mr-2 text-green-500" />}
+              />
+            </motion.div>
+          </Col>
+        </Row>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div
-          className="lg:col-span-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <CandidatePipeline stages={pipelineStages} />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <UpcomingInterviews
-            interviews={filteredInterviews}
-            onViewAllClick={() => navigate('/dashboard/interviews')}
-            loading={isLoading}
-            error={isError ? 'Failed to load interviews' : ''}
-          />
-        </motion.div>
-        <motion.div
-          className="lg:col-span-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <RecentActivity activities={recentActivities} />
-        </motion.div>
-      </div>
+      {/* Main Section */}
+      <Row gutter={[24, 24]}>
+        {/* Left Side */}
+        <Col xs={24} lg={16}>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <CandidateByStatus stages={pipelineStages} />
+            </motion.div>
+          </Space>
+        </Col>
+
+        {/* Right Side */}
+        <Col xs={24} lg={8}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <UpcomingInterviews
+              interviews={filteredInterviews}
+              onViewAllClick={() => navigate('/dashboard/interviews')}
+              loading={isLoading}
+              error={isError ? 'Failed to load interviews' : ''}
+            />
+          </motion.div>
+        </Col>
+
+        {/* Bottom Full Width */}
+        <Col xs={24} lg={16}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            <RecentActivity activities={recentActivities} />
+          </motion.div>
+        </Col>
+
+        <Col xs={24} lg={8}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <RecentActivityLog />
+          </motion.div>
+        </Col>
+      </Row>
     </div>
   );
 };

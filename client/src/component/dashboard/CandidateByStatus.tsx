@@ -1,5 +1,6 @@
 import React from 'react';
 import Card from '../ui/Card';
+import { useAppSelector } from '../../Hooks/hook';
 
 interface PipelineStage {
   id: string;
@@ -13,15 +14,17 @@ interface CandidatePipelineProps {
   className?: string;
 }
 
-export const CandidatePipeline: React.FC<CandidatePipelineProps> = ({
+export const CandidateByStatus: React.FC<CandidatePipelineProps> = ({
   stages,
   className = '',
 }) => {
-  const total = stages.reduce((sum, stage) => sum + stage.count, 0);
-  
+
+  const { candidate } = useAppSelector((state) => state.candidate);
+  const total = candidate?.length;
+
   return (
-    <Card 
-      title="Candidate Pipeline" 
+    <Card
+      title="Candidate By Status"
       subtitle={`${total} total candidates`}
       className={className}
     >
@@ -38,7 +41,7 @@ export const CandidatePipeline: React.FC<CandidatePipelineProps> = ({
             );
           })}
         </div>
-        
+
         <div className="space-y-4">
           {stages.map((stage) => (
             <div key={stage.id} className="flex items-center">
@@ -66,4 +69,4 @@ export const CandidatePipeline: React.FC<CandidatePipelineProps> = ({
   );
 };
 
-export default CandidatePipeline;
+export default CandidateByStatus;

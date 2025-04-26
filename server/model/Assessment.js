@@ -22,6 +22,14 @@ const assessmentSchema = new mongoose.Schema({
         required: true,
         lowercase: true
     },
+    duration: {
+        type: Number,
+        required: true
+    },
+    assessmentLink: {
+        type: String,
+        required: true
+    }
 }, {
     timestamps: true
 })

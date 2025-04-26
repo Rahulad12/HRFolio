@@ -1,68 +1,87 @@
-import { Dropdown, Input, MenuProps } from "antd";
-import { Filter, Search } from "lucide-react";
+import { Input, Select } from "antd";
 import { useState } from "react";
+import dayjs from "dayjs";
 import { storeSearch } from "../../action/StoreSearch";
 import { useAppDispatch } from "../../Hooks/hook";
-import dayjs from "dayjs";
+import { Search } from "lucide-react";
+import ExportButton from "./Export";
+import { useCandidate } from "../../action/StoreCandidate";
 
-const statusOptions = [
-    { value: "", label: "All" },
-    { value: "shortlisted", label: "Shortlisted" },
-    { value: "first interview", label: "First Interview" },
-    { value: "second interview", label: "Second Interview" },
-    { value: "hired", label: "Hired" },
-    { value: "rejected", label: "Rejected" },
-];
+const { Option } = Select;
 
-const TableSearch = () => {
+interface StatusOption {
+    label: string;
+    value: string;
+}
+
+interface TableSearchProps {
+    items?: StatusOption[];
+    placeholder?: string;
+
+}
+
+const TableSearch = ({
+    items = [],
+    placeholder = "Search",
+
+
+}: TableSearchProps) => {
     const dispatch = useAppDispatch();
 
     const [searchText, setSearchText] = useState("");
-    const [selectedStatus, setSelectedStatus] = useState("All");
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const { data: candidates } = useCandidate();
 
-    const handleSearch = () => {
-        dispatch(storeSearch(searchText, "", dayjs(), ""));
+    // const handleSearch = () => {
+    //     dispatch(storeSearch(searchText, selectedStatus, dayjs(), ""));
+    // };
+
+    const handleStatusChange = (value: string) => {
+        setSelectedStatus(value);
+        dispatch(storeSearch(searchText, value, dayjs(), ""));
+        if (value === "") {
+            dispatch(storeSearch(searchText, "", dayjs(), ""));
+        }
     };
 
-    const handleStatusChange: MenuProps["onClick"] = (info) => {
-        const status = info.key;
-        setSelectedStatus(status);
-        dispatch(storeSearch("", status, dayjs(), ""));
-    }
-
-    const dropdownItems: MenuProps["items"] = statusOptions.map((option) => ({
-        key: option.value,
-        label: option.label,
-    }))
-
+    const handleInputChange = (value: string) => {
+        setSearchText(value);
+        dispatch(storeSearch(searchText, selectedStatus, dayjs(), ""));
+        if (value === "") {
+            dispatch(storeSearch("", selectedStatus, dayjs(), ""));
+        }
+    };
 
     return (
-        <div className="flex flex-wrap gap-4 justify-between items-center p-2">
-            <Input.Search
-                placeholder="Search by name or technology or level..."
+        <div className="flex flex-wrap gap-4  items-center p-2  w-full ">
+            <div className="flex items-center gap-2 w-full md:w-1/2 ">
+                <Input
+                    placeholder={placeholder}
+                    allowClear
+                    value={searchText}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    prefix={<Search size={16} className="text-gray-500" />}
+                />
+            </div>
+
+            <Select
                 allowClear
-                enterButton={<Search className="w-4 h-4" />}
-                value={searchText}
-                style={{ width: 400}}
-                onChange={(e) => {
-                    const value = e.target.value;
-                    setSearchText(value);
+                value={selectedStatus}
+                onChange={handleStatusChange}
+                placeholder="Filter by status"
+                className="w-50"
+                showSearch
+            >
+                {items.map((option) => (
+                    <Option key={option.value} value={option.value} className="text-sm">
+                        {option.label}
+                    </Option>
+                ))}
+            </Select>
 
-                    if (value === "") {
-                        dispatch(storeSearch("", selectedStatus, dayjs(), ""));
-                    }
-                }}
-                onSearch={handleSearch}
-            />
+            <ExportButton data={candidates?.data} fileName="Candidates" />
 
-            {/* DropDown Filter by status  */}
-            <Dropdown menu={{ items: dropdownItems, onClick: handleStatusChange }} trigger={['click']}>
-                <div className="flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md cursor-pointer hover:bg-gray-100  transition">
-                    <Filter className="w-4 h-4 text-blue-950" />
-                    <span className="text-sm text-blue-950">{selectedStatus}</span>
-                </div>
-            </Dropdown>
-        </div>
+        </div >
     );
 };
 

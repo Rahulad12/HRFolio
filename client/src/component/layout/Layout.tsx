@@ -1,39 +1,34 @@
-import { useState } from 'react';
-import { Layout as AntLayout } from 'antd';
-import Sidebar from './Sidebar';
-import Navbar from './Nabbar';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useTheme } from '../../context/ThemeContext';
+import Sidebar from './Sidebar';
+import Header from './Header';
+import MobileSidebar from './MobileSidebar';
 
-const { Content } = AntLayout;
+export const Layout: React.FC = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-const Layout = () => {
-    const { darkMode } = useTheme();
-    const [collapsed, setCollapsed] = useState(false);
-    const LayoutBg = darkMode ? '#020817' : '#FFFFFF';
-    return (
-        <AntLayout className='h-dvh transition-colors duration-300'>
-            <Sidebar
-                collapsed={collapsed}
-                setCollapsed={setCollapsed}
-                isDarkMode={darkMode}
-            />
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
-            <AntLayout
-                className={`transition-all duration-300 ${collapsed ? 'ml-[80px]' : 'ml-[260px]'
-                    }`}
-            >
-                <Navbar collapsed={collapsed} isDarkMode={darkMode} />
-                <Content
-                    className="px-2 mt-16 min-h-screen overflow-y-auto transition-all duration-300" style={{
-                        backgroundColor: LayoutBg
-                    }}>
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar />
 
-                    <Outlet />
-                </Content>
-            </AntLayout>
-        </AntLayout>
-    );
+      {/* Mobile Sidebar */}
+      <MobileSidebar isOpen={isMobileMenuOpen} onClose={toggleMobileMenu} />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header onMenuToggle={toggleMobileMenu} />
+
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default Layout;

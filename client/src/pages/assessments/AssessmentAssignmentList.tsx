@@ -1,0 +1,265 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Eye, CheckCircle, Clock, AlertCircle, X, Check } from 'lucide-react';
+import Card from '../../component/ui/Card';
+import Badge from '../../component/ui/Badge';
+import { AssessmentDataResponse, AssignmentDataResponse, candidateData, AssignmentScoreFromData } from '../../types';
+import { motion } from 'framer-motion';
+import { useAssignedAssessment } from '../../action/StoreAssessment';
+import { useAppSelector } from '../../Hooks/hook';
+import { makeCapitilized } from '../../utils/TextAlter';
+import CustomTable from '../../component/common/Table';
+import { Button, Input, Select, Modal, Form, InputNumber, message } from 'antd';
+import dayjs from 'dayjs';
+import { useCreateAssignmentScoreMutation } from '../../services/assessmentServiceApi';
+import PrimaryButton from '../../component/ui/button/Primary';
+import ExportButton from '../../component/common/Export';
+const { TextArea } = Input;
+
+const AssessmentAssignmentList: React.FC = () => {
+  const [form] = Form.useForm();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [selectedAssignment, setSelectedAssignment] = useState<AssignmentDataResponse | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const { isLoading: assessmentLoading } = useAssignedAssessment();
+
+  const [createAssignmentScore, { isLoading: scoreLoading }] = useCreateAssignmentScoreMutation();
+
+  const { assignedAssessments } = useAppSelector((state) => state.assessments);
+
+  const filteredAssignments = assignedAssessments?.filter(assignment => {
+    const matchesSearch =
+      assignment?.candidate?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assignment?.assessment?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assignment?.assessment.type.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === '' || assignment.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleViewCandidate = (record: AssignmentDataResponse) => {
+    setSelectedAssignment({ ...record });
+    setIsModalOpen(true);
+  }
+  // const handleAssignmentComplete = (record: AssignmentDataResponse) => {
+  //   setSelectedAssignment({
+  //     ...record,
+  //   });
+  //   setIsModalOpen(true);
+  // };
+
+  const handleSaveFeedback = async (value: AssignmentScoreFromData) => {
+    if (!selectedAssignment) return;
+    const payload = {
+      ...value,
+      candidate: selectedAssignment?.candidate?._id,
+      assessment: selectedAssignment?.assessment?._id
+    };
+    console.log(payload)
+    try {
+      const res = await createAssignmentScore(payload).unwrap();
+      if (res?.success && res.data) {
+        message.success(res.message);
+        console.log("Feedback submitted:", res);
+        setIsModalOpen(false);
+        form.resetFields()
+      }
+    } catch (error: any) {
+      console.error("Failed to submit feedback", error);
+      message.error(error.data.message);
+    }
+  };
+
+
+  const statusOptions = [
+    { value: '', label: 'All Statuses' },
+    { value: 'assigned', label: 'Assigned' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'completed', label: 'Completed' },
+  ];
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'assigned':
+        return <Clock size={16} className="text-blue-500" />;
+      case 'pending':
+        return <AlertCircle size={16} className="text-amber-500" />;
+      case 'completed':
+        return <CheckCircle size={16} className="text-green-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const columns = [
+    {
+      title: 'CANDIDATE',
+      dataIndex: "candidate",
+      render: (candidate: candidateData) => (
+        <div className='flex flex-col'>
+          <span className='text-gray-900 font-medium'>{makeCapitilized(candidate?.name)}</span>
+          <span className='text-xs text-gray-500'>{makeCapitilized(candidate.email)}</span>
+        </div>
+      )
+    },
+    {
+      title: 'ASSESSMENT',
+      dataIndex: "assessment",
+      render: (assessment: AssessmentDataResponse) => (
+        <div>
+          <div className="font-medium text-gray-900 capitalize">{assessment?.title}</div>
+          <div className="text-xs text-gray-500">
+            {makeCapitilized(assessment?.type)}
+          </div>
+        </div>
+      )
+    },
+    {
+      title: 'ASSIGNED DATE',
+      dataIndex: 'date',
+      render: (date: string) => (
+        <span>
+          {dayjs(date).format('MM-DD-YYYY')}
+        </span>
+      )
+    },
+    {
+      title: 'STATUS',
+      dataIndex: "status",
+      render: (status: string) => (
+        <div className="flex items-center">
+          {getStatusIcon(status)}
+          <Badge
+            variant={
+              status === 'assigned' ? 'primary' :
+                status === 'pending' ? 'warning' : 'success'
+            }
+            className="ml-2"
+          >
+            {makeCapitilized(status)}
+          </Badge>
+        </div>
+      )
+    },
+    {
+      title: 'ACTIONS',
+      render: (_: any, record: AssignmentDataResponse) => (
+        <div className="flex items-center justify-center">
+          <Button type='text' onClick={() => handleViewCandidate(record)} disabled={record.status === 'completed'}>
+            <Eye size={16} className="text-blue-600" />
+          </Button>
+          {record.status === 'completed' ? (
+            // <Button type='text' onClick={() => handleAssignmentComplete(record)}>
+            <CheckCircle size={16} className="text-green-600" />
+            // </Button>
+          ) : (
+            <AlertCircle size={16} className="text-amber-500" />
+          )}
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Assessment Assignments</h1>
+          <p className="mt-1 text-sm text-gray-500">Manage and track candidate assessment assignments</p>
+        </div>
+        <div className="mt-4 sm:mt-0 flex space-x-3">
+          <PrimaryButton text='Assing Assessment' onClick={() => navigate('/dashboard/assessments/assign')} />
+        </div>
+      </div>
+
+      <Card>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <div className="relative flex-1">
+            <Input
+              placeholder="Search assignments..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              prefix={<Search size={18} className="text-gray-400" />}
+            />
+          </div>
+          <div className="flex space-x-2 gap-2">
+            <Select
+              options={statusOptions}
+              value={statusFilter}
+              onChange={(value) => setStatusFilter(value)}
+              className="w-40"
+            />
+            <ExportButton data={filteredAssignments} fileName="Assessignments" />
+          </div>
+        </div>
+
+        <CustomTable data={filteredAssignments} columns={columns} loading={assessmentLoading} pageSize={10} />
+      </Card>
+
+      <Modal
+        open={isModalOpen}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setSelectedAssignment(null);
+          form.resetFields(); // reset here
+        }}
+        title="Evaluate Assessment"
+        width={600}
+        afterClose={() => {
+          setSelectedAssignment(null);
+          form.resetFields(); // and also here just in case
+        }}
+        footer={null}
+      >
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-sm font-medium text-gray-700">Candidate:</h3>
+            <p className="text-sm text-gray-900 capitalize">{selectedAssignment?.candidate?.name}</p>
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-gray-700">Assessment:</h3>
+            <p className="text-sm text-gray-900 capitalize">{selectedAssignment?.assessment?.title}</p>
+          </div>
+          <Form
+            onFinish={handleSaveFeedback}
+            layout='vertical'
+            form={form}
+          >
+            <Form.Item label="Score" name="score" rules={[{ required: true, message: 'Please enter a score' }]}>
+              <InputNumber
+                min={0}
+                max={100}
+                className="w-full"
+                style={{ width: '100%' }}
+
+              />
+            </Form.Item>
+            <Form.Item
+              label="Feedback"
+              name="note"
+            >
+              <TextArea
+                rows={5}
+                placeholder="Provide detailed feedback on the candidate's performance..."
+              />
+            </Form.Item>
+
+            <Form.Item
+              className='flex justify-end'
+            >
+              <Button type="default" onClick={() => setIsModalOpen(false)} className="mr-3" icon={<X size={16} />}>Cancel</Button>
+              <Button type="primary" htmlType="submit" loading={scoreLoading} icon={<Check size={16} />} disabled={scoreLoading}>Save Evaluation</Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+    </motion.div>
+  );
+};
+
+export default AssessmentAssignmentList;

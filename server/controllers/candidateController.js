@@ -5,7 +5,7 @@ const createCandidate = async (req, res) => {
     const {
         name, email, phone,
         technology, level, experience,
-        expectedsalary, references
+        expectedsalary, references, applieddate, resume
     } = req.body;
     try {
         const existingCandidate = await Candidate.findOne({ email });
@@ -20,7 +20,7 @@ const createCandidate = async (req, res) => {
         const newCandidate = new Candidate({
             name, email, phone,
             technology, level, experience,
-            expectedsalary
+            expectedsalary, applieddate, resume
         })
 
         const savedCandidate = await newCandidate.save();
@@ -58,7 +58,7 @@ const createCandidate = async (req, res) => {
 const getCandidateById = async (req, res) => {
     const { id } = req.params;
     try {
-        const candidate = await Candidate.findById(id).select(" -updatedAt -__v").populate({
+        const candidate = await Candidate.findById(id).select("  -__v").populate({
             path: "references",
             select: "-createdAt -updatedAt -__v -candidate"
         });
@@ -96,6 +96,7 @@ const getCandidateById = async (req, res) => {
 // }
 const getAllCandidates = async (req, res) => {
     const { searchText, status } = req.query;
+
     try {
         // If no filter is passed, you can return an error or return all
         const query = {};
@@ -113,7 +114,7 @@ const getAllCandidates = async (req, res) => {
         }
 
         const candidates = await Candidate.find(query).select(
-            "-updatedAt -__v -references"
+            " -__v -references"
         );
 
         if (!candidates.length) {

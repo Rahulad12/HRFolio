@@ -9,9 +9,9 @@ export const storeCandidate = (candidate: candidateData[]) => (dispatch: AppDisp
     dispatch(setCandidate(candidate));
 }
 
-export const getCandidate = () => {
+export const useCandidate = () => {
     const dispatch = useAppDispatch();
-    const { data, isSuccess } = useGetCandidateQuery({
+    const { data, isSuccess, refetch } = useGetCandidateQuery({
         searchText: "",
         status: "",
     },
@@ -19,13 +19,10 @@ export const getCandidate = () => {
             refetchOnMountOrArgChange: false
         }
     );
-
     useEffect(() => {
         if (isSuccess && data?.data) {
             dispatch(storeCandidate(data.data));
         }
-        return () => {
-            dispatch(storeCandidate([]));
-        };
     }, [data]);
+    return { data, isSuccess, refetch };
 }

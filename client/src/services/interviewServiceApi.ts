@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { interviewData, interviewResponse, interviewResponseById, interviewerResponse } from "../types";
+import { interviewData, interviewResponse, interviewResponseById, interviewerData, interviewerResponse, interviewerResponseId } from "../types";
 import { INTERVIEW_URL, INTERVIEWER_URL } from "../constant";
 import type { Dayjs } from "dayjs";
 
@@ -15,7 +15,7 @@ export const interviewServiceApi = api.injectEndpoints({
             invalidatesTags: ["Interview"],
         }),
 
-        getInterview: builder.query<interviewResponse, { date: Dayjs | null | string, status: string }>({
+        getInterview: builder.query<interviewResponse, { date: Dayjs | null | string, status: string | null }>({
             query: ({
                 date,
                 status
@@ -36,12 +36,35 @@ export const interviewServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Interview"],
         }),
+        getInterviewByCandidateId: builder.query<interviewResponseById, string | undefined>({
+            query: (id) => ({
+                url: `${INTERVIEW_URL}/candidate/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Interview"],
+        }),
 
         getInterviewer: builder.query<interviewerResponse, void>({
             query: () => ({
                 url: `${INTERVIEWER_URL}`,
                 method: "GET",
             }),
+            providesTags: ["Interviewer"],
+        }),
+        createInterviewer: builder.mutation<interviewerResponse, interviewerData>({
+            query: (data) => ({
+                url: `${INTERVIEWER_URL}`,
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ["Interviewer"],
+        }),
+        getInterviewerById: builder.query<interviewerResponseId, string>({
+            query: (id) => ({
+                url: `${INTERVIEWER_URL}/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Interviewer"],
         }),
         updateInterview: builder.mutation<interviewResponse, { id: string, data: interviewData }>({
             query: ({
@@ -53,8 +76,27 @@ export const interviewServiceApi = api.injectEndpoints({
                 body: data
             }),
             invalidatesTags: ["Interview"],
-        })
+        }),
+
+        updateInterviewer: builder.mutation<interviewerResponse, { id: string, data: interviewerData }>({
+            query: ({
+                id,
+                data
+            }) => ({
+                url: `${INTERVIEWER_URL}/${id}`,
+                method: "PUT",
+                body: data
+            }),
+            invalidatesTags: ["Interviewer"],
+        }),
+        deleteInterviewer: builder.mutation<interviewerResponse, string>({
+            query: (id) => ({
+                url: `${INTERVIEWER_URL}/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Interviewer"],
+        }),
     })
 })
 
-export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation } = interviewServiceApi
+export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation, useGetInterviewByCandidateIdQuery, useCreateInterviewerMutation, useGetInterviewerByIdQuery, useUpdateInterviewerMutation, useDeleteInterviewerMutation } = interviewServiceApi

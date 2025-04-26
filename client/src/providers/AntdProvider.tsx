@@ -1,11 +1,12 @@
 import { ConfigProvider, App as AntdApp, theme as antdTheme } from "antd";
 import { useTheme } from "../context/ThemeContext";
 
+
 const AntdProvider = ({ children }: { children: React.ReactNode }) => {
   const { darkMode } = useTheme();
 
   const colorBgBase = darkMode ? "#020817" : "#FFFFFF";
-  const colorPrimary = "#363062";
+  const colorPrimary = "#1A365D";
   const colorTextBase = darkMode ? "#FBFBFF" : "#191D32";
   const colorHover = darkMode ? "#3f3f55" : "#f0f0f0"; // Hover color for menu items
 
@@ -16,32 +17,32 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
           ? antdTheme.darkAlgorithm
           : antdTheme.defaultAlgorithm,
         token: {
-          colorPrimary,
-          colorBgBase,
-          colorTextBase,
-          colorText: colorTextBase,
+          colorPrimary: '#1A365D',
+          colorSuccess: '#52C41A',
+          colorWarning: '#FAAD14',
+          colorError: '#FF4D4F',
+          colorInfo: '#1A365D',
           borderRadius: 6,
         },
         components: {
           Menu: {
-            itemColor: "#ffff",
-            itemHoverColor: colorPrimary,
+            itemColor: colorTextBase,
+            itemHoverColor: "#1A365D",
             itemHoverBg: colorHover,
             itemSelectedColor: "#fff",
-            itemSelectedBg: colorPrimary,
+            itemSelectedBg: "#1A365D",
             activeBarBorderWidth: 0,
             borderRadius: 6,
           },
           Button: {
-            colorPrimary,
-            colorPrimaryHover: "#EF5B5B",
+            colorPrimaryHover: "#F54A00",
             colorPrimaryActive: "#C62828",
           },
           Table: {
             colorText: colorTextBase,
             colorBgContainer: colorBgBase,
-            headerBg: darkMode ? "#2A2E45" : "#191D32",
-            headerColor: darkMode ? "#C0C0C0" : "#FFFF",
+            headerBg: darkMode ? "#2A2E45" : "#F9FAFB",
+            headerColor: darkMode ? "#C0C0C0" : "#191D32",
             colorTextHeading: colorPrimary,
             borderColor: darkMode ? "#2A2E45" : "#e5e7eb",
             paddingSM: 8,
@@ -53,7 +54,8 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
           Input: {
             colorBgContainer: darkMode ? "#020817" : "#ffffff",
             colorText: colorTextBase,
-            activeBorderColor: "#D3D3D3",
+            activeBorderColor: "#4d79ff",
+            hoverBorderColor: "none",
           },
           DatePicker: {
             colorBgContainer: darkMode ? "#020817" : "#ffffff",
@@ -63,8 +65,8 @@ const AntdProvider = ({ children }: { children: React.ReactNode }) => {
           Select: {
             colorText: colorTextBase,
             colorBgContainer: darkMode ? "#020817" : "#ffffff",
-            activeBorderColor: "#D3D3D3",
-            borderRadius: 4,
+            activeBorderColor: "#4d79ff",
+            hoverBorderColor: "none",
           },
           Dropdown: {
             colorBgContainer: darkMode ? "#020817" : "#ffffff",

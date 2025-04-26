@@ -1,5 +1,5 @@
 import express from 'express';
-import { assignAssessment, createAssessment, getAssessment, getAssignment, deleteAssessment, deleteAssignment, updateAssessment, updateAssignmnet, getAssessmentById, getAssignmentById, createScore, getScoreById, getScore } from "../controllers/assessmentController.js";
+import { assignAssessment, createAssessment, getAssessment, getAssignment, deleteAssessment, deleteAssignment, updateAssessment, updateAssignmnet, getAssessmentById, getAssignmentById, createScore, getScoreById, getScore, getAssignmentByCandidateId } from "../controllers/assessmentController.js";
 import { authenticate, checkUserExist } from "../middleware/auhtMiddleware.js"
 const assessmentRouter = express.Router();
 
@@ -16,5 +16,7 @@ assessmentRouter.get("/assignment/:id", authenticate, checkUserExist, getAssignm
 assessmentRouter.post("/score", authenticate, checkUserExist, createScore);
 assessmentRouter.get("/score/:id", authenticate, checkUserExist, getScoreById);
 assessmentRouter.get("/score", authenticate, checkUserExist, getScore);
+assessmentRouter.get("/assignment/candidate/:id", authenticate, checkUserExist, getAssignmentByCandidateId);
+
 
 export default assessmentRouter;

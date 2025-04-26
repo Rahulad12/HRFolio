@@ -44,9 +44,9 @@ const CustomTable = ({
             columns={columns}
             rowKey="_id"
             loading={loading}
-            size="small"
+            size="large"
             sortDirections={['ascend', 'descend', 'ascend']}
-            scroll={{ x: 55 * 5 }}
+            scroll={{ x: 'max-content' }}
             pagination={false}
             footer={() => {
                 return (

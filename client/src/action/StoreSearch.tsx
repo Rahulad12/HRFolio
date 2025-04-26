@@ -1,16 +1,19 @@
 import { AppDispatch } from "../store";
-import { setText, setStatus, setDate, setInterviewStatus } from "../slices/setSearchSlices";
+import { setCandidateSearch, setInterviewSearch } from "../slices/setSearchSlices";
 import type { Dayjs } from 'dayjs';
 
 export const storeSearch = (searchText: string, status: string, date: Dayjs | null, interviewStatus: string) => (dispatch: AppDispatch) => {
-    console.log(searchText, status, date, interviewStatus);
-    if (searchText) {
-        dispatch(setText(searchText));
+
+    if (searchText !== "" || status !== "") {
+        dispatch(setCandidateSearch({ text: searchText, status }));
     }
     else {
-        dispatch(setText(''));
+        dispatch(setCandidateSearch({ text: "", status: "" }));
     }
-    dispatch(setStatus(status));
-    dispatch(setDate(date));
-    dispatch(setInterviewStatus(interviewStatus));
+    if (date) {
+        dispatch(setInterviewSearch({ text: searchText, date, interviewStatus }));
+    }
+    else {
+        dispatch(setInterviewSearch({ text: "", date: null, interviewStatus: "" }));
+    }
 }

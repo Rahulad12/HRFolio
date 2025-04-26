@@ -2,9 +2,9 @@ import Interview from "../model/Interview.js";
 import Interviewers from "../model/Interviewers.js";
 
 const createInterview = async (req, res) => {
-    const { candidate, interviewer, date, time } = req.body;
+    const { candidate, interviewer, date, time, type, notes } = req.body;
     try {
-        const interview = await Interview.create({ candidate, interviewer, date, time });
+        const interview = await Interview.create({ candidate, interviewer, date, time, type, notes });
 
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not created" });
@@ -24,9 +24,7 @@ const createInterview = async (req, res) => {
 const getAllInterviews = async (req, res) => {
     const { date, status } = req.query;
     try {
-
         const query = {};
-
         if (date) {
             query.date = date;
         }
@@ -42,7 +40,7 @@ const getAllInterviews = async (req, res) => {
         }).populate({
             path: 'interviewer',
             select: '-createdAt -updatedAt -__v'
-        }).select('-createdAt -updatedAt -__v');
+        }).select(' -__v');
 
         if (interviews.length === 0) {
             return res.status(404).json({ success: false, message: "No interviews found" });
@@ -54,6 +52,7 @@ const getAllInterviews = async (req, res) => {
             data: interviews
         });
     } catch (error) {
+        console.log("get interview error", error);
         return res.status(500).json({ success: false, message: error.message });
     }
 }
@@ -62,6 +61,9 @@ const getInterviewById = async (req, res) => {
     try {
         const interview = await Interview.findById(req.params.id).populate({
             path: "interviewer",
+            select: '-createdAt -updatedAt -__v'
+        }).populate({
+            path: "candidate",
             select: '-createdAt -updatedAt -__v'
         })
         if (!interview) {
@@ -77,12 +79,16 @@ const getInterviewById = async (req, res) => {
     }
 }
 
+
 const getAllInterviewsByCandidate = async (req, res) => {
     try {
         const interviews = await Interview.find({ candidate: req.params.id }).populate({
             path: 'candidate',
             select: '-createdAt -updatedAt -__v'
-        }).select('-createdAt -updatedAt -__v');
+        }).populate({
+            path: 'interviewer',
+            select: '-createdAt -updatedAt -__v'
+        }).select(' -__v');
         if (interviews.length === 0) {
             return res.status(404).json({ success: false, message: "No interviews found" });
         }

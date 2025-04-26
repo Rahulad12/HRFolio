@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { assessmentFormData, assessmentResponse, assessmentResponseById, AssignmentData, assignmentResponse, assignmentResponseById } from "../types/index"
+import { assessmentFormData, assessmentResponse, assessmentResponseById, AssgnmentScoreResponse, AssignmentData, assignmentResponse, assignmentResponseById, AssignmentScoreFromData } from "../types/index"
 import { ASSESSMENT_URL } from "../constant";
 export const assessmentServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -29,6 +29,13 @@ export const assessmentServiceApi = api.injectEndpoints({
         getAssignedAssessment: builder.query<assignmentResponse, void>({
             query: () => ({
                 url: `${ASSESSMENT_URL}/assignment`,
+                method: "GET",
+            }),
+            providesTags: ["Assignment", "Assessment"]
+        }),
+        getAssignmentByCandidate: builder.query<assignmentResponse, string>({
+            query: (id) => ({
+                url: `${ASSESSMENT_URL}/assignment/candidate/${id}`,
                 method: "GET",
             }),
             providesTags: ["Assignment", "Assessment"]
@@ -77,6 +84,14 @@ export const assessmentServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Assignment", "Assessment"]
         }),
+        createAssignmentScore: builder.mutation<AssgnmentScoreResponse, AssignmentScoreFromData>({
+            query: (data) => ({
+                url: `${ASSESSMENT_URL}/score`,
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Score', 'Assignment']
+        }),
     }),
 });
 
@@ -90,5 +105,7 @@ export const {
     useUpdateAssessmentMutation,
     useUpdateAssignmnetMutation,
     useGetAssessmentByIdQuery,
-    useGetAssignmentByIdQuery
+    useGetAssignmentByIdQuery,
+    useGetAssignmentByCandidateQuery,
+    useCreateAssignmentScoreMutation
 } = assessmentServiceApi;

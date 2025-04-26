@@ -11,7 +11,7 @@ const interviewSchema = new mongoose.Schema({
         ref: "interviewers"
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     },
     time: {
@@ -24,6 +24,23 @@ const interviewSchema = new mongoose.Schema({
         default: "scheduled",
         required: true
     },
+    type: {
+        type: String,
+        enum: ["in-person", "phone", "video"],
+        default: "in-person",
+        required: true
+    },
+    notes: {
+        type: String,
+    },
+    feedback: {
+        type: String,
+    },
+    rating:{
+        type: Number
+    }
+}, {
+    timestamps: true
 });
 
 

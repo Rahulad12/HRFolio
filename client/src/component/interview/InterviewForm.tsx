@@ -36,7 +36,8 @@ const InterviewForm = () => {
         try {
             const res = await createInterview({
                 ...values,
-                date: dayjs(values.date.format("YYYY-MM-DD" + " " + "HH:mm:ss")),
+                date: dayjs(values.date).format('YYYY-MM-DD'),
+                time: dayjs(values.time).format('h:mm A'),
             }).unwrap();
             if (res.success) {
                 api.success({

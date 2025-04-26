@@ -9,10 +9,10 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
-
+  const googleURL = import.meta.env.VITE_API_URL;
   const submitHandler = () => {
     setIsLoading(true);
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = `${googleURL}auth/google`;
   };
 
   useEffect(() => {

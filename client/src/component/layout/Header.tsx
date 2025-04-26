@@ -5,12 +5,9 @@ import { Avatar, Dropdown, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import { logout } from '../../slices/authSlices';
 
-interface HeaderProps {
-  onMenuToggle: () => void;
-}
 
 
-export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
+export const Header: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -29,19 +26,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-end h-16">
-          {/* <div className="flex">
-            <Button
-              type="text"
-              className="md:hidden"
-              onClick={onMenuToggle}
-              aria-label="Menu"
-            >
-              <Menu size={20} />
-            </Button>
-            <div className="hidden md:ml-6 md:flex md:space-x-8">
-
-            </div>
-          </div> */}
 
           <div className="flex items-center">
             {showSearch ? (

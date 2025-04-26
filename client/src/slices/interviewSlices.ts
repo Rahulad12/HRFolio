@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { interviewData, interviewer } from "../types";
+import { interviewData, interviewerData } from "../types";
 interface interviewState {
     interviews: interviewData[];
-    interviewer: interviewer[];
+    interviewer: interviewerData[];
 }
 
 const initialState: interviewState = {
@@ -17,7 +17,7 @@ const interviewSlice = createSlice({
         setInterviews: (state, action: PayloadAction<interviewData[]>) => {
             state.interviews = action.payload;
         },
-        setInterviewer: (state, action: PayloadAction<interviewer[]>) => {
+        setInterviewer: (state, action: PayloadAction<interviewerData[]>) => {
             state.interviewer = action.payload;
         }
     }

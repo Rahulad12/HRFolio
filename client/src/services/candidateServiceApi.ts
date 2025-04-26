@@ -1,6 +1,6 @@
 import { CANDIDATE_URL } from "../constant";
 import { api } from "./api";
-import { candidateResponse, candidateFormData, globalResponse, candidateData, candidateFilter, candidateStatus } from "../types";
+import { candidateResponse, candidateFormData, globalResponse, candidateData, candidateFilter } from "../types";
 
 interface candidateIdResposne {
     success: boolean,

@@ -1,8 +1,6 @@
 import { Provider } from "react-redux"
 import MainRoutes from "./routes/MainRoutes"
 import { store } from "./store"
-import "./App.css"
-import 'react-toastify/dist/ReactToastify.css';
 import AntdProvider from "./providers/AntdProvider"
 import { ThemeProvider } from "./context/ThemeContext";
 

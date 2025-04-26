@@ -3,7 +3,7 @@ import { Users, Calendar, Plus, FileCheck, FileText } from 'lucide-react';
 import MetricsCard from '../component/dashboard/MetricsCard';
 import CandidateByStatus from '../component/dashboard/CandidateByStatus';
 import RecentActivity from '../component/dashboard/RecentActivity';
-import UpcomingInterviews from '../component/dashboard/UpcomingInterviews';
+import UpcomingInterviews from '../component/dashboard/UpComingInterviews';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '../Hooks/hook';
@@ -18,7 +18,7 @@ export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const { isLoading, isError } = useInterview(null, null);
-  const { data } = useCandidate();
+  const { refetch } = useCandidate();
   const { user } = useAppSelector((state) => state.auth);
 
   const { candidate } = useAppSelector((state) => state.candidate);

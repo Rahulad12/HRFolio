@@ -4,7 +4,6 @@ import Dashboard from '../pages/Dashboard';
 import CandidateList from '../pages/candidates/CandidateList';
 import CandidateDetail from '../pages/candidates/CandidateDetail';
 import CandidateForm from '../pages/candidates/CandidateForm';
-import InterviewList from '../../depreceate/InterviewList';
 import InterviewSchedule from '../pages/interviews/InterviewSchedule';
 import AssessmentList from '../pages/assessments/AssessmentList';
 import AssessmentForm from '../pages/assessments/AssessmentForm';

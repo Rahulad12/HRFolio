@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { Dayjs } from "dayjs";
-import { setCandidate } from "./candidateSlices";
 
 interface candidatesearchTerms {
     text: string;

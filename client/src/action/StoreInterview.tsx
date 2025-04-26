@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { useAppDispatch } from "../Hooks/hook";
 import { Dayjs } from "dayjs";
 export const storeInterview = (interviews: interviewData[]) => (dispatch: AppDispatch) => {
-    console.log(interviews, "interviews data");
     dispatch(setInterviews(interviews));
 };
 
@@ -41,7 +40,7 @@ export const useInterviewer = () => {
     const { data: interviewers, isLoading: interviewerLoading, isError: interviewerError } = useGetInterviewerQuery();
 
     if (interviewers?.success && interviewers?.data) {
-        dispatch(storeInterviewer(interviewers.data));
+        dispatch(storeInterviewer(interviewers?.data));
     }
     return { interviewers, interviewerLoading, interviewerError };
 }

@@ -28,7 +28,7 @@ import { useCandidate } from '../../action/StoreCandidate';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { offerLetter, offerLetterPostData } from '../../types';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const OfferForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();

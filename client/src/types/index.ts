@@ -80,7 +80,6 @@ export type interviewer = {
     name: string;
     email: string;
     department: string;
-    availability: string;
     position: string
     createdAt: string;
     updatedAt: string
@@ -127,8 +126,6 @@ export type assessmentFormData = {
     assessmentLink: string;
     duration: number
 }
-
-
 
 export type AssessmentDataResponse = {
     title: string;
@@ -234,13 +231,6 @@ export type interviewerData = {
     email: string;
     department: string;
     position: string;
-    availability: [
-        {
-            id: string;
-            day: string;
-            timeSlots: string[]
-        }
-    ]
     createdAt: string;
     updatedAt: string
 }

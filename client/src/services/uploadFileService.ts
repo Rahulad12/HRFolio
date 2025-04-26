@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { UploadFileResponse, UploadFileRequest } from "../types/index"
+import { UploadFileResponse } from "../types/index"
 
 export const uploadFileServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({

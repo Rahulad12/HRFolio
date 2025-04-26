@@ -18,7 +18,9 @@ export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const { isLoading, isError } = useInterview(null, null);
-  const { refetch } = useCandidate();
+
+  useCandidate(); // Fetch candidates and that will store in redux also 
+
   const { user } = useAppSelector((state) => state.auth);
 
   const { candidate } = useAppSelector((state) => state.candidate);

@@ -9,7 +9,7 @@ import {
 import { RootState } from '../store';
 import { logout } from '../slices/authSlices';
 
-const baseURL = import.meta.VITE_API_URL;
+const baseURL = import.meta.env.VITE_API_URL;
 
 // Base query with token
 const rawBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError, {}, FetchBaseQueryMeta> = fetchBaseQuery({

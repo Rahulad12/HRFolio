@@ -24,5 +24,6 @@ export const useCandidate = () => {
             dispatch(storeCandidate(data.data));
         }
     }, [data]);
+
     return { data, isSuccess, refetch };
 }

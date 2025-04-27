@@ -7,7 +7,7 @@ import { useAssignedAssessment } from '../../action/StoreAssessment';
 import { useAppSelector } from '../../Hooks/hook';
 import { makeCapitilized } from '../../utils/TextAlter';
 import CustomTable from '../../component/common/Table';
-import { Button, Input, Card, Select, Modal, Form, InputNumber, message, Typography,Tag } from 'antd';
+import { Button, Input, Card, Select, Modal, Form, InputNumber, message, Typography, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useCreateAssignmentScoreMutation } from '../../services/assessmentServiceApi';
 import PrimaryButton from '../../component/ui/button/Primary';
@@ -151,9 +151,7 @@ const AssessmentAssignmentList: React.FC = () => {
             <Eye size={16} className="text-blue-600" />
           </Button>
           {record.status === 'completed' ? (
-            // <Button type='text' onClick={() => handleAssignmentComplete(record)}>
             <CheckCircle size={16} className="text-green-600" />
-            // </Button>
           ) : (
             <AlertCircle size={16} className="text-amber-500" />
           )}

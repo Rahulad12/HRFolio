@@ -1,7 +1,6 @@
 import { Table, Pagination } from 'antd';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useTheme } from '../../context/ThemeContext';
 
 interface AnimatedTableProps {
     loading: boolean;
@@ -30,7 +29,6 @@ const CustomTable = ({
     columns,
     pageSize = 2,
 }: AnimatedTableProps) => {
-    const { darkMode } = useTheme();
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -52,7 +50,6 @@ const CustomTable = ({
                 return (
                     <div className="gap-2 flex justify-center items-baseline">
                         <motion.span
-                            className={`text-center ${darkMode ? 'text-white' : 'text-gray-600 '} text-sm  mx-2 p-2 rounded-md`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                         >

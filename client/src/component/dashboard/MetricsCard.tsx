@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card } from 'antd';
+import { Card, Typography } from 'antd';
+const { Text } = Typography;
 interface MetricsCardProps {
   title: string;
   value: string | number;
@@ -22,7 +23,7 @@ export const MetricsCard: React.FC<MetricsCardProps> = ({
         <div className="flex-1">
           <h3 className="text-sm font-medium text-gray-500">{title}</h3>
           <div className="flex items-baseline mt-1">
-            <p className="text-2xl font-semibold text-gray-900">{value}</p>
+            <Text strong className="text-2xl">{value}</Text>
           </div>
         </div>
       </div>

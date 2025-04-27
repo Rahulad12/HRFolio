@@ -1,6 +1,5 @@
+import { Card, Tag } from 'antd';
 import React from 'react';
-import Card from '../ui/Card';
-import Badge from '../ui/Badge';
 
 interface Activity {
   id: string;
@@ -46,13 +45,13 @@ const getActivityLabel = (type: Activity['type']) => {
   }
 };
 
-export const RecentActivity: React.FC<RecentActivityProps> = ({ 
+export const RecentActivity: React.FC<RecentActivityProps> = ({
   activities,
   className = '',
 }) => {
   return (
-    <Card 
-      title="Recent Activity" 
+    <Card
+      title="Recent Activity"
       className={className}
     >
       <div className="space-y-6">
@@ -65,13 +64,13 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
               <div className="ml-4 flex-1">
                 <div className="flex items-center justify-between">
                   <h4 className="text-sm font-medium text-gray-900">{activity.title}</h4>
-                  <Badge variant={
-                    activity.type === 'interview' ? 'primary' :
-                    activity.type === 'assessment' ? 'secondary' :
-                    activity.type === 'offer' ? 'success' : 'warning'
+                  <Tag color={
+                    activity.type === 'interview' ? 'blue' :
+                      activity.type === 'assessment' ? 'orange' :
+                        activity.type === 'offer' ? 'success' : 'warning'
                   }>
                     {getActivityLabel(activity.type)}
-                  </Badge>
+                  </Tag>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">{activity.description}</p>
                 <p className="text-xs text-gray-400 mt-1">{activity.date} • {activity.time}</p>

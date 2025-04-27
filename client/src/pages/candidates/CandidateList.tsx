@@ -1,4 +1,4 @@
-import { Button, Space, Tag, Tooltip, Popconfirm, Skeleton, notification } from 'antd';
+import { Button, Space, Tag, Tooltip, Popconfirm, Skeleton, notification, Card, Typography } from 'antd';
 import { Plus, Trash2, Pencil } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../Hooks/hook';
 import { useDeleteCandidateMutation, useGetCandidateQuery } from '../../services/candidateServiceApi';
@@ -9,7 +9,6 @@ import { makeCapitilized } from '../../utils/TextAlter';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TableColumnsType } from 'antd';
 import CustomTable from '../../component/common/Table';
-import Card from '../../component/ui/Card';
 import TableSearch from '../../component/common/TableSearch';
 import PrimaryButton from '../../component/ui/button/Primary';
 import Predefineddata from '../../data/PredefinedData';
@@ -79,7 +78,7 @@ const CandidateTable = () => {
             <span>{makeCapitilized(text.charAt(0))}</span>
           </div>
           <div>
-            <div className="font-medium">{text}</div>
+            <div className="font-medium capitalize">{text}</div>
             <div className="text-xs text-gray-500">{record.email}</div>
           </div>
         </div>
@@ -210,10 +209,10 @@ const CandidateTable = () => {
     >
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Candidates</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <Typography.Title level={2} >Candidates</Typography.Title>
+          <Typography.Text className="mt-1 text-sm text-gray-500">
             Manage and track all candidates in your recruitment pipeline
-          </p>
+          </Typography.Text>
         </div>
         <PrimaryButton
           text='Add Candidate'

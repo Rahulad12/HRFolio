@@ -20,8 +20,7 @@ const interviewSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["scheduled", "cancelled", "completed"],
-        default: "scheduled",
+        enum: ["draft", "scheduled", "cancelled", "completed"],
         required: true
     },
     type: {
@@ -36,13 +35,25 @@ const interviewSchema = new mongoose.Schema({
     feedback: {
         type: String,
     },
-    rating:{
+    rating: {
         type: Number
     }
 }, {
     timestamps: true
 });
 
+// interviewSchema.pre("save", async function (next) {
+//     if (this.status === "scheduled") {
+//         const candidateId = this.candidate;
+//         const candidate = await candidate.findById(candidateId);
+
+//         if (candidate) {
+//             candidate.status = "First";
+//             await candidate.save();
+//         }
+//     }
+//     next();
+// });
 
 const Interview = mongoose.model("interview", interviewSchema);
 

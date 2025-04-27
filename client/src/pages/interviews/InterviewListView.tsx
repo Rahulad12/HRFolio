@@ -1,5 +1,5 @@
-import { Card, Divider, Tag, Typography, notification } from 'antd'
-import { Calendar, CalendarIcon, Clock, MapPin, Phone, Users, Video } from 'lucide-react'
+import { Button, Card, Divider, Popconfirm, Space, Tag, Typography, message, notification } from 'antd'
+import { Calendar, CalendarIcon, Check, Clock, Eye, MapPin, Phone, Send, Trash2, Users, Video } from 'lucide-react'
 import { useAppSelector } from '../../Hooks/hook'
 import dayjs, { Dayjs } from 'dayjs'
 import InterviewDetailsModal from './InterviewDetailsModal'
@@ -7,7 +7,7 @@ import InterviewDetailsModal from './InterviewDetailsModal'
 import { interviewData, interviewStatus } from '../../types'
 import { useMemo, useState } from 'react'
 const { Title, Text } = Typography
-import { useUpdateInterviewMutation } from '../../services/interviewServiceApi';
+import { useUpdateInterviewMutation, useDeleteInterviewMutation, useCreateInterviewMutation } from '../../services/interviewServiceApi';
 interface interviewSearchTerms {
     searchTerm?: string;
     interviewStatus?: string | null;
@@ -26,8 +26,12 @@ const InterviewListView = ({
     const [api, contextHolder] = notification.useNotification();
     const [selectedInterviews, setSelectedInterviews] = useState<interviewData[]>([]);
     const [updateInterview] = useUpdateInterviewMutation();
+    const [deleteInterview] = useDeleteInterviewMutation();
+    const [createInterview] = useCreateInterviewMutation();
 
+    //selected Interview
     const { interviews } = useAppSelector(state => state.interview);
+
     const getInterviewTypeIcon = (type: string) => {
         switch (type) {
             case 'phone':
@@ -141,6 +145,33 @@ const InterviewListView = ({
             console.log(error);
         }
     }
+    const handleInterviewDelete = async (id: string) => {
+        try {
+            const res = await deleteInterview(id);
+            if (res?.data?.success) {
+                message.success(res?.data?.message);
+            }
+        } catch (error: any) {
+            console.log(error);
+            console.log(error.data.message)
+            message.error("Error deleting interview");
+        }
+    }
+    const handleSendDraftedInterview = async (interview: interviewData) => {
+        try {
+            const res = await createInterview({
+                ...interview,
+                status: 'scheduled'
+            });
+            if (res?.data?.success) {
+                message.success(res?.data?.message);
+            }
+        } catch (error: any) {
+            console.log(error);
+            console.log(error.data.message)
+            message.error("Error sending interview");
+        }
+    }
     const filteredInterviews = useMemo(() => {
         return interviews.filter((interview) => {
 
@@ -167,16 +198,35 @@ const InterviewListView = ({
                 <Card
                     key={interview?._id}
                     className="hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => handleViewDetails(interview)}
+                    extra={
+                        <Space>
+                            <Button type="link" onClick={() => handleViewDetails(interview)} icon={<Eye size={16} color='blue' />} />
+                            {
+                                interview?.status === 'scheduled' && (
+                                    <Button type="link" onClick={() => handleStatusUpdate(interview?._id, 'completed')} icon={<Check size={16} color='green' />} />
+                                )
+                            }
+                            {
+                                interview?.status === 'draft' && (
+                                    <Button type="link" onClick={() => handleSendDraftedInterview(interview)} icon={<Send size={16} color='green' />} />
+                                )
+                            }
+                            {/* <Button type="link" onClick={() => handleViewDetails(interview)} icon={<PencilIcon size={16} />} /> */}
+                            <Popconfirm title="Are you sure you want to delete this interview?" onConfirm={() => handleInterviewDelete(interview?._id)} okText="Yes" cancelText="No">
+                                <Button type="link" icon={<Trash2 size={16} />} danger />
+                            </Popconfirm>
+                        </Space>
+                    }
                 >
                     <div className="flex justify-between">
+
                         <div className="flex">
                             <div className="w-12 h-12 rounded-lg bg-blue-950 flex items-center justify-center text-white mr-3">
                                 {getInterviewTypeIcon(interview?.type)}
                             </div>
                             <div>
                                 <div className="flex items-center">
-                                    <Title level={5} className="m-0 mr-2 capitalize">{interview?.candidate?.name}</Title>
+                                    <Title level={5} className="m-0 mr-2 capitalize" onClick={() => handleViewDetails(interview)}>{interview?.candidate?.name}</Title>
                                     <Tag color={getInterviewTypeColor(interview?.type)} className='capitalize'>
                                         {interview?.type.charAt(0).toUpperCase() + interview.type.slice(1)}
                                     </Tag>

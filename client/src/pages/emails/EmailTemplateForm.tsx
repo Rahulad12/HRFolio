@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
-import Card from '../../component/ui/Card';
 import { motion } from 'framer-motion';
-import { Button, Input, Select, Form, message } from 'antd';
+import { Button, Input, Select, Form, message, Card, Typography } from 'antd';
 const { TextArea } = Input;
 import { useCreateEmailTemplateMutation, useGetEmailTemplateByIdQuery, useUpdateEmailTemplateMutation } from '../../services/emailService';
 import { emailTemplateData } from '../../types';
+import { useAppSelector } from '../../Hooks/hook';
 
 const EmailTemplateForm: React.FC = () => {
   const [form] = Form.useForm();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = !!id;
+  const darkMode = useAppSelector(state => state.theme.mode === 'dark');
 
   const [createEmailTemplate, { isLoading: createemailTemplateLoading }] = useCreateEmailTemplateMutation();
   const { data: emailTemplates, isLoading: emailTemplateLoading } = useGetEmailTemplateByIdQuery(id || "", { skip: !id });
@@ -88,9 +89,9 @@ const EmailTemplateForm: React.FC = () => {
           onClick={() => navigate('/dashboard/email-templates')}
           aria-label="Back"
         />
-        <h1 className="text-2xl font-bold text-gray-900">
+        <Typography.Title level={2} className="text-2xl font-bold text-gray-900">
           {isEditing ? 'Edit Email Template' : 'Create Email Template'}
-        </h1>
+        </Typography.Title>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -171,18 +172,18 @@ const EmailTemplateForm: React.FC = () => {
         <div>
           <Card title="Available Variables">
             <div className="space-y-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm ">
                 Use these variables in your template by wrapping them in double curly braces:
-                <code className="bg-gray-100 px-1 py-0.5 rounded text-sm ml-1">{'{{variableName}}'}</code>
+                <code className={`${darkMode ? 'bg-gray-500' : 'bg-blue-50 text-blue-700'} px-1 py-0.5 rounded text-sm ml-1`}>{'{{variableName}}'}</code>
               </p>
 
               <ul className="space-y-2">
                 {variableExamples.map((variable) => (
                   <li key={variable.name} className="text-sm">
-                    <code className="bg-blue-50 text-blue-700 px-1 py-0.5 rounded font-mono">
+                    <code className={`${darkMode ? 'bg-gray-500' : 'bg-blue-50 text-blue-700'}  px-1 py-0.5 rounded font-mono`}>
                       {'{{' + variable.name + '}}'}
                     </code>
-                    <span className="ml-2 text-gray-600">{variable.description}</span>
+                    <span className="ml-2 ">{variable.description}</span>
                   </li>
                 ))}
               </ul>

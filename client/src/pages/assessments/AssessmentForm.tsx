@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
-import Card from '../../component/ui/Card';
 import { motion } from 'framer-motion';
-import { Col, Form, Row, Button, Input, Select, message, InputNumber, Typography } from 'antd';
+import { Col, Form, Row, Button, Card, Input, Select, message, InputNumber, Typography } from 'antd';
 import Predefineddata from '../../data/PredefinedData';
 import { useCreateAssessmentMutation, useGetAssessmentByIdQuery, useUpdateAssessmentMutation } from '../../services/assessmentServiceApi';
 import { assessmentFormData } from '../../types';

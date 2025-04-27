@@ -11,7 +11,7 @@ import { useCandidate } from '../action/StoreCandidate';
 import { useInterview } from '../action/StoreInterview';
 import dayjs from 'dayjs';
 import PrimaryButton from '../component/ui/button/Primary';
-import { Col, Row, Space, Button } from 'antd';
+import { Col, Row, Space, Button, Typography } from 'antd';
 import RecentActivityLog from '../component/dashboard/RecentActivitiesLog';
 
 export const Dashboard: React.FC = () => {
@@ -106,10 +106,10 @@ export const Dashboard: React.FC = () => {
       {/* Top Section */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-blue-950">Dashboard</h1>
-          <p className="mt-1 text-sm text-blue-950">
+          <Typography.Title level={2} className="text-2xl font-bold text-blue-950">Dashboard</Typography.Title>
+          <Typography.Text className="mt-1 text-sm text-blue-950">
             Welcome back! <span className="font-bold">{user.username}</span>
-          </p>
+          </Typography.Text>
         </div>
         <Space className="mt-4 sm:mt-0">
           <PrimaryButton

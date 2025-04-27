@@ -53,7 +53,7 @@ export type referenceResponse = {
 
 }
 export type candidateStatus = 'shortlisted' | 'first' | 'second' | 'third' | 'assessment' | 'offered' | 'hired' | 'rejected';
-export type interviewStatus = 'scheduled' | 'completed' | 'cancelled'
+export type interviewStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled'
 export type candidateData = {
     name: string;
     email: string;

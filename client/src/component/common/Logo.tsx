@@ -1,15 +1,15 @@
-import { useTheme } from "../../context/ThemeContext"
+import React from 'react';
 
-const Logo = () => {
-    const { darkMode } = useTheme();
+
+const Logo: React.FC = () => {
     return (
-        <div>
-            {/* <span className={`${darkMode ? "text-white" : "text-gray-800"} text-5xl`}>H</span> */}
-            <span className={`${darkMode ? "text-white" : "text-blue-950"}  text-4xl font-bold`}>H</span>
-            <span className=" text-orange-600 text-6xl font-extrabold">R</span>
-            <span className={`${darkMode ? "text-white" : "text-blue-950"} font-semibold text-3xl`}>Folio</span>
-        </div>
-    )
-}
+        <div className="text-center">
+            <span className={`text-white text-4xl font-bold`}>H</span>
+            <span className="text-orange-600 text-6xl font-extrabold">R</span>
+            <span className={` text-white font-semibold text-3xl`}> Folio</span>
 
-export default Logo
+        </div>
+    );
+};
+
+export default Logo;

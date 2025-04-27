@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
-import Card from '../../component/ui/Card';
 import { motion } from 'framer-motion';
 import { useCreateInterviewMutation } from '../../services/interviewServiceApi';
-import { Button, DatePicker, Form, Input, Select, TimePicker, Typography, message } from 'antd';
+import { Button, DatePicker, Form, Input, Select, TimePicker, Typography, message, Card } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
-import { interviewData } from '../../types';
+import { interviewData, interviewStatus } from '../../types';
 import { useInterviewer } from '../../action/StoreInterview';
 import { useCandidate } from '../../action/StoreCandidate';
 import { makeCapitilized } from '../../utils/TextAlter';
+import SecondaryButton from '../../component/ui/button/Secondary';
 const { Option } = Select;
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -21,39 +21,42 @@ const InterviewSchedule: React.FC = () => {
   const [createInterview, { isLoading: createInterviewLoading }] = useCreateInterviewMutation();
   const { interviewers } = useInterviewer();
   const { data: candidates } = useCandidate();
-  // const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-
-  // const [interviewerId, setInterviewerId] = useState<string>('');
-
-  // const handleInterviewerChange = (value: string) => {
-  //   setInterviewerId(value);
-  //   form.setFieldsValue({ time: undefined }); // reset time when interviewer changes
-  // };
 
   const handleDateChange = (date: any) => {
     setSelectedDate(dayjs(date));
     form.setFieldsValue({ date: date });
   };
 
-  // useEffect(() => {
-  //   if (interviewerId && selectedDate) {
-  //     const interviewer = interviewers?.data?.find((i) => i._id === interviewerId);
-  //     if (interviewer) {
-  //       const dayOfWeek = format(selectedDate.toDate(), 'EEEE').toLowerCase();
-  //       const availability = interviewer?.availability.find((a) => a.day === dayOfWeek);
-  //       setAvailableTimes(availability?.timeSlots || []);
-  //     }
-  //   } else {
-  //     setAvailableTimes([]);
-  //   }
-  // }, [interviewerId, selectedDate, interviewers]);
+  const handleDraftInterview = async () => {
+    const payload = form.getFieldsValue();
+
+    try {
+      const response = await createInterview({
+        ...payload,
+        date: dayjs(payload.date).format('YYYY-MM-DD'),
+        time: dayjs(payload.time).format('h:mm A'),
+        status: 'draft' as interviewStatus
+      }).unwrap();
+
+      if (response?.success && response?.data) {
+        message.success('Interview saved as draft');
+        navigate('/dashboard/interviews');
+      }
+
+    } catch (error: any) {
+      message.error(`Failed to save draft: ${error.data.message}`);
+      console.error('Error saving draft:', error);
+
+    }
+  }
 
   const onFinish = async (values: interviewData) => {
     const payload = {
       ...values,
       date: dayjs(values.date).format('YYYY-MM-DD'),
       time: dayjs(values.time).format('h:mm A'),
+      status: 'scheduled' as interviewStatus
 
     };
     try {
@@ -159,6 +162,11 @@ const InterviewSchedule: React.FC = () => {
             <Button icon={<X size={16} />} onClick={() => navigate('/dashboard/interviews')}>
               Cancel
             </Button>
+            <SecondaryButton
+              text='Draft'
+              icon={<Save size={16} />}
+              onClick={handleDraftInterview}
+            />
             <Button type="primary" htmlType="submit" icon={<Save size={16} />} loading={createInterviewLoading} disabled={createInterviewLoading}>
               Schedule Interview
             </Button>

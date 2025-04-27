@@ -1,26 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Steps, Select, notification } from 'antd';
-import { useParams } from 'react-router-dom';
+import { Steps, notification, Row, Space, Col, Card, Button, Typography } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../../services/candidateServiceApi';
-import {  candidateFormData } from '../../types/index';
+import { candidateFormData } from '../../types/index';
 import CandidateProfileLoading from '../../component/Loding/CandidateProfileLoading';
 import { makeCapitilized } from '../../utils/TextAlter';
-import Predefineddata from '../../data/PredefinedData';
 import { useGetInterviewByCandidateIdQuery } from '../../services/interviewServiceApi';
 import { storeInterview } from '../../action/StoreInterview';
 import { useAppDispatch } from '../../Hooks/hook';
-import { storeCandidate } from '../../action/StoreCandidate';
+import { storeCandidate, useCandidate } from '../../action/StoreCandidate';
 import CandidateProfile from '../../component/candidate/CandidateProfile';
 import { candidateStatus } from '../../types/index';
-import CandidateInfo from '../../component/candidate/CandidateInfo';
-import CandidateDetailsFooter from '../../component/candidate/CandidateDetailsFooter';
-const { Option } = Select;
-
-
+import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
+import { ArrowLeft } from 'lucide-react';
 
 const CandidateDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const {
+    data: candidates
+  } = useCandidate();
+
   const { data, isLoading } = useGetCandidateByIdQuery(id);
   const [updateCandidate] = useUpdateCandidateMutation();
   const { data: interviewData } = useGetInterviewByCandidateIdQuery(id, {
@@ -77,58 +78,56 @@ const CandidateDetails = () => {
     }
   };
 
-  const interviewSteps = ['shortlisted', 'first', 'second', 'third', 'assessment', 'offered', 'hired', 'rejected'];
+  const interviewSteps = ['shortlisted', 'assessment', 'first', 'second', 'third', 'offered', 'hired', 'rejected'];
   const currentStep = interviewSteps.indexOf(candidate.status);
 
   if (isLoading) return <CandidateProfileLoading />;
 
+  const candidateStatus = [...new Set(
+    candidates?.data?.map((c: candidateFormData) => c.status) || []
+  )]
+
+  const candidatesStatusOptions = interviewSteps
+    .filter((step) => candidateStatus.includes(step as candidateStatus))
+    .map((status) => {
+      const stepIndex = interviewSteps.indexOf(status);
+      const isDisabled = stepIndex < currentStep;
+      return {
+        label: makeCapitilized(status),
+        value: status,
+        disabled: isDisabled
+      };
+    });
+
+
   return (
     <div className="space-y-6">
       {contextHolder}
+      <div className="mb-6 flex items-center">
+        <Button type="text" icon={<ArrowLeft size={18} />} onClick={() => navigate('/dashboard/candidates')} />
+        <Typography.Title level={2}>Candidate Details</Typography.Title>
+      </div>
 
       {/* Header Section */}
-      <div className="bg-white rounded-2xl shadow-md p-6">
-        <div className="flex">
-          <div className="flex-1">
-            <CandidateProfile />
-          </div>
-          <div className="min-w-[200px]">
-            <Select
-              placeholder="Update Status"
-              className="w-full shadow-sm"
-              value={candidate.status}
-              size="large"
-              onChange={updateStatus}
-            >
-              {Predefineddata.Status?.map((status) => (
-                <Option key={status.key} value={status.value}>
-                  {makeCapitilized(status.label)}
-                </Option>
-              ))}
-            </Select>
-          </div>
-        </div>
+      <Space direction='vertical'>
+        <Row gutter={[16, 16]}>
+          <Col md={16} xs={24}>
+            <CandidateProfile updateStatus={updateStatus} statusOptions={candidatesStatusOptions} />
+          </Col>
+          <Col md={8} xs={24}>
+            <CandidateQuickAction />
 
-      </div>
-      <div className="bg-white rounded-2xl shadow-md p-6">
+          </Col>
+        </Row>
+      </Space>
+      <Card className="bg-white rounded-2xl shadow-md p-6">
         <h2 className="text-lg font-semibold mb-4">Candidate Progress</h2>
         <Steps current={currentStep} responsive size="small">
           {interviewSteps.map((step) => (
             <Steps.Step key={step} title={makeCapitilized(step)} />
           ))}
         </Steps>
-      </div>
-
-      <div className="bg-white rounded-2xl shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">Candidate Details</h2>
-
-        <CandidateInfo />
-      </div>
-      {/* Candidate Details Section */}
-      <div className="bg-white rounded-2xl shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">Candidate Information</h2>
-        <CandidateDetailsFooter />
-      </div>
+      </Card>
     </div>
   );
 

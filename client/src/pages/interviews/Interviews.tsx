@@ -60,7 +60,7 @@ const Interviews = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
                 <div>
                     <Title level={3} className="m-0">Interviews</Title>
-                    <Text type="secondary">Schedule and manage candidate interviews</Text>
+                    <Text>Schedule and manage candidate interviews</Text>
                 </div>
                 <Button
                     type="primary"

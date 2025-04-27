@@ -1,6 +1,6 @@
 import React from 'react';
-import Card from '../ui/Card';
 import { useAppSelector } from '../../Hooks/hook';
+import { Card } from 'antd';
 
 interface PipelineStage {
   id: string;
@@ -16,7 +16,6 @@ interface CandidatePipelineProps {
 
 export const CandidateByStatus: React.FC<CandidatePipelineProps> = ({
   stages,
-  className = '',
 }) => {
 
   const { candidate } = useAppSelector((state) => state.candidate);
@@ -25,8 +24,13 @@ export const CandidateByStatus: React.FC<CandidatePipelineProps> = ({
   return (
     <Card
       title="Candidate By Status"
-      subtitle={`${total} total candidates`}
-      className={className}
+      extra={
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Total</span>
+          <span className="text-sm text-gray-500">{total}</span>
+        </div>
+
+      }
     >
       <div className="mt-2">
         <div className="flex h-4 mb-6">

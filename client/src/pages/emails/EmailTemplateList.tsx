@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FileText, Search, Pencil, Trash2, Copy } from 'lucide-react';
 import { emailTemplateData } from '../../types';
 import { motion } from 'framer-motion';
-import { Button, Card, Select, Input, Tag, message, Popconfirm, Tooltip } from 'antd';
+import { Button, Card, Select, Input, Tag, message, Popconfirm, Tooltip, Typography } from 'antd';
 import PrimaryButton from '../../component/ui/button/Primary';
 import CustomTable from '../../component/common/Table';
 import { useDeleteEmailTemplateMutation, useGetAllEmailTemplateQuery } from '../../services/emailService';
@@ -79,7 +79,7 @@ const EmailTemplateList: React.FC = () => {
       title: 'Name',
       dataIndex: 'name',
       render: (text: string) => (
-        <div className="font-medium text-gray-900 capitalize">{text}</div>
+        <div className="font-medium  capitalize">{text}</div>
       )
     },
     {
@@ -165,10 +165,10 @@ const EmailTemplateList: React.FC = () => {
     >
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Email Templates</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <Typography.Title level={2} className="text-2xl font-bold text-gray-900">Email Templates</Typography.Title>
+          <Typography.Text className="mt-1 text-sm text-gray-500">
             Manage email templates for various recruitment communications
-          </p>
+          </Typography.Text>
         </div>
         <PrimaryButton
           text="Create Template"

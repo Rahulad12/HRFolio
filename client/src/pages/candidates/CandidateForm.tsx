@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, MinusCircle, PlusCircle, X } from 'lucide-react';
 import { UploadOutlined } from "@ant-design/icons";
-import Card from '../../component/ui/Card';
 import { motion } from 'framer-motion';
-import { Button, Col, DatePicker, Form, Input, InputNumber, message, Row, Select, Typography, Upload, } from 'antd';
+import { Button, Col, DatePicker, Form, Input, InputNumber, message, Row, Select, Typography, Upload, Card } from 'antd';
 import { candidateFormData } from '../../types';
 import {
   useCreateCandidateMutation, useGetCandidateByIdQuery,
@@ -297,7 +296,7 @@ const CandidateForm: React.FC = () => {
                 </div>
 
                 {fields.map(({ key, name, ...restField }) => (
-                  <div
+                  <Card
                     key={key}
                     className="bg-gray-50 border border-gray-200 p-4 rounded-lg relative"
                   >
@@ -341,7 +340,7 @@ const CandidateForm: React.FC = () => {
                     >
                       Remove
                     </Button>
-                  </div>
+                  </Card>
                 ))}
               </div>
             )}

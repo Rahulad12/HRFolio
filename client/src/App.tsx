@@ -1,25 +1,54 @@
-import { Provider } from "react-redux"
-import MainRoutes from "./routes/MainRoutes"
-import { store } from "./store"
-import AntdProvider from "./providers/AntdProvider"
-import { ThemeProvider } from "./context/ThemeContext";
-
-
+import MainRoutes from "./routes/MainRoutes";
+import { ConfigProvider, App as AntApp, theme } from 'antd';
+import { useAppDispatch, useAppSelector } from "./Hooks/hook";
+import { setThemeMode } from "./slices/themeSlices";
+import { useEffect } from "react";
 
 const App = () => {
+  const dispatch = useAppDispatch();
+  const { mode } = useAppSelector(state => state.theme);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('themeMode');
+    if (savedTheme) {
+      dispatch(setThemeMode(savedTheme as 'light' | 'dark'));
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      dispatch(setThemeMode('dark'));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (mode === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [mode]);
+
+  const antTheme = {
+    token: {
+      colorPrimary: '#1A365D',
+      colorSuccess: '#52C41A',
+      colorWarning: '#FAAD14',
+      colorError: '#FF4D4F',
+      colorInfo: '#1A365D',
+      borderRadius: 6,
+    },
+    components: {
+      Button: {
+        colorPrimaryHover: '#FF7A22',
+      },
+    },
+    algorithm: mode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
+  };
+
   return (
-    <>
-      <Provider store={store}>
-        <ThemeProvider>
-          <AntdProvider>
-            <MainRoutes />
-          </AntdProvider>
-        </ThemeProvider>
+    <ConfigProvider theme={antTheme}>
+      <AntApp>
+        <MainRoutes />
+      </AntApp>
+    </ConfigProvider>
+  );
+};
 
-      </Provider>
-    </>
-
-  )
-}
-
-export default App
+export default App;

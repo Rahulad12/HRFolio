@@ -8,6 +8,7 @@ import {
     Row,
     Select,
     Transfer,
+    Typography,
 } from 'antd';
 import { Key, useState } from 'react';
 import dayjs from 'dayjs';
@@ -117,7 +118,7 @@ const AssignAssessment = () => {
                     icon={<ArrowLeft size={18} />}
                     onClick={() => navigate('/dashboard/assessments/assignments')}
                 />
-                <h2 className="ml-2 text-lg font-semibold">Assign Assessment</h2>
+                <Typography.Title level={2} className="ml-2 text-lg font-semibold">Assign Assessment</Typography.Title>
             </div>
             <Row gutter={16}>
                 <Col xs={24} md={12} lg={14}>

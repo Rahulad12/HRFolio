@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserPlus, Search, Pencil, Trash2 } from 'lucide-react';
 import { interviewerData } from '../../types';
 import { motion } from 'framer-motion';
-import { Button, Card, Input, message, Popconfirm, Select, Tooltip } from 'antd';
+import { Button, Card, Input, message, Popconfirm, Select, Tooltip, Typography } from 'antd';
 import CustomTable from '../../component/common/Table';
 import { useGetInterviewerQuery, useDeleteInterviewerMutation } from '../../services/interviewServiceApi';
 import ExportButton from '../../component/common/Export';
@@ -60,7 +60,7 @@ const InterviewerList: React.FC = () => {
       dataIndex: 'name',
       render: (text: string, record: interviewerData) => (
         <div>
-          <div className="font-medium text-gray-900">{text}</div>
+          <div className="font-medium ">{text}</div>
           <div className="text-xs text-gray-500">{record?.email}</div>
         </div>
       )
@@ -133,10 +133,10 @@ const InterviewerList: React.FC = () => {
     >
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Interviewers</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <Typography.Title className="text-2xl font-bold text-gray-900">Interviewers</Typography.Title>
+          <Typography.Text className="mt-1 text-sm text-gray-500">
             Manage staff members who conduct interviews
-          </p>
+          </Typography.Text>
         </div>
         <Button
           type="primary"

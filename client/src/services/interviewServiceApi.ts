@@ -96,7 +96,14 @@ export const interviewServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Interviewer"],
         }),
+        deleteInterview: builder.mutation<interviewResponse, string>({
+            query: (id) => ({
+                url: `${INTERVIEW_URL}/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Interview"],
+        })
     })
 })
 
-export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation, useGetInterviewByCandidateIdQuery, useCreateInterviewerMutation, useGetInterviewerByIdQuery, useUpdateInterviewerMutation, useDeleteInterviewerMutation } = interviewServiceApi
+export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation, useGetInterviewByCandidateIdQuery, useCreateInterviewerMutation, useGetInterviewerByIdQuery, useUpdateInterviewerMutation, useDeleteInterviewerMutation, useDeleteInterviewMutation } = interviewServiceApi

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck, Search, Pencil, Trash2 } from 'lucide-react';
-import Card from '../../component/ui/Card';
-import Badge from '../../component/ui/Badge';
 import { AssessmentDataResponse } from '../../types';
 import { motion } from 'framer-motion';
 import { useAssessment } from '../../action/StoreAssessment';
 import { useAppSelector } from '../../Hooks/hook';
 import CustomTable from '../../component/common/Table';
-import { Button, Popconfirm, Tooltip, Input, Select, message } from 'antd';
+import { Button, Popconfirm, Tooltip, Input, Select, message, Card, Typography, Tag } from 'antd';
 import { makeCapitilized } from '../../utils/TextAlter';
 import PrimaryButton from '../../component/ui/button/Primary';
 import ExportButton from '../../component/common/Export';
@@ -64,7 +62,7 @@ const AssessmentList: React.FC = () => {
       key: "title",
       render: (title: string) => (
         <div className=' cursor-pointer' >
-          <span className='text-gray-900  font-medium capitalize'>{title}</span>
+          <span className=' font-medium capitalize'>{title}</span>
         </div>
       )
     },
@@ -72,7 +70,7 @@ const AssessmentList: React.FC = () => {
       title: "TYPE",
       dataIndex: "type",
       key: "type",
-      render: (type: string) => <Badge>{makeCapitilized(type)}</Badge>
+      render: (type: string) => <Tag color={type === 'technical' ? 'blue' : 'orange'}>{makeCapitilized(type)}</Tag>
     },
     {
       title: "DURATION",
@@ -97,7 +95,7 @@ const AssessmentList: React.FC = () => {
       dataIndex: "assessmentLink",
       key: "assessmentLink",
       render: (assessmentLink: string) => (
-        <a href={assessmentLink} target="_blank" rel="noopener noreferrer">
+        <a href={assessmentLink} target="_blank" rel="noopener noreferrer" className='text-gray-500'>
           <Button type="link" icon={<ClipboardCheck size={14} />} > View Assessment</Button>
         </a>
       )
@@ -135,10 +133,10 @@ const AssessmentList: React.FC = () => {
     >
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Assessments</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <Typography.Title level={2} className="text-2xl font-bold text-gray-900">Assessments</Typography.Title>
+          <Typography.Text className="mt-1 text-sm text-gray-500">
             Manage assessment templates for candidate evaluation
-          </p>
+          </Typography.Text>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <PrimaryButton

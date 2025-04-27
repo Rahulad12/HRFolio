@@ -4,10 +4,9 @@ import { FileText, Search, Filter, Download, Eye, Pencil, Send, } from 'lucide-r
 import { offerLetter } from '../../types';
 import { motion } from 'framer-motion';
 import PrimaryButton from '../../component/ui/button/Primary';
-import { Button, Card, Input, message, Select } from 'antd';
+import { Button, Card, Input, message, Select, Typography, Tag } from 'antd';
 import CustomTable from '../../component/common/Table';
 import { useGetOfferLetterQuery, useCreateOfferLetterMutation } from '../../services/offerService';
-import Badge from '../../component/ui/Badge';
 
 const OfferList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,13 +78,13 @@ const OfferList: React.FC = () => {
   const getStatusBadge = (status: offerLetter['status']) => {
     switch (status) {
       case 'draft':
-        return <Badge variant='warning'>Draft</Badge>;
+        return <Tag color='warning'>Draft</Tag>;
       case 'sent':
-        return <Badge variant="info">Sent</Badge>;
+        return <Tag color="green">Sent</Tag>;
       case 'accepted':
-        return <Badge variant="success">Accepted</Badge>;
+        return <Tag color="success">Accepted</Tag>;
       case 'rejected':
-        return <Badge variant="error">Rejected</Badge>;
+        return <Tag color="error">Rejected</Tag>;
       default:
         return null;
     }
@@ -96,7 +95,7 @@ const OfferList: React.FC = () => {
       title: 'Candidate',
       render: (_: any, record: offerLetter) => (
         <div>
-          <div className="font-medium text-gray-900 capitalize">{record?.candidate?.name}</div>
+          <div className="font-medium capitalize">{record?.candidate?.name}</div>
           <div className="text-xs text-gray-500 capitalize">{record?.candidate?.email}</div>
         </div>
       )
@@ -170,10 +169,10 @@ const OfferList: React.FC = () => {
     >
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Offer Letters</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <Typography.Title level={2} className="text-2xl font-bold text-gray-900">Offer Letters</Typography.Title>
+          <Typography.Text className="mt-1 text-sm text-gray-500">
             Create and manage offer letters for candidates
-          </p>
+          </Typography.Text>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <PrimaryButton

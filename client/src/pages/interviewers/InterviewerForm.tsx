@@ -71,7 +71,7 @@ const InterviewerForm: React.FC = () => {
           onClick={() => navigate('/dashboard/interviewers')}
           aria-label="Back"
         />
-        <Title level={3}>
+        <Title level={2}>
           {isEditing ? 'Edit Interviewer' : 'Add Interviewer'}
         </Title>
       </div>

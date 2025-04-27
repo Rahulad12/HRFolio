@@ -1,23 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Users, Calendar, ClipboardCheck, UserPlus, FileText, BarChart2 } from 'lucide-react';
-import Logo from '../ui/Logo';
-import { Menu } from 'antd';
+import { Users, UserPlus, FileText, UserRound, LayoutDashboard, CalendarClock } from 'lucide-react';
+import Logo from '../common/Logo';
+import { Menu, Layout } from 'antd';
 
-interface sideBarProsp {
-  isMobile: boolean
+const { Sider } = Layout;
+
+interface SidebarProps {
+  isMobile: boolean;
 }
-export const Sidebar: React.FC<sideBarProsp> = ({ isMobile = false }) => {
+
+export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
   const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
   const currentPath = location.pathname;
 
   const links = [
-    { key: 'dashboard', icon: <BarChart2 size={20} />, label: <Link to="/dashboard">Dashboard</Link> },
-    { key: '/dashboard/candidates', icon: <Users size={20} />, label: <Link to="/dashboard/candidates">Candidates</Link> },
-    { key: '/dashboard/interviews', icon: <Calendar size={20} />, label: <Link to="/dashboard/interviews">Interviews</Link> },
+    {
+      key: '/dashboard',
+      icon: <LayoutDashboard size={18} />,
+      label: <Link to="/dashboard">Dashboard</Link>
+    },
+    {
+      key: '/dashboard/candidates',
+      icon: <Users size={18} />,
+      label: <Link to="/dashboard/candidates">Candidates</Link>
+    },
+    {
+      key: '/dashboard/interviews',
+      icon: <CalendarClock size={18} />,
+      label: <Link to="/dashboard/interviews">Interviews</Link>
+    },
     {
       key: 'assessments',
-      icon: <ClipboardCheck size={20} />,
+      icon: <UserRound size={18} />,
       label: 'Assessments',
       children: [
         {
@@ -30,7 +46,11 @@ export const Sidebar: React.FC<sideBarProsp> = ({ isMobile = false }) => {
         },
       ],
     },
-    { key: '/dashboard/interviewers', icon: <UserPlus size={20} />, label: <Link to="/dashboard/interviewers">Interviewers</Link> },
+    {
+      key: '/dashboard/interviewers',
+      icon: <UserPlus size={20} />,
+      label: <Link to="/dashboard/interviewers">Interviewers</Link>
+    },
     {
       key: 'offers',
       icon: <FileText size={20} />,
@@ -38,7 +58,7 @@ export const Sidebar: React.FC<sideBarProsp> = ({ isMobile = false }) => {
       children: [
         {
           key: '/dashboard/email-templates',
-          label: <Link to="dashboard/email-templates">Manage Templates</Link>,
+          label: <Link to="/dashboard/email-templates">Manage Templates</Link>,
         },
         {
           key: '/dashboard/offers',
@@ -49,23 +69,32 @@ export const Sidebar: React.FC<sideBarProsp> = ({ isMobile = false }) => {
   ];
 
   return (
-    <div className={`${isMobile ? 'w-full' : 'w-55 hidden md:block'} bg-white h-screen shadow-sm overflow-y-auto`}>
-      <div className="px-6 py-6">
-        <Logo />
-        <p className="text-sm text-gray-500 mt-1">Recruitment Manager</p>
+    <Sider
+      theme='dark'
+      width={250}
+      collapsible
+      collapsed={collapsed}
+      onCollapse={(value) => setCollapsed(value)}
+      style={{
+        zIndex: 100,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+      }}
+      className={`${isMobile ? 'w-full' : 'w-55 hidden md:block'} bg-white h-screen shadow-sm overflow-y-auto site-layout-background`}
+    >
+      <div className="flex items-center justify-center h-16 p-4" >
+        {!collapsed && (
+          <Logo />
+
+        )}
+        {collapsed && <UserRound size={24} color="white" />}
       </div>
-      <div className="mt-2 space-y-1">
-        <Menu
-          mode="inline"
-          selectedKeys={[currentPath]}
-          defaultOpenKeys={['dashboard']}
-          items={links}
-        />
-
-      </div>
-
-
-    </div>
+      <Menu
+        theme='dark'
+        mode="inline"
+        selectedKeys={[currentPath]}
+        items={links}
+      />
+    </Sider>
   );
 };
 

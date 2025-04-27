@@ -2,9 +2,19 @@ import Interview from "../model/Interview.js";
 import Interviewers from "../model/Interviewers.js";
 
 const createInterview = async (req, res) => {
-    const { candidate, interviewer, date, time, type, notes } = req.body;
+    const { candidate, interviewer, date, time, type, notes, status } = req.body;
     try {
-        const interview = await Interview.create({ candidate, interviewer, date, time, type, notes });
+        const existingInterview = await Interview.findOne({ candidate, date });
+
+        if (existingInterview && existingInterview.status === "scheduled") {
+            return res.status(400).json({ success: false, message: "Interview already send on this date for this candidate" });
+        }
+
+        if (existingInterview && existingInterview.status === "draft") {
+            await Interview.findByIdAndDelete(existingInterview._id);
+        }
+
+        const interview = await Interview.create({ candidate, interviewer, date, time, type, notes, status });
 
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not created" });
@@ -119,5 +129,20 @@ const updateInterview = async (req, res) => {
     }
 }
 
-export { createInterview, getAllInterviews, updateInterview, getInterviewById, getAllInterviewsByCandidate };
+const deleteInterview = async (req, res) => {
+    try {
+        const deleteInterview = await Interview.findByIdAndDelete(req.params.id);
+        if (!deleteInterview) {
+            return res.status(404).json({ success: false, message: "Interview not found" });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Interview deleted successfully",
+            data: deleteInterview
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+export { createInterview, getAllInterviews, updateInterview, getInterviewById, getAllInterviewsByCandidate, deleteInterview };
 

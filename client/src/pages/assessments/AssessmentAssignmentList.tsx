@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Eye, CheckCircle, Clock, AlertCircle, X, Check } from 'lucide-react';
-import Card from '../../component/ui/Card';
-import Badge from '../../component/ui/Badge';
 import { AssessmentDataResponse, AssignmentDataResponse, candidateData, AssignmentScoreFromData } from '../../types';
 import { motion } from 'framer-motion';
 import { useAssignedAssessment } from '../../action/StoreAssessment';
 import { useAppSelector } from '../../Hooks/hook';
 import { makeCapitilized } from '../../utils/TextAlter';
 import CustomTable from '../../component/common/Table';
-import { Button, Input, Select, Modal, Form, InputNumber, message } from 'antd';
+import { Button, Input, Card, Select, Modal, Form, InputNumber, message, Typography,Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useCreateAssignmentScoreMutation } from '../../services/assessmentServiceApi';
 import PrimaryButton from '../../component/ui/button/Primary';
@@ -101,7 +99,7 @@ const AssessmentAssignmentList: React.FC = () => {
       dataIndex: "candidate",
       render: (candidate: candidateData) => (
         <div className='flex flex-col'>
-          <span className='text-gray-900 font-medium'>{makeCapitilized(candidate?.name)}</span>
+          <span className='tfont-medium'>{makeCapitilized(candidate?.name)}</span>
           <span className='text-xs text-gray-500'>{makeCapitilized(candidate.email)}</span>
         </div>
       )
@@ -111,7 +109,7 @@ const AssessmentAssignmentList: React.FC = () => {
       dataIndex: "assessment",
       render: (assessment: AssessmentDataResponse) => (
         <div>
-          <div className="font-medium text-gray-900 capitalize">{assessment?.title}</div>
+          <div className="font-medium capitalize">{assessment?.title}</div>
           <div className="text-xs text-gray-500">
             {makeCapitilized(assessment?.type)}
           </div>
@@ -131,17 +129,17 @@ const AssessmentAssignmentList: React.FC = () => {
       title: 'STATUS',
       dataIndex: "status",
       render: (status: string) => (
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           {getStatusIcon(status)}
-          <Badge
-            variant={
-              status === 'assigned' ? 'primary' :
+          <Tag
+            color={
+              status === 'assigned' ? 'blue' :
                 status === 'pending' ? 'warning' : 'success'
             }
             className="ml-2"
           >
             {makeCapitilized(status)}
-          </Badge>
+          </Tag>
         </div>
       )
     },
@@ -168,8 +166,8 @@ const AssessmentAssignmentList: React.FC = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Assessment Assignments</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage and track candidate assessment assignments</p>
+          <Typography.Title level={2} className="text-2xl font-bold text-gray-900">Assessment Assignments</Typography.Title>
+          <Typography.Text className="mt-1 text-sm text-gray-500">Manage and track candidate assessment assignments</Typography.Text>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <PrimaryButton text='Assing Assessment' onClick={() => navigate('/dashboard/assessments/assign')} />

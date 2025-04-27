@@ -1,60 +1,110 @@
 import { useAppSelector } from '../../Hooks/hook';
-import { ArrowLeft, Mail, Phone, FileText } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { makeCapitilized } from '../../utils/TextAlter';
-import { Button } from 'antd';
+import { Mail, Phone, FileText, Clock, User, ExternalLink } from 'lucide-react';
+import { Card, Descriptions, Select, Tabs } from 'antd';
+import TabPane from 'antd/es/tabs/TabPane';
+import { useState } from 'react';
+import { candidateStatus } from '../../types';
 
-const CandidateProfile = () => {
-    const navigate = useNavigate();
+interface Props {
+    updateStatus?: (newStatus: candidateStatus) => void;
+    statusOptions: any;
+
+}
+const CandidateProfile = ({
+    updateStatus,
+    statusOptions,
+
+}: Props) => {
+    const [activeTab, setActiveTab] = useState('profile');
     const { candidate } = useAppSelector((state) => state.candidate);
     const profile = candidate?.[0];
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center mb-4">
-                <Button
-                    type="text"
-                    className="mr-2"
-                    size='small'
-                    icon={<ArrowLeft size={18} />}
-                    onClick={() => navigate('/dashboard/candidates')}
-                    aria-label="Back"
-                />
-                <div>
-                    <h1 className="text-2xl font-bold mb-6">{makeCapitilized(profile?.name)}</h1>
-                    <div className="flex flex-wrap gap-4 mt-2 text-gray-600 text-sm">
-                        <span className="flex items-center gap-2">
-                            <Mail className="w-4 h-4" />
-                            <a href={`mailto:${profile?.email}`}>{profile?.email}</a>
-                            {/* {profile?.email} */}
-                        </span>
-                        <span className="flex items-center gap-2">
-                            <Phone className="w-4 h-4" />
-                            <a href={`tel:${profile?.phone}`}>
-                                {profile?.phone}
-                            </a>
-                        </span>
-                        {profile?.resume && (
-                            <span>
-                                <span className="flex items-center gap-2">
-                                    <FileText className="w-4 h-4" />
-                                    <a
-                                        href={profile.resume}
-                                        target="_blank"
-                                        download
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        View Resume
-                                    </a>
+        <Card 
+        title="Candidate Profile"
+        extra={
+            <Select
+                placeholder="Update Status"
+                className="w-full cursor-pointer"
+                onChange={updateStatus}
+                options={statusOptions}
+                value={profile?.status}
+                showSearch
+                style={{
+                    width: '100%',
+                }}
+                
+            />
+        }>
+            <Tabs activeKey={activeTab} onChange={setActiveTab}>
+                <TabPane tab="Profile" key="profile" />
+                <TabPane tab="Interviews" key="interviews" />
+                <TabPane tab="Assessments" key="assessments" />
+                <TabPane tab="Timeline" key="timeline" />
+            </Tabs>
+            {
+                activeTab === 'profile' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <div className="flex items-center mb-4">
+                                <div className="h-16 w-16 rounded-full bg-blue-950 flex items-center justify-center text-white text-2xl mr-4 capitalize">
+                                    {profile?.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <div className="text-xl font-medium capitalize">{profile?.name}</div>
+                                    <div className="text-gray-500 capitalize">{profile?.technology}</div>
+                                </div>
+                            </div>
 
-                                </span>
-                            </span>
-                        )}
+                            <Descriptions column={1} className="mb-4">
+                                <Descriptions.Item
+                                    label={<div className="flex items-center"><Mail size={16} className="mr-2" /> Email</div>}
+                                >
+                                    <a href={`mailto:${profile?.email}`}>{profile?.email}</a>
+                                </Descriptions.Item>
+                                <Descriptions.Item
+                                    label={<div className="flex items-center"><Phone size={16} className="mr-2" /> Phone</div>}
+                                >
+                                    <a href={`tel:${profile?.phone}`}>{profile?.phone}</a>
+                                </Descriptions.Item>
+                                <Descriptions.Item
+                                    label={<div className="flex items-center"><Clock size={16} className="mr-2" /> Experience</div>}
+                                >
+                                    {profile?.experience} {profile?.experience === 1 ? 'year' : 'years'}
+                                </Descriptions.Item>
+                                <Descriptions.Item
+                                    label={<div className="flex items-center"><User size={16} className="mr-2" /> References</div>}
+                                >
+                                    {profile?.references?.map((reference) => (
+                                        <p >{reference?.name}</p>
+                                    ))}
+                                </Descriptions.Item>
+
+                                <Descriptions.Item
+                                    label={<div className="flex items-center"><FileText size={16} className="mr-2" /> Resume</div>}
+                                >
+                                    {profile?.resume ? (
+                                        <a href={profile?.resume} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                                            View Resume <ExternalLink size={14} className="ml-1" />
+                                        </a>
+                                    ) : (
+                                        'Not provided'
+                                    )}
+                                </Descriptions.Item>
+                            </Descriptions>
+
+
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div >
+                )
+            }
+
+
+        </Card >
+
     );
 };
 
 export default CandidateProfile;
+
+

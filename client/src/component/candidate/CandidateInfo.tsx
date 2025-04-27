@@ -1,12 +1,11 @@
 import { useAppSelector } from '../../Hooks/hook'
-import { Descriptions, Tag } from 'antd'
-import { Briefcase, DollarSign } from 'lucide-react'
+import { Card, Descriptions, Tag } from 'antd'
 import { makeCapitilized } from '../../utils/TextAlter'
 const CandidateInfo = () => {
     const { candidate } = useAppSelector((state) => state.candidate)
     const profile = candidate?.[0]
     return (
-        <div>
+        <Card title="Candidate Profile">
             <Descriptions bordered column={{ xs: 1, sm: 2, md: 2 }}>
                 <Descriptions.Item label="Technology">
                     <Tag color="blue">{makeCapitilized(profile?.technology)}</Tag>
@@ -16,18 +15,16 @@ const CandidateInfo = () => {
                 </Descriptions.Item>
                 <Descriptions.Item label="Experience">
                     <span className="flex items-center gap-2">
-                        <Briefcase className="w-4 h-4" />
                         {profile?.experience} years
                     </span>
                 </Descriptions.Item>
                 <Descriptions.Item label="Expected Salary">
                     <span className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        ${profile?.expectedsalary.toLocaleString()}
+                        {profile?.expectedsalary.toLocaleString()}
                     </span>
                 </Descriptions.Item>
             </Descriptions>
-        </div>
+        </Card>
     )
 }
 

@@ -11,7 +11,7 @@ export const storeCandidate = (candidate: candidateData[]) => (dispatch: AppDisp
 
 export const useCandidate = () => {
     const dispatch = useAppDispatch();
-    const { data, isSuccess, refetch } = useGetCandidateQuery({
+    const { data, isSuccess, refetch,isLoading } = useGetCandidateQuery({
         searchText: "",
         status: "",
     },
@@ -25,5 +25,5 @@ export const useCandidate = () => {
         }
     }, [data]);
 
-    return { data, isSuccess, refetch };
+    return { data, isSuccess, refetch,isLoading };
 }

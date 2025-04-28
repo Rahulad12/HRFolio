@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Menu, Bell, Search, X } from 'lucide-react';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
-import { theme as antTheme, Avatar, Dropdown, Button, Layout, Input } from 'antd';
+import { theme as antTheme, Avatar, Dropdown, Button, Layout, Input, Modal } from 'antd';
 import type { MenuProps } from 'antd';
 import { logout } from '../../slices/authSlices';
 import ThemeToggle from '../common/ThemeToggle';
 import { toggleSideBarCollapsed } from '../../slices/sideBarCollapsed';
+import { setSearchTerms } from '../../slices/searchTermsSlices';
 
 const { Header } = Layout;
 
@@ -16,11 +17,18 @@ interface HeaderProps {
 
 export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
   const [showSearch, setShowSearch] = useState(false);
+  const [searchText, SetSearchText] = useState<string>("");
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { collapse: isSidebarCollapsed } = useAppSelector((state) => state.sideBar);
   const isDarkMode = useAppSelector(state => state.theme.mode === 'dark');
   const { token } = antTheme.useToken();
+
+  useEffect(() => {
+    dispatch(setSearchTerms({
+      text: searchText
+    }))
+  }, [searchText])
 
   const items: MenuProps['items'] = [
     { label: 'Sign out', key: 'logout' },
@@ -35,7 +43,6 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
   const handleSideBarCollapse = () => {
     dispatch(toggleSideBarCollapsed());
   };
-
   return (
     <Header style={{
       padding: '0 16px',
@@ -83,6 +90,8 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
             <Input
               prefix={<Search size={18} className="text-gray-400" />}
               placeholder="Search candidates, interviews..."
+              value={searchText}
+              onChange={(e) => SetSearchText(e.target.value)}
               autoFocus
               suffix={
                 <Button
@@ -124,7 +133,10 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
           </div>
         </Dropdown>
       </div>
+      <Modal>
+      </Modal>
     </Header>
+
   );
 };
 

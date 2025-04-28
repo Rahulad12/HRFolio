@@ -13,13 +13,14 @@ import CandidateProfile from '../../component/candidate/CandidateProfile';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
 import { ArrowLeft } from 'lucide-react';
+import Predefineddata from '../../data/PredefinedData';
 
 const CandidateDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const {
-    data: candidates
+    isLoading: candidateLoading
   } = useCandidate();
 
   const { data, isLoading } = useGetCandidateByIdQuery(id);
@@ -83,21 +84,17 @@ const CandidateDetails = () => {
 
   if (isLoading) return <CandidateProfileLoading />;
 
-  const candidateStatus = [...new Set(
-    candidates?.data?.map((c: candidateFormData) => c.status) || []
-  )]
 
   const candidatesStatusOptions = interviewSteps
-    .filter((step) => candidateStatus.includes(step as candidateStatus))
-    .map((status) => {
-      const stepIndex = interviewSteps.indexOf(status);
-      const isDisabled = stepIndex < currentStep;
-      return {
-        label: makeCapitilized(status),
-        value: status,
-        disabled: isDisabled
-      };
-    });
+    .filter(step => Predefineddata?.Status.map((status) => status.value).includes(step))
+    .map((step, index) => ({
+      key: index,
+      label: makeCapitilized(step),
+      value: step,
+      disabled: index < currentStep
+    })
+
+    );
 
 
   return (

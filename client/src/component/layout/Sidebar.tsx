@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Users, UserPlus, FileText, UserRound, LayoutDashboard, CalendarClock } from 'lucide-react';
 import Logo from '../common/Logo';
@@ -86,7 +86,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
           <Logo />
 
         )}
-        {collapse && <UserRound size={24} color="white" />}
+        {collapse &&
+          <>
+            <span className='text-white font-medium text-3xl'>H</span>
+            <span className='text-orange-600 text-5xl font-bold'>R</span>
+          </>
+
+        }
       </div>
       <Menu
         theme='dark'

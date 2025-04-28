@@ -1,20 +1,16 @@
-import { candidateData } from "../types";
+import { candidateResponse } from "../types";
 import { api } from "./api";
-
 
 const searchServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getSearchTerms: builder.query<candidateData[], string>({
-            query: (data: string) => ({
+        getSearchTerms: builder.query<candidateResponse, string>({
+            query: (searchText) => ({
                 url: '/search',
-                method: "GET",
-                params: {
-                    searchText: data
-                }
+                method: 'GET',
+                params: { searchText },
             }),
         }),
-    })
-})
+    }),
+});
 
 export const { useGetSearchTermsQuery } = searchServiceApi;
-

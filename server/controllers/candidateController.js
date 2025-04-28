@@ -1,5 +1,8 @@
 import Candidate from "../model/Candidate.js";
+import EmailTemplate from "../model/EmailTemplate.js";
+import Offer from "../model/Offer.js";
 import Reference from "../model/Reference.js";
+import sendEmail from "../utils/sendEmail.js";
 
 const createCandidate = async (req, res) => {
     const {
@@ -152,14 +155,44 @@ const deleteCandidate = async (req, res) => {
 const updateCandidate = async (req, res) => {
     try {
         const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
+
+        if (candidate.status === "hired") {
+            const candidateInfo = candidate.name;
+            const candidateEmail = candidate.email;
+
+            if (candidateInfo && candidateEmail) {
+                const emailTemplate = await EmailTemplate.findOne({ type: "hired" });
+                const candidateOffer = await Offer.findOne({ candidate: candidate._id });
+
+                if (!emailTemplate) {
+                    return res.status(400).json({ success: false, message: "Hired email template not found" });
+                }
+                if (!candidateOffer) {
+                    return res.status(400).json({ success: false, message: "Candidate offer not found" });
+                }
+
+                const emailSubject = emailTemplate.subject;
+                const emailBody = emailTemplate.body
+                    .replace("{{candidateName}}", candidateInfo)
+                    .replace("{{position}}", candidateOffer.position);
+
+                await sendEmail(candidateEmail, emailSubject, emailBody);
+            }
+        }
+
         return res.status(200).json({ success: true, message: "Candidate updated successfully", data: candidate });
-    } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: "Server Error", error: err.message });
     }
-}
+};
+
+
 
 const filterCandidate = async (req, res) => {
     const { name, technology, level, status } = req.query;

@@ -1,36 +1,21 @@
 import { useAppSelector } from '../../Hooks/hook';
 import { Mail, Phone, FileText, Clock, User, ExternalLink } from 'lucide-react';
-import { Card, Descriptions, Select, Tabs, Typography } from 'antd';
+import { Card, Descriptions, Tabs, Typography } from 'antd';
 import TabPane from 'antd/es/tabs/TabPane';
 import { useState } from 'react';
-import { candidateStatus } from '../../types';
 
-interface Props {
-    updateStatus?: (newStatus: candidateStatus) => void;
-    statusOptions: any;
+// interface Props {
+//     updateStatus?: (newStatus: candidateStatus) => void;
+//     statusOptions: any;
 
-}
-const CandidateProfile = ({
-    updateStatus,
-    statusOptions,
-
-}: Props) => {
+// }
+const CandidateProfile = () => {
     const [activeTab, setActiveTab] = useState('profile');
     const { candidate } = useAppSelector((state) => state.candidate);
     const profile = candidate?.[0];
 
     return (
-        <Card
-            extra={
-                <Select
-                    placeholder="Update Status"
-                    className="w-40 cursor-pointer"
-                    onChange={updateStatus}
-                    options={statusOptions}
-                    value={profile?.status}
-                    showSearch
-                />
-            }>
+        <Card >
             <Tabs activeKey={activeTab} onChange={setActiveTab}>
                 <TabPane tab="Profile" key="profile" />
                 <TabPane tab="Interviews" key="interviews" />

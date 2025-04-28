@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Users, UserPlus, FileText, UserRound, LayoutDashboard, CalendarClock } from 'lucide-react';
 import Logo from '../common/Logo';
@@ -8,12 +7,7 @@ import { toggleSideBarCollapsed } from '../../slices/sideBarCollapsed';
 
 const { Sider } = Layout;
 
-interface SidebarProps {
-  isMobile: boolean;
-
-}
-
-export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
+export const Sidebar = () => {
   const location = useLocation();
   const diapatch = useAppDispatch();
   const { collapse } = useAppSelector(state => state.sideBar);
@@ -31,11 +25,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
       label: <Link to="/dashboard/candidates">Candidates</Link>
     },
     {
-      key: '/dashboard/interviews',
-      icon: <CalendarClock size={18} />,
-      label: <Link to="/dashboard/interviews">Interviews</Link>
-    },
-    {
       key: 'assessments',
       icon: <UserRound size={18} />,
       label: 'Assessments',
@@ -50,6 +39,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
         },
       ],
     },
+    {
+      key: '/dashboard/interviews',
+      icon: <CalendarClock size={18} />,
+      label: <Link to="/dashboard/interviews">Interviews</Link>
+    },
+
     {
       key: '/dashboard/interviewers',
       icon: <UserPlus size={20} />,
@@ -79,19 +74,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
       collapsible
       collapsed={collapse}
       onCollapse={() => diapatch(toggleSideBarCollapsed())}
-      className={`${isMobile ? 'w-full' : 'w-55 hidden md:block'} bg-white h-screen shadow-sm overflow-y-auto site-layout-background`}
+      theme='dark'
     >
       <div className="flex items-center justify-center h-16 p-4" >
         {!collapse && (
           <Logo />
-
         )}
         {collapse &&
           <>
             <span className='text-white font-medium text-3xl'>H</span>
             <span className='text-orange-600 text-5xl font-bold'>R</span>
           </>
-
         }
       </div>
       <Menu

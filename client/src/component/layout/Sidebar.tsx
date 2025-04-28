@@ -3,16 +3,20 @@ import { Link, useLocation } from 'react-router-dom';
 import { Users, UserPlus, FileText, UserRound, LayoutDashboard, CalendarClock } from 'lucide-react';
 import Logo from '../common/Logo';
 import { Menu, Layout } from 'antd';
+import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
+import { toggleSideBarCollapsed } from '../../slices/sideBarCollapsed';
 
 const { Sider } = Layout;
 
 interface SidebarProps {
   isMobile: boolean;
+
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
+  const diapatch = useAppDispatch();
+  const { collapse } = useAppSelector(state => state.sideBar);
   const currentPath = location.pathname;
 
   const links = [
@@ -70,23 +74,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
 
   return (
     <Sider
-      theme='dark'
+      breakpoint='lg'
       width={250}
       collapsible
-      collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
-      style={{
-        zIndex: 100,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-      }}
+      collapsed={collapse}
+      onCollapse={() => diapatch(toggleSideBarCollapsed())}
       className={`${isMobile ? 'w-full' : 'w-55 hidden md:block'} bg-white h-screen shadow-sm overflow-y-auto site-layout-background`}
     >
       <div className="flex items-center justify-center h-16 p-4" >
-        {!collapsed && (
+        {!collapse && (
           <Logo />
 
         )}
-        {collapsed && <UserRound size={24} color="white" />}
+        {collapse && <UserRound size={24} color="white" />}
       </div>
       <Menu
         theme='dark'

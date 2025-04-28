@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Menu, Bell, Search, X } from 'lucide-react';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
 import { theme as antTheme, Avatar, Dropdown, Button, Layout, Input } from 'antd';
 import type { MenuProps } from 'antd';
 import { logout } from '../../slices/authSlices';
 import ThemeToggle from '../common/ThemeToggle';
+import { toggleSideBarCollapsed } from '../../slices/sideBarCollapsed';
+
 const { Header } = Layout;
+
 interface HeaderProps {
   openMobileMenu: () => void;
 }
@@ -14,75 +18,111 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
   const [showSearch, setShowSearch] = useState(false);
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-
+  const { collapse: isSidebarCollapsed } = useAppSelector((state) => state.sideBar);
   const isDarkMode = useAppSelector(state => state.theme.mode === 'dark');
   const { token } = antTheme.useToken();
+
   const items: MenuProps['items'] = [
-    { label: 'Sign out', key: 'logout' }
+    { label: 'Sign out', key: 'logout' },
   ];
 
-  const handleMenuClick = () => {
-    dispatch(logout());
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e.key === 'logout') {
+      dispatch(logout());
+    }
   };
 
+  const handleSideBarCollapse = () => {
+    dispatch(toggleSideBarCollapsed());
+  };
 
   return (
     <Header style={{
       padding: '0 16px',
       background: isDarkMode ? token.colorBgContainer : '#fff',
       boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     }}>
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Mobile Menu Button */}
-          <div className="flex items-center md:hidden">
-            <Button type="text" onClick={openMobileMenu} aria-label="Open menu">
-              <Menu size={24} />
-            </Button>
-          </div>
-
-          {/* Search and User Info */}
-          <div className="flex items-center flex-1 justify-end">
-            {showSearch ? (
-              <div className="relative w-full max-w-xs md:max-w-md">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search size={18} className="text-gray-400" />
-                </div>
-                <Input
-                  type="text"
-                  placeholder="Search candidates, interviews..."
-                  autoFocus
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <Button type="text" onClick={() => setShowSearch(false)} aria-label="Close search">
-                    <X size={18} className="text-gray-400" />
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <Button type="text" onClick={() => setShowSearch(true)} aria-label="Search">
-                <Search size={20} />
-              </Button>
-            )}
-
-            <Button type="text" className="ml-2 p-2 relative" aria-label="Notifications">
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500"></span>
-            </Button>
-
-            <ThemeToggle />
-            <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight">
-              <div className="ml-3 flex items-center cursor-pointer">
-                <Button type="text" className="flex items-center p-1" aria-label="User menu">
-                  <Avatar src={user?.picture || ''} alt="User Avatar" size={40} />
-                  <span className="hidden md:flex ml-2 text-sm font-medium">
-                    {user?.username || 'User'}
-                  </span>
-                </Button>
-              </div>
-            </Dropdown>
-          </div>
+      {/* Left Section */}
+      <div className="flex items-center gap-2">
+        {/* Desktop Sidebar Toggle */}
+        <div className="hidden md:flex">
+          <Button
+            type="text"
+            icon={isSidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={handleSideBarCollapse}
+            style={{
+              fontSize: '18px',
+              width: 48,
+              height: 48,
+            }}
+          />
         </div>
+
+        {/* Mobile Menu Button */}
+        <div className="flex md:hidden">
+          <Button
+            type="text"
+            onClick={openMobileMenu}
+            icon={<Menu size={22} />}
+            style={{
+              width: 48,
+              height: 48,
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Right Section */}
+      <div className="flex items-center gap-4">
+        {/* Search */}
+        {showSearch ? (
+          <div className="relative w-56">
+            <Input
+              prefix={<Search size={18} className="text-gray-400" />}
+              placeholder="Search candidates, interviews..."
+              autoFocus
+              suffix={
+                <Button
+                  type="text"
+                  size="small"
+                  onClick={() => setShowSearch(false)}
+                  icon={<X size={18} className="text-gray-400" />}
+                />
+              }
+            />
+          </div>
+        ) : (
+          <Button
+            type="text"
+            onClick={() => setShowSearch(true)}
+            icon={<Search size={20} />}
+            style={{ width: 40, height: 40 }}
+          />
+        )}
+
+        {/* Notification Bell */}
+        <Button
+          type="text"
+          className="relative"
+          icon={<Bell size={20} />}
+          style={{ width: 40, height: 40 }}
+        >
+          <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+        </Button>
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
+        {/* User Menu */}
+        <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight">
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Avatar src={user?.picture || ''} alt="User Avatar" size="large" />
+            <span className="hidden md:block font-medium text-sm">{user?.username || 'User'}</span>
+          </div>
+        </Dropdown>
       </div>
     </Header>
   );

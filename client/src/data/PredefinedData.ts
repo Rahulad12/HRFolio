@@ -18,7 +18,6 @@ const Predefineddata = {
         { key: 12, label: "Senior", value: "senior" }
     ],
     Status: [
-        { key: 12, label: "All Status", value: "" },
         { key: 13, label: "Shortlisted", value: "shortlisted" },
         { key: 14, label: "First Interview", value: "first" },
         { key: 15, label: "Second Interview", value: "second" },

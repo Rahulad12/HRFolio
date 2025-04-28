@@ -1,41 +1,21 @@
 import { useAppSelector } from '../../Hooks/hook';
 import { Mail, Phone, FileText, Clock, User, ExternalLink } from 'lucide-react';
-import { Card, Descriptions, Select, Tabs } from 'antd';
+import { Card, Descriptions, Tabs, Typography } from 'antd';
 import TabPane from 'antd/es/tabs/TabPane';
 import { useState } from 'react';
-import { candidateStatus } from '../../types';
 
-interface Props {
-    updateStatus?: (newStatus: candidateStatus) => void;
-    statusOptions: any;
+// interface Props {
+//     updateStatus?: (newStatus: candidateStatus) => void;
+//     statusOptions: any;
 
-}
-const CandidateProfile = ({
-    updateStatus,
-    statusOptions,
-
-}: Props) => {
+// }
+const CandidateProfile = () => {
     const [activeTab, setActiveTab] = useState('profile');
     const { candidate } = useAppSelector((state) => state.candidate);
     const profile = candidate?.[0];
 
     return (
-        <Card 
-        title="Candidate Profile"
-        extra={
-            <Select
-                placeholder="Update Status"
-                className="w-full cursor-pointer"
-                onChange={updateStatus}
-                options={statusOptions}
-                value={profile?.status}
-                showSearch
-                style={{
-                    width: '100%',
-                }}
-                
-            />
-        }>
+        <Card >
             <Tabs activeKey={activeTab} onChange={setActiveTab}>
                 <TabPane tab="Profile" key="profile" />
                 <TabPane tab="Interviews" key="interviews" />
@@ -51,8 +31,8 @@ const CandidateProfile = ({
                                     {profile?.name.charAt(0)}
                                 </div>
                                 <div>
-                                    <div className="text-xl font-medium capitalize">{profile?.name}</div>
-                                    <div className="text-gray-500 capitalize">{profile?.technology}</div>
+                                    <Typography.Title level={4} className="text-xl font-medium capitalize">{profile?.name}</Typography.Title>
+                                    <Typography.Paragraph className="text-gray-500 capitalize">{profile?.technology}</Typography.Paragraph>
                                 </div>
                             </div>
 

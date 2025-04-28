@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Calendar, Plus, FileCheck, FileText } from 'lucide-react';
+import { Users, Calendar, FileCheck, FileText } from 'lucide-react';
 import MetricsCard from '../component/dashboard/MetricsCard';
 import CandidateByStatus from '../component/dashboard/CandidateByStatus';
 import RecentActivity from '../component/dashboard/RecentActivity';
@@ -10,16 +10,15 @@ import { useAppSelector } from '../Hooks/hook';
 import { useCandidate } from '../action/StoreCandidate';
 import { useInterview } from '../action/StoreInterview';
 import dayjs from 'dayjs';
-import PrimaryButton from '../component/ui/button/Primary';
-import { Col, Row, Space, Button, Typography } from 'antd';
+import { Col, Row, Space, Typography } from 'antd';
 import RecentActivityLog from '../component/dashboard/RecentActivitiesLog';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
-  const { isLoading, isError } = useInterview(null, null);
+  const { isLoading: interviewLoading } = useInterview(null, null);
 
-  useCandidate(); // Fetch candidates and that will store in redux also 
+  const { isLoading: candidateLoading } = useCandidate(); // Fetch candidates and that will store in redux also 
 
   const { user } = useAppSelector((state) => state.auth);
 
@@ -111,22 +110,6 @@ export const Dashboard: React.FC = () => {
             Welcome back! <span className="font-bold">{user.username}</span>
           </Typography.Text>
         </div>
-        <Space className="mt-4 sm:mt-0">
-          <PrimaryButton
-            text="Add Candidate"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => navigate('/dashboard/candidates/new')}
-            disabled={false}
-            loading={false}
-          />
-          <Button
-            type="default"
-            icon={<Calendar size={16} />}
-            onClick={() => navigate('/dashboard/interviews/schedule')}
-          >
-            Schedule Interview
-          </Button>
-        </Space>
       </div>
 
       {/* Metrics Cards */}
@@ -142,6 +125,8 @@ export const Dashboard: React.FC = () => {
                 title="Active Candidates"
                 value={candidate?.length}
                 icon={<Users size={20} className="text-purple-700" />}
+                link="/dashboard/candidates"
+                loading={candidateLoading}
               />
             </motion.div>
           </Col>
@@ -151,6 +136,9 @@ export const Dashboard: React.FC = () => {
                 title="Active Assessment"
                 value={assessment?.length}
                 icon={<FileCheck size={20} className="mr-2 text-orange-500" />}
+                link="/dashboard/assessments"
+                loading={candidateLoading}
+
               />
             </motion.div>
           </Col>
@@ -160,6 +148,8 @@ export const Dashboard: React.FC = () => {
                 title="Scheduled Interviews"
                 value={interviews?.length}
                 icon={<Calendar size={20} className="text-green-700" />}
+                link="/dashboard/interviews"
+                loading={interviewLoading}
               />
             </motion.div>
           </Col>
@@ -169,6 +159,8 @@ export const Dashboard: React.FC = () => {
                 title="Offer Sent"
                 value={offered?.length}
                 icon={<FileText size={20} className="mr-2 text-green-500" />}
+                link="/dashboard/offers"
+                loading={candidateLoading}
               />
             </motion.div>
           </Col>
@@ -185,7 +177,7 @@ export const Dashboard: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <CandidateByStatus stages={pipelineStages} />
+              <CandidateByStatus stages={pipelineStages} loading={candidateLoading} />
             </motion.div>
           </Space>
         </Col>
@@ -200,8 +192,7 @@ export const Dashboard: React.FC = () => {
             <UpcomingInterviews
               interviews={filteredInterviews}
               onViewAllClick={() => navigate('/dashboard/interviews')}
-              loading={isLoading}
-              error={isError ? 'Failed to load interviews' : ''}
+              loading={interviewLoading}
             />
           </motion.div>
         </Col>

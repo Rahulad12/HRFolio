@@ -10,7 +10,6 @@ interface UpcomingInterviewsProps {
   onViewAllClick?: () => void;
   className?: string;
   loading?: boolean;
-  error?: string;
 }
 
 export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
@@ -18,7 +17,6 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
   onViewAllClick,
   className = '',
   loading = false,
-  error = '',
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 3;
@@ -29,26 +27,6 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
 
   const paginatedInterviews = interviews.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  if (loading) {
-    return (
-      <Card title="Upcoming Interviews" className={className}>
-        <div className="flex items-center justify-center h-32">
-          <p className="text-gray-500">Loading...</p>
-        </div>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card title="Upcoming Interviews" className={className}>
-        <div className="flex items-center justify-center h-32">
-          <p className="text-red-500">{error}</p>
-        </div>
-      </Card>
-    );
-  }
-
   return (
     <Card
       title="Upcoming Interviews"
@@ -58,6 +36,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
           View All
         </Button>
       }
+      loading={loading}
     >
       <div className="space-y-4 flex gap-2 flex-col">
         {paginatedInterviews.length > 0 ? (

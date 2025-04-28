@@ -18,7 +18,7 @@ export const Layout: React.FC = () => {
 
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
-        <Sidebar isMobile={false} />
+        <Sidebar />
       </div>
 
       {/* Mobile Sidebar */}

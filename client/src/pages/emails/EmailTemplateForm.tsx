@@ -58,7 +58,9 @@ const EmailTemplateForm: React.FC = () => {
     { value: 'offer', label: 'Offer Letter' },
     { value: 'interview', label: 'Interview' },
     { value: 'assessment', label: 'Assessment' },
+    { value: 'hired', label: 'Hired' },
     { value: 'rejection', label: 'Rejection' },
+
     { value: 'other', label: 'Other' }
   ];
 

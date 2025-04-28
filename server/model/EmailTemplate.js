@@ -30,7 +30,7 @@ const emailTemplateSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ["offer", "interview", "assessment", "rejection", "other"],
+        enum: ["offer", "interview", "assessment", "rejection", "hired", "other"],
         required: true,
         lowercase: true
     },

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Steps, notification, Row, Space, Col, Card, Button, Typography } from 'antd';
+import { Steps, notification, Row, Space, Col, Card, Button, Typography, Select } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../../services/candidateServiceApi';
 import { candidateFormData } from '../../types/index';
@@ -8,20 +8,17 @@ import { makeCapitilized } from '../../utils/TextAlter';
 import { useGetInterviewByCandidateIdQuery } from '../../services/interviewServiceApi';
 import { storeInterview } from '../../action/StoreInterview';
 import { useAppDispatch } from '../../Hooks/hook';
-import { storeCandidate, useCandidate } from '../../action/StoreCandidate';
+import { storeCandidate } from '../../action/StoreCandidate';
 import CandidateProfile from '../../component/candidate/CandidateProfile';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
 import { ArrowLeft } from 'lucide-react';
+import Predefineddata from '../../data/PredefinedData';
 
 const CandidateDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const {
-    data: candidates
-  } = useCandidate();
-
   const { data, isLoading } = useGetCandidateByIdQuery(id);
   const [updateCandidate] = useUpdateCandidateMutation();
   const { data: interviewData } = useGetInterviewByCandidateIdQuery(id, {
@@ -55,8 +52,38 @@ const CandidateDetails = () => {
     }
   }, [data, interviewData]);
 
+  const StatusFlow = [
+    'shortlisted',
+    'assessment',
+    'first',
+    'second',
+    'third',
+    'offered',
+    'hired',
+    'rejected'
+  ] as const;
+
+  type CandidateStatusFlow = typeof StatusFlow[number];
+  const canMoveToNextStatus = (currentStatus: CandidateStatusFlow, nextStatus: CandidateStatusFlow) => {
+    if (nextStatus === 'rejected') return true; // special case: rejection allowed anytime
+
+    const currentIndex = StatusFlow.indexOf(currentStatus);
+    const nextIndex = StatusFlow.indexOf(nextStatus);
+
+    if (currentIndex === -1 || nextIndex === -1) return false;
+
+    return nextIndex === currentIndex + 1; // Only next step allowed
+  };
 
   const updateStatus = async (newStatus: candidateStatus) => {
+    if (!canMoveToNextStatus(candidate.status as CandidateStatusFlow, newStatus as CandidateStatusFlow)) {
+      api.error({
+        message: "You cannot skip steps! Complete the current stage first.",
+        placement: "topRight",
+        duration: 3000,
+      });
+      return;
+    }
     setCandidate({ ...candidate, status: newStatus });
 
     try {
@@ -78,41 +105,48 @@ const CandidateDetails = () => {
     }
   };
 
-  const interviewSteps = ['shortlisted', 'assessment', 'first', 'second', 'third', 'offered', 'hired', 'rejected'];
-  const currentStep = interviewSteps.indexOf(candidate.status);
+
+
+  const currentStep = StatusFlow.indexOf(candidate.status);
 
   if (isLoading) return <CandidateProfileLoading />;
 
-  const candidateStatus = [...new Set(
-    candidates?.data?.map((c: candidateFormData) => c.status) || []
-  )]
 
-  const candidatesStatusOptions = interviewSteps
-    .filter((step) => candidateStatus.includes(step as candidateStatus))
-    .map((status) => {
-      const stepIndex = interviewSteps.indexOf(status);
-      const isDisabled = stepIndex < currentStep;
-      return {
-        label: makeCapitilized(status),
-        value: status,
-        disabled: isDisabled
-      };
-    });
+  const candidatesStatusOptions = StatusFlow
+    .filter(step => Predefineddata?.Status.map((status) => status.value).includes(step))
+    .map((step, index) => ({
+      key: index,
+      label: makeCapitilized(step),
+      value: step,
+      disabled: !canMoveToNextStatus(candidate.status as CandidateStatusFlow, step as CandidateStatusFlow)
+    }));
+
+
 
 
   return (
     <div className="space-y-6">
       {contextHolder}
-      <div className="mb-6 flex items-center">
-        <Button type="text" icon={<ArrowLeft size={18} />} onClick={() => navigate('/dashboard/candidates')} />
-        <Typography.Title level={2}>Candidate Details</Typography.Title>
+      <div className="mb-6 flex items-center justify-between">
+        <div className='flex items-center space-x-2'>
+          <Button type="text" icon={<ArrowLeft size={18} />} onClick={() => navigate('/dashboard/candidates')} />
+          <Typography.Title level={2}>Candidate Details</Typography.Title>
+        </div>
+        <Select
+          placeholder="Update Status"
+          className="w-40 cursor-pointer"
+          onChange={updateStatus}
+          options={candidatesStatusOptions}
+          value={candidate?.status}
+          showSearch
+        />
       </div>
 
       {/* Header Section */}
       <Space direction='vertical'>
         <Row gutter={[16, 16]}>
           <Col md={16} xs={24}>
-            <CandidateProfile updateStatus={updateStatus} statusOptions={candidatesStatusOptions} />
+            <CandidateProfile />
           </Col>
           <Col md={8} xs={24}>
             <CandidateQuickAction />
@@ -123,7 +157,7 @@ const CandidateDetails = () => {
       <Card className="bg-white rounded-2xl shadow-md p-6">
         <h2 className="text-lg font-semibold mb-4">Candidate Progress</h2>
         <Steps current={currentStep} responsive size="small">
-          {interviewSteps.map((step) => (
+          {StatusFlow.map((step) => (
             <Steps.Step key={step} title={makeCapitilized(step)} />
           ))}
         </Steps>

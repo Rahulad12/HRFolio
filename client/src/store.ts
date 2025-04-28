@@ -8,6 +8,7 @@ import assessmentSlice from "./slices/assessmentSlices.ts"
 import buttonPropsSliceReducer from "./slices/ButtonPropsSlices.ts"
 import themeReducer from './slices/themeSlices.ts';
 import sideBarCollapsedSliceReducer from "./slices/sideBarCollapsed.ts"
+import SearchTermsReducer from "./slices/searchTermsSlices.ts"
 
 export const store = configureStore({
     reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
         assessments: assessmentSlice,
         buttonProps: buttonPropsSliceReducer,
         theme: themeReducer,
-        sideBar: sideBarCollapsedSliceReducer
+        sideBar: sideBarCollapsedSliceReducer,
+        searchTerms: SearchTermsReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

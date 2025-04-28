@@ -12,10 +12,12 @@ interface PipelineStage {
 interface CandidatePipelineProps {
   stages: PipelineStage[];
   className?: string;
+  loading?: boolean;
 }
 
 export const CandidateByStatus: React.FC<CandidatePipelineProps> = ({
   stages,
+  loading = false
 }) => {
 
   const { candidate } = useAppSelector((state) => state.candidate);
@@ -24,6 +26,7 @@ export const CandidateByStatus: React.FC<CandidatePipelineProps> = ({
   return (
     <Card
       title="Candidate By Status"
+      loading={loading}
       extra={
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-gray-700">Total</span>

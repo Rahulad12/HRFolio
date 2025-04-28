@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
-import Button from '../ui/Button';
-import Sidebar from './Sidebar';
+import React from 'react';
+import { Drawer, Menu,Button } from 'antd';
+import { CalendarClock, FileText, LayoutDashboard, UserPlus, UserRound, Users, X } from 'lucide-react';
+
+import { Link } from 'react-router-dom';
+import Logo from '../common/Logo';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -10,71 +11,89 @@ interface MobileSidebarProps {
 }
 
 export const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose]);
+  const links = [
+    {
+      key: '/dashboard',
+      icon: <LayoutDashboard size={18} />,
+      label: <Link to="/dashboard">Dashboard</Link>
+    },
+    {
+      key: '/dashboard/candidates',
+      icon: <Users size={18} />,
+      label: <Link to="/dashboard/candidates">Candidates</Link>
+    },
+    {
+      key: '/dashboard/interviews',
+      icon: <CalendarClock size={18} />,
+      label: <Link to="/dashboard/interviews">Interviews</Link>
+    },
+    {
+      key: 'assessments',
+      icon: <UserRound size={18} />,
+      label: 'Assessments',
+      children: [
+        {
+          key: '/dashboard/assessments',
+          label: <Link to="/dashboard/assessments">Assessments</Link>,
+        },
+        {
+          key: '/dashboard/assessments/assignments',
+          label: <Link to="/dashboard/assessments/assignments">Manage Assessment</Link>,
+        },
+      ],
+    },
+    {
+      key: '/dashboard/interviewers',
+      icon: <UserPlus size={20} />,
+      label: <Link to="/dashboard/interviewers">Interviewers</Link>
+    },
+    {
+      key: 'offers',
+      icon: <FileText size={20} />,
+      label: 'Offers',
+      children: [
+        {
+          key: '/dashboard/email-templates',
+          label: <Link to="/dashboard/email-templates">Manage Templates</Link>,
+        },
+        {
+          key: '/dashboard/offers',
+          label: <Link to="/dashboard/offers">Offer</Link>,
+        },
+      ],
+    },
+  ];
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Animated backdrop */}
-          <motion.div
-            className="fixed inset-0 bg-gray-600 z-20 md:hidden"
-            onClick={onClose}
-            aria-hidden="true"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.75 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          />
+    <Drawer
+      open={isOpen}
+      placement="left"
+      onClose={onClose}
+      closable={false}
+      width={280}
+      maskClosable={true}
+      style={{
+        position: 'absolute',
+        height: '100vh',
+        backgroundColor: '#1A365D',
 
-          {/* Animated sidebar */}
-          <motion.div
-            className="fixed inset-y-0 left-0 flex z-30 md:hidden"
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
-          >
-            <div className="relative flex-1 flex flex-col w-72 max-w-sm bg-white  shadow-lg">
-              {/* Close button */}
-              <div className="absolute top-0 right-0 p-1">
-                <Button
-                  variant="ghost"
-                  className="p-2"
-                  onClick={onClose}
-                  aria-label="Close menu"
-                >
-                  <X size={24} />
-                </Button>
-              </div>
+      }}
+    >
+      {/* Close Button */}
+      <div className="flex justify-end mb-4">
+        <Logo/>
+        <Button onClick={onClose} type="text">
+          <X size={20} />
+        </Button>
+      </div>
 
-              {/* Sidebar Content */}
-              <div className="flex-1 overflow-y-auto pt-12">
-                <Sidebar isMobile />
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+      {/* Sidebar Links */}
+      <div className="flex flex-col gap-2">
+        <Menu mode="inline" items={links} theme="dark" style={{
+          backgroundColor: '#1A365D',
+        }} />
+      </div>
+    </Drawer>
   );
 };
 

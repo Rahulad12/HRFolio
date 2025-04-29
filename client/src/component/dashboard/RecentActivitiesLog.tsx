@@ -12,7 +12,7 @@ import { useGetActivityLogsQuery } from '../../services/activityLogs';
 import { makeCapitilized } from '../../utils/TextAlter';
 import dayjs from 'dayjs';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const RecentActivityLog: React.FC = () => {
     const { data: activityLog, isLoading: logsLoading } = useGetActivityLogsQuery();

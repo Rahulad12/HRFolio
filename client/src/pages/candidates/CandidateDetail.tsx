@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Steps, notification, Row, Space, Col, Card, Button, Typography, Select, Descriptions } from 'antd';
+import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../../services/candidateServiceApi';
 import { candidateFormData } from '../../types/index';
@@ -12,7 +12,7 @@ import { storeCandidate } from '../../action/StoreCandidate';
 import CandidateProfile from '../../component/candidate/CandidateProfile';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
-import { ArrowLeft, Clock, ExternalLink, FileText, Mail, Phone, User } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import Predefineddata from '../../data/PredefinedData';
 
 const CandidateDetails = () => {
@@ -64,26 +64,26 @@ const CandidateDetails = () => {
   ] as const;
 
   type CandidateStatusFlow = typeof StatusFlow[number];
-  // const canMoveToNextStatus = (currentStatus: CandidateStatusFlow, nextStatus: CandidateStatusFlow) => {
-  //   if (nextStatus === 'rejected') return true; // special case: rejection allowed anytime
+  const canMoveToNextStatus = (currentStatus: CandidateStatusFlow, nextStatus: CandidateStatusFlow) => {
+    if (nextStatus === 'rejected') return true; // special case: rejection allowed anytime
 
-  //   const currentIndex = StatusFlow.indexOf(currentStatus);
-  //   const nextIndex = StatusFlow.indexOf(nextStatus);
+    const currentIndex = StatusFlow.indexOf(currentStatus);
+    const nextIndex = StatusFlow.indexOf(nextStatus);
 
-  //   if (currentIndex === -1 || nextIndex === -1) return false;
+    if (currentIndex === -1 || nextIndex === -1) return false;
 
-  //   return nextIndex === currentIndex + 1; // Only next step allowed
-  // };
+    return nextIndex === currentIndex + 1; // Only next step allowed
+  };
 
   const updateStatus = async (newStatus: candidateStatus) => {
-    // if (!canMoveToNextStatus(candidate.status as CandidateStatusFlow, newStatus as CandidateStatusFlow)) {
-    //   api.error({
-    //     message: "You cannot skip steps! Complete the current stage first.",
-    //     placement: "topRight",
-    //     duration: 3000,
-    //   });
-    //   return;
-    // }
+    if (!canMoveToNextStatus(candidate.status as CandidateStatusFlow, newStatus as CandidateStatusFlow)) {
+      api.error({
+        message: "You cannot skip steps! Complete the current stage first.",
+        placement: "topRight",
+        duration: 3000,
+      });
+      return;
+    }
     setCandidate({ ...candidate, status: newStatus });
 
     try {

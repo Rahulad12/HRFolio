@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAppSelector } from '../../Hooks/hook';
 import { Clock, CheckCircle, AlertCircle, XCircle, Star } from 'lucide-react';
-import { Card, Tabs, Badge, Spin, Empty, Skeleton } from 'antd';
+import { Card, Tabs, Empty, Skeleton } from 'antd';
 import { interviewLogData } from '../../types';
 import { useGetInterviewLogByCanidateIdQuery } from '../../services/interviewServiceApi';
 import dayjs from 'dayjs';

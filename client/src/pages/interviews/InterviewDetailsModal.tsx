@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 import { interviewData } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { makeCapitilized } from '../../utils/TextAlter';
-import { useGetInterviewLogByCanidateIdQuery } from '../../services/interviewServiceApi';
 
 const { TextArea } = Input;
 const { Title } = Typography;

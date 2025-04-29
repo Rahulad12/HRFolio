@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { interviewData, interviewResponse, interviewResponseById, interviewerData, interviewerResponse, interviewerResponseId, interviewLogData, interviewLogResponse, interviewLogResponseById } from "../types";
+import { interviewData, interviewResponse, interviewResponseById, interviewerData, interviewerResponse, interviewerResponseId, interviewLogResponse, interviewLogResponseById } from "../types";
 import { INTERVIEW_URL, INTERVIEWER_URL } from "../constant";
 import type { Dayjs } from "dayjs";
 

@@ -54,8 +54,8 @@ const InterviewSchedule: React.FC = () => {
   const onFinish = async (values: interviewData) => {
     const payload = {
       ...values,
-      date: dayjs(values.date).format('YYYY-MM-DD'),
-      time: dayjs(values.time).format('h:mm A'),
+      date:  dayjs(values.date),
+      time: values.time,
       status: 'scheduled' as interviewStatus
 
     };

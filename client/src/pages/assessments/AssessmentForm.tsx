@@ -88,120 +88,90 @@ const AssessmentForm: React.FC = () => {
         >
           <Row gutter={24}>
             <Col xs={24} md={12}>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
+
+              <Form.Item
+                name="title"
+                label="Assessment"
+                rules={[{ required: true, message: "Assessment Name is Required" }]}
               >
-                <Form.Item
-                  name="title"
-                  label="Assessment"
-                  rules={[{ required: true, message: "Assessment Name is Required" }]}
-                >
-                  <Input size='large' placeholder='Assessment' />
-                </Form.Item>
-              </motion.div>
+                <Input size='large' placeholder='Assessment' />
+              </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
+
+              <Form.Item
+                name="type"
+                label="Type"
+                rules={[{ required: true, message: "Type is Required" }]}
               >
-                <Form.Item
-                  name="type"
-                  label="Type"
-                  rules={[{ required: true, message: "Type is Required" }]}
-                >
-                  <Select size='large' placeholder='Select Type' allowClear>
-                    {
-                      Predefineddata.Type?.map((type) => (
-                        <Select.Option value={type.value} key={type.key}>{type.label} </Select.Option>
-                      ))
-                    }
-                  </Select>
-                </Form.Item>
-              </motion.div>
+                <Select size='large' placeholder='Select Type' allowClear>
+                  {
+                    Predefineddata.Type?.map((type) => (
+                      <Select.Option value={type.value} key={type.key}>{type.label} </Select.Option>
+                    ))
+                  }
+                </Select>
+              </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
+
+              <Form.Item
+                name="technology"
+                label="Technology"
+                rules={[{ required: true, message: "Technology is Required" }]}
               >
-                <Form.Item
-                  name="technology"
-                  label="Technology"
-                  rules={[{ required: true, message: "Technology is Required" }]}
-                >
-                  <Select size='large' placeholder='Select Technology' allowClear>
-                    {
-                      Predefineddata.Technology?.map((tech) => (
-                        <Select.Option value={tech.value} key={tech.key}>{tech.label}</Select.Option>
-                      ))
-                    }
-                  </Select>
-                </Form.Item>
-              </motion.div>
+                <Select size='large' placeholder='Select Technology' allowClear>
+                  {
+                    Predefineddata.Technology?.map((tech) => (
+                      <Select.Option value={tech.value} key={tech.key}>{tech.label}</Select.Option>
+                    ))
+                  }
+                </Select>
+              </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
+
+              <Form.Item
+                name="level"
+                label="Level"
+                rules={[{ required: true, message: "Level is Required" }]}
               >
-                <Form.Item
-                  name="level"
-                  label="Level"
-                  rules={[{ required: true, message: "Level is Required" }]}
-                >
-                  <Select size='large' placeholder='Select Level' allowClear>
-                    {
-                      Predefineddata.Level?.map((level) => (
-                        <Select.Option value={level.value} key={level.key}>{level.label}</Select.Option>
-                      ))
-                    }
-                  </Select>
-                </Form.Item>
-              </motion.div>
+                <Select size='large' placeholder='Select Level' allowClear>
+                  {
+                    Predefineddata.Level?.map((level) => (
+                      <Select.Option value={level.value} key={level.key}>{level.label}</Select.Option>
+                    ))
+                  }
+                </Select>
+              </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
+
+              <Form.Item
+                name="assessmentLink"
+                label="Assessment Link"
+                rules={[
+                  { required: true, message: 'Please enter Google Form URL' },
+                  { type: 'url', message: 'Please enter a valid URL' }
+                ]}
               >
-                <Form.Item
-                  name="assessmentLink"
-                  label="Assessment Link"
-                  rules={[
-                    { required: true, message: 'Please enter Google Form URL' },
-                    { type: 'url', message: 'Please enter a valid URL' }
-                  ]}
-                >
-                  <Input placeholder="https://docs.google.com/forms/..." />
-                </Form.Item>
-              </motion.div>
+                <Input placeholder="https://docs.google.com/forms/..." />
+              </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
+
+              <Form.Item
+                name="duration"
+                label="Duration"
+                initialValue={60}
+                rules={[{ required: true, message: "Level is Required" }]}
               >
-                <Form.Item
-                  name="duration"
-                  label="Duration"
-                  initialValue={60}
-                  rules={[{ required: true, message: "Level is Required" }]}
-                >
-                  <InputNumber size='large' placeholder='Duration' className="w-full" />
-                </Form.Item>
-              </motion.div>
+                <InputNumber size='large' placeholder='Duration' className="w-full" />
+              </Form.Item>
             </Col>
           </Row>
           <Form.Item>

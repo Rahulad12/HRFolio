@@ -243,7 +243,7 @@ const InterviewListView = ({
                                     <div className="flex items-center">
                                         <Clock size={14} className="mr-1 text-gray-500" />
                                         <Text type="secondary">
-                                            {interview?.time} ({60} min)
+                                            {dayjs(interview?.time).format('h:mm A')} ({60} min)
                                         </Text>
                                     </div>
                                     <div className="flex items-center">

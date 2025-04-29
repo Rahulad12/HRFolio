@@ -70,7 +70,7 @@ export const Sidebar = () => {
   return (
     <Sider
       breakpoint='lg'
-      width={250}
+      width={200}
       collapsible
       collapsed={collapse}
       onCollapse={() => diapatch(toggleSideBarCollapsed())}

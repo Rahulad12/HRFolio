@@ -84,7 +84,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
                       With: {interview?.interviewer?.name}
                     </span>
                     <span className="text-xs font-medium text-blue-600">
-                      {interview?.time}
+                      {dayjs(interview?.time).format('hh:mm A')}
                     </span>
                   </div>
                 </div>

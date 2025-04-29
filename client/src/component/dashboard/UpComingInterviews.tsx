@@ -3,7 +3,7 @@ import { Calendar } from 'lucide-react';
 import { interviewData } from '../../types';
 import dayjs from 'dayjs';
 import { makeCapitilized } from '../../utils/TextAlter';
-import { Button, Card, Pagination, Row, Tag } from 'antd';
+import { Button, Card, Pagination, Row, Tag, Typography } from 'antd';
 
 interface UpcomingInterviewsProps {
   interviews: interviewData[];
@@ -25,8 +25,18 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
     setCurrentPage(page);
   };
 
-  const paginatedInterviews = interviews.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const filterInterview = interviews.filter((interview) => {
+    const afterDate = dayjs(interview.date).isAfter(dayjs());
+    const scheduled = interview.status === 'scheduled';
+    return afterDate && scheduled;
+  })
 
+
+
+  const paginatedInterviews = filterInterview?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  console.log('All interviews:', interviews);
+  console.log('Filtered interviews:', filterInterview);
+  console.log('Paginated interviews:', paginatedInterviews);
   return (
     <Card
       title="Upcoming Interviews"
@@ -51,9 +61,9 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center">
-                    <h4 className="text-sm font-medium text-gray-900 capitalize">
+                    <Typography.Text className="capitalize">
                       {interview?.candidate?.name}
-                    </h4>
+                    </Typography.Text>
                     <span className="text-xs text-gray-500">
                       {dayjs(interview?.date).format('MMM DD, YYYY')}
                     </span>
@@ -84,7 +94,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
                       With: {interview?.interviewer?.name}
                     </span>
                     <span className="text-xs font-medium text-blue-600">
-                      {interview?.time}
+                      {dayjs(interview?.time).format('hh:mm A')}
                     </span>
                   </div>
                 </div>

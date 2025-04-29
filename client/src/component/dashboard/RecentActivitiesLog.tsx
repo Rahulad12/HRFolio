@@ -1,118 +1,92 @@
 import React from 'react';
-import { Card, List, Avatar, Button, Typography } from 'antd';
+import { Card, Timeline, Avatar, Typography, Spin, Empty } from 'antd';
 import {
     UserPlus,
-    UserCheck,
     CalendarClock,
     FileCheck,
     File,
     Check,
+    UserCheck,
 } from 'lucide-react';
+import { useGetActivityLogsQuery } from '../../services/activityLogs';
+import { makeCapitilized } from '../../utils/TextAlter';
+import dayjs from 'dayjs';
 
 const { Text } = Typography;
 
-interface Activity {
-    id: string;
-    type: 'new_candidate' | 'interview_scheduled' | 'assessment_completed' | 'offer_sent' | 'offer_accepted' | 'interview_completed';
-    description: string;
-    timestamp: string;
-}
-
 const RecentActivityLog: React.FC = () => {
-    const activities: Activity[] = [
-        {
-            id: '1',
-            type: 'offer_accepted',
-            description: 'John Doe accepted the Frontend Developer offer',
-            timestamp: '2 hours ago',
-        },
-        {
-            id: '2',
-            type: 'interview_completed',
-            description: 'Jane Smith completed second interview for Backend Developer',
-            timestamp: '5 hours ago',
-        },
-        {
-            id: '3',
-            type: 'assessment_completed',
-            description: 'Technical assessment completed by Mike Johnson',
-            timestamp: 'Yesterday',
-        },
-        {
-            id: '4',
-            type: 'new_candidate',
-            description: 'Sarah Williams applied for UX Designer position',
-            timestamp: '2 days ago',
-        },
-        {
-            id: '5',
-            type: 'offer_sent',
-            description: 'Offer sent to Tom Harris for Product Manager position',
-            timestamp: '3 days ago',
-        },
-    ];
+    const { data: activityLog, isLoading: logsLoading } = useGetActivityLogsQuery();
 
     const getIcon = (type: string) => {
+        const iconProps = { size: 16 };
         switch (type) {
-            case 'new_candidate':
-                return <UserPlus size={20} />;
-            case 'interview_scheduled':
-            case 'interview_completed':
-                return <CalendarClock size={20} />;
-            case 'assessment_completed':
-                return <FileCheck size={20} />;
-            case 'offer_sent':
-                return <File size={20} />;
-            case 'offer_accepted':
-                return <Check size={20} />;
-            default:
-                return <UserCheck size={20} />;
+            case 'new_candidate': return <UserPlus {...iconProps} />;
+            case 'interview_scheduled': return <CalendarClock {...iconProps} />;
+            case 'interview_completed': return <FileCheck {...iconProps} />;
+            case 'assessment_completed': return <File {...iconProps} />;
+            case 'offer_sent': return <Check {...iconProps} />;
+            case 'offer_accepted': return <UserCheck {...iconProps} />;
+            default: return <UserCheck {...iconProps} />;
         }
     };
 
-    const getIconBgColor = (type: string) => {
+    const getColor = (type: string) => {
         switch (type) {
-            case 'new_candidate':
-                return 'bg-blue-500';
-            case 'interview_scheduled':
-                return 'bg-purple-500';
-            case 'interview_completed':
-                return 'bg-indigo-500';
-            case 'assessment_completed':
-                return 'bg-orange-500';
-            case 'offer_sent':
-                return 'bg-yellow-500';
-            case 'offer_accepted':
-                return 'bg-green-500';
-            default:
-                return 'bg-gray-500';
+            case 'new_candidate': return 'blue';
+            case 'interview_scheduled': return 'purple';
+            case 'interview_completed': return 'green';
+            case 'assessment_completed': return 'orange';
+            case 'offer_sent': return 'gold';
+            case 'offer_accepted': return 'green';
+            default: return 'gray';
         }
     };
+
+    const sortedLog = [...(activityLog?.data || [])].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
     return (
         <Card
             title="Recent Activities"
-            extra={<Button type="link">View All</Button>}
-            className="h-full"
+            bodyStyle={{ padding: 16 }}
         >
-            <List
-                itemLayout="horizontal"
-                dataSource={activities}
-                renderItem={(item) => (
-                    <List.Item>
-                        <List.Item.Meta
-                            avatar={
+            {logsLoading ? (
+                <div className="flex justify-center items-center h-32">
+                    <Spin size="large" />
+                </div>
+            ) : sortedLog.length === 0 ? (
+                <Empty description="No recent activities" />
+            ) : (
+                <Timeline>
+                    {sortedLog.map((item, index) => (
+                        <Timeline.Item
+                            key={index}
+                            color={getColor(item?.action)}
+                            dot={
                                 <Avatar
-                                    icon={getIcon(item.type)}
-                                    className={`${getIconBgColor(item.type)} text-white flex items-center justify-center`}
-                                />
+                                    size={28}
+                                    className="bg-white shadow-sm text-black flex items-center justify-center"
+                                >
+                                    {getIcon(item?.action)}
+                                </Avatar>
                             }
-                            title={item.description}
-                            description={<Text type="secondary">{item.timestamp}</Text>}
-                        />
-                    </List.Item>
-                )}
-            />
+                        >
+                            <div className="flex flex-col gap-1">
+                                <Text strong className="text-md">
+                                    {item?.metaData?.candidate || 'Unknown Candidate'}
+                                </Text>
+                                <Text type="secondary">
+                                    {makeCapitilized(item?.entityType)} was <b>{item?.action.replace('_', ' ')}</b>
+                                </Text>
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                    {dayjs(item?.createdAt).format('DD MMM YYYY, hh:mm A')}
+                                </Text>
+                            </div>
+                        </Timeline.Item>
+                    ))}
+                </Timeline>
+            )}
         </Card>
     );
 };

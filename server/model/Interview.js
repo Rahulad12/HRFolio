@@ -11,11 +11,11 @@ const interviewSchema = new mongoose.Schema({
         ref: "interviewers"
     },
     date: {
-        type: String,
+        type: Date,
         required: true
     },
     time: {
-        type: String,
+        type: Date,
         required: true
     },
     status: {
@@ -27,6 +27,12 @@ const interviewSchema = new mongoose.Schema({
         type: String,
         enum: ["in-person", "phone", "video"],
         default: "in-person",
+        required: true
+    },
+    candidateStatus: {
+        type: String,
+        enum: ["First", "Second", "Third"],
+        default: "First",
         required: true
     },
     notes: {
@@ -55,7 +61,7 @@ const interviewSchema = new mongoose.Schema({
 //     next();
 // });
 
-const Interview = mongoose.model("interview", interviewSchema);
+const Interview = mongoose.model("interviews", interviewSchema);
 
 
 export default Interview;

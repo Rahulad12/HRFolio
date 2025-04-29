@@ -2,7 +2,6 @@ import React from 'react';
 import { Users, Calendar, FileCheck, FileText } from 'lucide-react';
 import MetricsCard from '../component/dashboard/MetricsCard';
 import CandidateByStatus from '../component/dashboard/CandidateByStatus';
-import RecentActivity from '../component/dashboard/RecentActivity';
 import UpcomingInterviews from '../component/dashboard/UpComingInterviews';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,6 +11,7 @@ import { useInterview } from '../action/StoreInterview';
 import dayjs from 'dayjs';
 import { Col, Row, Space, Typography } from 'antd';
 import RecentActivityLog from '../component/dashboard/RecentActivitiesLog';
+import ListOfCandidatesWithStatus from '../component/dashboard/ListOfCandidatesWithStatus';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -41,40 +41,6 @@ export const Dashboard: React.FC = () => {
     { id: '6', name: 'Rejected', count: rejected.length, color: '#EF4444' },
   ];
 
-  const recentActivities = [
-    {
-      id: '1',
-      type: 'interview' as const,
-      title: 'Interview with Michael Chen',
-      description: 'Technical interview for Data Scientist position',
-      date: 'Today',
-      time: '10:30 AM',
-    },
-    {
-      id: '2',
-      type: 'assessment' as const,
-      title: 'Frontend Coding Challenge',
-      description: 'John Doe completed the assessment',
-      date: 'Yesterday',
-      time: '4:45 PM',
-    },
-    {
-      id: '3',
-      type: 'offer' as const,
-      title: 'Offer Extended',
-      description: 'Offer letter sent to Emily Davis for Product Manager',
-      date: 'May 5, 2025',
-      time: '2:15 PM',
-    },
-    {
-      id: '4',
-      type: 'candidate' as const,
-      title: 'New Application',
-      description: 'Robert Johnson applied for Backend Developer',
-      date: 'May 4, 2025',
-      time: '9:30 AM',
-    },
-  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -170,6 +136,9 @@ export const Dashboard: React.FC = () => {
       {/* Main Section */}
       <Row gutter={[24, 24]}>
         {/* Left Side */}
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <ListOfCandidatesWithStatus />
+        </Space>
         <Col xs={24} lg={16}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <motion.div
@@ -198,7 +167,7 @@ export const Dashboard: React.FC = () => {
         </Col>
 
         {/* Bottom Full Width */}
-        <Col xs={24} lg={16}>
+        {/* <Col xs={24} lg={16}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -206,7 +175,7 @@ export const Dashboard: React.FC = () => {
           >
             <RecentActivity activities={recentActivities} />
           </motion.div>
-        </Col>
+        </Col> */}
 
         <Col xs={24} lg={8}>
           <motion.div

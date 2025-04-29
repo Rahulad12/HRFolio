@@ -3,7 +3,6 @@ import Protected from "./Protected.tsx";
 import Public from "./Public.tsx";
 import Layout from "../component/layout/Layout.tsx";
 const MainRoutes = () => {
-
     return (
         <BrowserRouter>
             <Routes>

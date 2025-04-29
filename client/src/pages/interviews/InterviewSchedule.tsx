@@ -54,8 +54,8 @@ const InterviewSchedule: React.FC = () => {
   const onFinish = async (values: interviewData) => {
     const payload = {
       ...values,
-      date: dayjs(values.date).format('YYYY-MM-DD'),
-      time: dayjs(values.time).format('h:mm A'),
+      date: dayjs(values.date),
+      time: values.time,
       status: 'scheduled' as interviewStatus
 
     };
@@ -99,8 +99,8 @@ const InterviewSchedule: React.FC = () => {
               name="candidate"
               rules={[{ required: true, message: 'Candidate is required' }]}
             >
-              <Select placeholder="Select Candidate">
-                {candidates?.data?.map((c) => (
+              <Select placeholder="Select Candidate"showSearch>
+                {candidates?.data?.filter((c) => c?.status === 'first')?.map((c) => (
                   <Option key={c._id} value={c._id}>
                     {makeCapitilized(c.name)} - {makeCapitilized(c.technology)} ({makeCapitilized(c.level)})
                   </Option>

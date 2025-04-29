@@ -1,11 +1,10 @@
 import { api } from "./api";
-import { interviewData, interviewResponse, interviewResponseById, interviewerData, interviewerResponse, interviewerResponseId } from "../types";
+import { interviewData, interviewResponse, interviewResponseById, interviewerData, interviewerResponse, interviewerResponseId, interviewLogResponse, interviewLogResponseById } from "../types";
 import { INTERVIEW_URL, INTERVIEWER_URL } from "../constant";
 import type { Dayjs } from "dayjs";
 
 export const interviewServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
-
         createInterview: builder.mutation<interviewResponse, interviewData>({
             query: (data: interviewData) => ({
                 url: `${INTERVIEW_URL}`,
@@ -102,8 +101,24 @@ export const interviewServiceApi = api.injectEndpoints({
                 method: "DELETE",
             }),
             invalidatesTags: ["Interview"],
+        }),
+        getinterviewLog: builder.query<interviewLogResponse, void>({
+            query: () => ({
+                url: `${INTERVIEW_URL}/log`,
+                method: "GET",
+            }),
+            providesTags: ["InterviewLog", "Interview"],
+        }),
+
+        getInterviewLogByCanidateId: builder.query<interviewLogResponseById, string>({
+            query: (id) => ({
+                url: `${INTERVIEW_URL}/log/candidate/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["InterviewLog", "Interview"],
         })
     })
 })
 
-export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation, useGetInterviewByCandidateIdQuery, useCreateInterviewerMutation, useGetInterviewerByIdQuery, useUpdateInterviewerMutation, useDeleteInterviewerMutation, useDeleteInterviewMutation } = interviewServiceApi
+export const { useCreateInterviewMutation, useGetInterviewQuery, useGetInterviewByIdQuery, useGetInterviewerQuery, useUpdateInterviewMutation, useGetInterviewByCandidateIdQuery, useCreateInterviewerMutation, useGetInterviewerByIdQuery, useUpdateInterviewerMutation, useDeleteInterviewerMutation, useDeleteInterviewMutation, useGetinterviewLogQuery,
+    useGetInterviewLogByCanidateIdQuery } = interviewServiceApi

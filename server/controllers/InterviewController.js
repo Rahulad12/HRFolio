@@ -1,10 +1,26 @@
+import ActivityLog from "../model/ActivityLogs.js";
+import Candidate from "../model/Candidate.js";
 import Interview from "../model/Interview.js";
-import Interviewers from "../model/Interviewers.js";
+import InterviewLog from "../model/interviewLog.js";
+import dayjs from "dayjs";
 
 const createInterview = async (req, res) => {
     const { candidate, interviewer, date, time, type, notes, status } = req.body;
+    // console.log(req.body)
+    // console.log(dayjs(date).isBefore(dayjs()))
+    // console.log(dayjs(time).isBefore(dayjs()))
+    // console.log(dayjs(` ${date} ${time}`).isBefore(dayjs()))
+    // console.log(dayjs().format('YYYY-MM-DD'))
+    // console.log(dayjs(date).format('h:mm A'))
+    // console.log(dayjs(time).format('h:mm A'))
+    if (!candidate || !interviewer || !date || !time || !type || !status) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
     try {
-        const existingInterview = await Interview.findOne({ candidate, date });
+        if (dayjs(` ${date} ${time}`).isBefore(dayjs())) {
+            return res.status(400).json({ success: false, message: "Cannot schedule interview in the past" });
+        }
+        const existingInterview = await Interview.findOne({ candidate, date, time }).lean();
 
         if (existingInterview && existingInterview.status === "scheduled") {
             return res.status(400).json({ success: false, message: "Interview already send on this date for this candidate" });
@@ -19,6 +35,31 @@ const createInterview = async (req, res) => {
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not created" });
         }
+        const exstingCandidate = await Candidate.findById(interview.candidate);
+
+        //log the creation
+        await InterviewLog.create({
+            interviewId: interview._id,
+            candidate,
+            interviewer,
+            action: 'created',
+            details: {
+                date, time, type, notes, status,
+            },
+            performedBy: req.user.id // optional
+        });
+
+        //log the activity
+        await ActivityLog.create({
+            userID: req.user.id,
+            action: 'created',
+            entityType: 'interviews',
+            relatedId: interview._id,
+            metaData: {
+                candidate: exstingCandidate?.name,
+                feedback: interview.feedback,
+            },
+        })
 
         return res.status(201).json({
             success: true,
@@ -26,7 +67,7 @@ const createInterview = async (req, res) => {
             data: interview
         });
     } catch (error) {
-        console.log("get interview error", error);
+        console.error("Create interview error:", error);
         return res.status(500).json({ message: error.message });
     }
 };
@@ -114,14 +155,35 @@ const getAllInterviewsByCandidate = async (req, res) => {
 
 const updateInterview = async (req, res) => {
     try {
-        const updateInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updateInterview) {
+        const updatedInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedInterview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
+        await InterviewLog.create({
+            interviewId: updatedInterview._id,
+            candidate: updatedInterview.candidate,
+            interviewer: updatedInterview.interviewer,
+            action: 'updated',
+            details: {
+                date: updatedInterview.date, time: updatedInterview.time, type: updatedInterview.type, notes: updatedInterview.notes, status: updatedInterview.status,
+                feedback: updatedInterview.feedback, rating: updatedInterview.rating
+            },
+            performedBy: req.user.id
+        });
+        await ActivityLog.create({
+            userID: req.user.id,
+            action: 'updated',
+            entityType: 'interviews',
+            relatedId: updatedInterview._id,
+            metaData: {
+                candidate: updatedInterview.candidate.name,
+                feedback: updatedInterview.feedback,
+            },
+        })
         return res.status(200).json({
             success: true,
             message: "Interview updated successfully",
-            data: updateInterview
+            data: updatedInterview
         });
 
     } catch (error) {
@@ -144,5 +206,60 @@ const deleteInterview = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-export { createInterview, getAllInterviews, updateInterview, getInterviewById, getAllInterviewsByCandidate, deleteInterview };
+const getInterviewLog = async (req, res) => {
+    console.log("get interview log");
+    try {
+        const interviewLog = await InterviewLog.find({}).populate
+            ({
+                path: 'candidate',
+                select: '-createdAt -updatedAt -__v'
+            }).populate({
+                path: 'interviewer',
+                select: '-createdAt -updatedAt -__v'
+            }).populate({
+                path: "interviewId",
+                select: '-createdAt -updatedAt -__v'
+            }).select(' -__v');
+        if (!interviewLog) {
+            return res.status(404).json({ success: false, message: "Interview log not found" });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Interview log fetched successfully",
+            data: interviewLog
+        });
+    } catch (error) {
+        console.log("get interview log error", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+const getInterviewLogByCandidate = async (req, res) => {
+    try {
+        const interviewLog = await InterviewLog.find({ candidate: req.params.id }).populate
+            ({
+                path: 'candidate',
+                select: '-createdAt -updatedAt -__v'
+            }).populate({
+                path: 'interviewId',
+                select: '-createdAt -updatedAt -__v'
+            }).populate({
+                path: 'interviewer',
+                select: '-createdAt -updatedAt -__v'
+
+            }).select(' -__v');
+
+        if (!interviewLog) {
+            return res.status(404).json({ success: false, message: "Interview log not found" });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Interview log fetched successfully",
+            data: interviewLog
+        });
+    } catch (error) {
+        console.log("get interview log error", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+export { createInterview, getAllInterviews, updateInterview, getInterviewById, getAllInterviewsByCandidate, deleteInterview, getInterviewLog, getInterviewLogByCandidate };
 

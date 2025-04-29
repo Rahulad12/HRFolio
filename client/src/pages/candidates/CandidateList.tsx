@@ -21,12 +21,12 @@ import Predefineddata from '../../data/PredefinedData';
 
 const statusColors: Record<string, string> = {
   shortlisted: 'blue',
+  assessment: "geekblue",
   first: 'orange',
   second: 'purple',
-  third: 'yellow',
+  third: 'cyan',
+  offerd: "volcano",
   hired: 'green',
-  assessment: "gray",
-  offerd: "green",
   rejected: 'red',
 };
 

@@ -243,7 +243,7 @@ const InterviewListView = ({
                                     <div className="flex items-center">
                                         <Clock size={14} className="mr-1 text-gray-500" />
                                         <Text type="secondary">
-                                            {interview?.time} ({60} min)
+                                            {dayjs(interview?.time).format('h:mm A')} ({60} min)
                                         </Text>
                                     </div>
                                     <div className="flex items-center">
@@ -264,13 +264,13 @@ const InterviewListView = ({
                     {interview.feedback && (
                         <div className="mt-3">
                             <Divider plain>Feedback</Divider>
-                            <div className="p-3 bg-gray-50  rounded-lg">
+                            <Card className="p-3">
                                 <div className="flex justify-between">
                                     <Text strong>Interview Feedback</Text>
                                     {/* <Text>{interview.rating}/5</Text> */}
                                 </div>
                                 <Text type="secondary">{interview?.feedback}</Text>
-                            </div>
+                            </Card>
                         </div>
                     )}
                 </Card>

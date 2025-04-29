@@ -4,6 +4,7 @@ import Score from "../model/ScoreModle.js";
 import sendEmail from "../utils/sendEmail.js";
 import EmailTemplate from "../model/EmailTemplate.js";
 import Candidate from "../model/Candidate.js";
+import dayjs from "dayjs";
 
 const createAssessment = async (req, res) => {
     const { title, type, technology, level, duration, assessmentLink } = req.body
@@ -23,8 +24,19 @@ const createAssessment = async (req, res) => {
 
 const assignAssessment = async (req, res) => {
     let { candidate, assessment, dueDate, emailTemplate, status } = req.body;
-    console.log(candidate, assessment, dueDate, emailTemplate, status);
 
+    if (!candidate || !assessment || !dueDate || !emailTemplate || !status) {
+        return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+
+    if (!dayjs(dueDate, 'YYYY-MM-DD', true).isValid()) {
+        return res.status(400).json({ success: false, message: "Invalid due date format" });
+    }
+
+    if (dayjs(dueDate).isBefore(dayjs(), 'day')) {
+        return res.status(400).json({ success: false, message: "Due date cannot be in the past" });
+    }
     if (!Array.isArray(candidate)) {
         candidate = [candidate];
     }
@@ -36,10 +48,12 @@ const assignAssessment = async (req, res) => {
             dueDate,
         });
 
+        const duplicateCandidate = existingAssignment[0]?.candidate?.toString();
+
         if (existingAssignment.length > 0) {
             return res.status(400).json({
                 success: false,
-                message: `Candidate ${candidate.indexOf(existingAssignment[0].candidate)} already assigned to assessment on ${new Date(dueDate).toLocaleDateString()}`,
+                message: `Candidate with ID ${duplicateCandidate} is already assigned to the same assessment on ${dayjs(existingAssignment[0].dueDate).format('YYYY-MM-DD')}`,
             });
         }
 
@@ -52,9 +66,9 @@ const assignAssessment = async (req, res) => {
         if (!template) {
             return res.status(404).json({ success: false, message: 'Email template not found' });
         }
-
-        const assignments = await Promise.all(
-            candidate.map(async (candidateId) => {
+        const assignments = [];
+        for (const candidateId of candidate) {
+            try {
                 const createdAssignment = await AssessmentAssignment.create({
                     candidate: candidateId,
                     assessment,
@@ -63,8 +77,7 @@ const assignAssessment = async (req, res) => {
                     status,
                 });
 
-                // Send email after assignment
-                if (status === 'assigned') {
+                if (status === 'assigned' && process.env.NODE_ENV === 'production') {
                     const candidateInfo = await Candidate.findById(candidateId);
                     if (candidateInfo) {
                         const assessmentTime = new Date(createdAssignment.createdAt).toLocaleTimeString([], {
@@ -94,9 +107,13 @@ const assignAssessment = async (req, res) => {
                     }
                 }
 
-                return createdAssignment;
-            })
-        );
+                assignments.push(createdAssignment);
+
+            } catch (error) {
+                console.error('Assignment Error:', error);
+                return res.status(500).json({ success: false, message: error.message });
+            }
+        }
 
         return res.status(200).json({
             success: true,
@@ -108,9 +125,6 @@ const assignAssessment = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
-
-export default assignAssessment;
-
 
 const getAssessment = async (req, res) => {
     try {

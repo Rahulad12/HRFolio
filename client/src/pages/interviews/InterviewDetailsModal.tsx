@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
-import { Modal, Descriptions, Tag, Timeline, Button, Form, Input, Rate, Divider, Typography } from 'antd';
+import React from 'react';
+import { Modal, Descriptions, Tag, Timeline, Button, Form, Input, Rate, Divider, Typography, Popconfirm } from 'antd';
 import { Calendar, Clock, Users, Video, Phone, MapPin, FileText, } from 'lucide-react';
 import dayjs from 'dayjs';
 import { interviewData } from '../../types';
 import { useNavigate } from 'react-router-dom';
-import { useGetInterviewByIdQuery } from '../../services/interviewServiceApi';
 import { makeCapitilized } from '../../utils/TextAlter';
 
 const { TextArea } = Input;
@@ -28,13 +27,14 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
 
   const navigate = useNavigate();
   const [feedbackForm] = Form.useForm();
-  const [interviewData, setInterviewData] = React.useState<interviewData | null>(null);
-  const { data: interviewById } = useGetInterviewByIdQuery(interview?._id || '');
-  useEffect(() => {
-    if (interviewById?.success && interviewById?.data) {
-      setInterviewData(interviewById.data);
-    }
-  })
+  // const [interviewData, setInterviewData] = React.useState<interviewData | null>(null);
+  // const { data: interviewById } = useGetInterviewByIdQuery(interview?._id || '');
+ 
+  // useEffect(() => {
+  //   if (interviewById?.success && interviewById?.data) {
+  //     setInterviewData(interviewById.data);
+  //   }
+  // }, [interviewById]);
 
   const getInterviewTypeIcon = (type: string | undefined) => {
     switch (type) {
@@ -64,7 +64,7 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
 
   const handleFeedbackSubmit = () => {
     feedbackForm.validateFields().then(values => {
-      onFeedbackSubmit(interviewData?._id || '', values.feedback, values.rating);
+      onFeedbackSubmit(interview?._id || '', values.feedback, values.rating);
       feedbackForm.resetFields();
     });
   };
@@ -75,13 +75,13 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
         <div className="flex items-center justify-between gap-2">
           <div>
             <span className='flex  item-center justify-center'>
-              <Title className=" font-semibold m-0 capitalize" level={4}>{interviewData?.candidate?.name}</Title>
-              <Button className='ml-2' type='link' size='small' onClick={() => navigate(`/dashboard/candidates/${interviewData?.candidate?._id}`)}>View</Button>
+              <Title className=" font-semibold m-0 capitalize" level={4}>{interview?.candidate?.name}</Title>
+              <Button className='ml-2' type='link' size='small' onClick={() => navigate(`/dashboard/candidates/${interview?.candidate?._id}`)}>View</Button>
             </span>
-            <p className="text-sm text-gray-500 mt-1 capitalize">{interviewData?.candidate?.level}</p>
+            <p className="text-sm text-gray-500 mt-1 capitalize">{interview?.candidate?.level}</p>
           </div>
-          <Tag color={getStatusColor(interviewData?.status)} className="uppercase">
-            {interviewData?.status}
+          <Tag color={getStatusColor(interview?.status)} className="uppercase">
+            {interview?.status}
           </Tag>
         </div>
       }
@@ -96,63 +96,71 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
             label={<div className="flex items-center"><Calendar size={14} className="mr-2" />Date</div>}
             span={1}
           >
-            {dayjs(interviewData?.date).format('MMMM D, YYYY')}
+            {dayjs(interview?.date).format('MMMM D, YYYY')}
           </Descriptions.Item>
           <Descriptions.Item
             label={<div className="flex items-center"><Clock size={14} className="mr-2" />Time</div>}
             span={1}
           >
-            {(interviewData?.time)} ({60} minutes)
+            {(dayjs(interview?.time).format('h:mm A'))} ({60} minutes)
           </Descriptions.Item>
           <Descriptions.Item
             label={<div className="flex items-center"><Users size={14} className="mr-2" />Interviewers</div>}
             span={2}
           >
-            {interviewData?.interviewer?.name}
+            {interview?.interviewer?.name}
           </Descriptions.Item>
           <Descriptions.Item
-            label={<div className="flex items-center">{getInterviewTypeIcon(interviewData?.type)} Type</div>}
+            label={<div className="flex items-center">{getInterviewTypeIcon(interview?.type)} Type</div>}
             span={2}
           >
-            {makeCapitilized(interviewData?.type || '')} Interview
+            {makeCapitilized(interview?.type || '')} Interview
           </Descriptions.Item>
-          {interviewData?.notes && (
+          {interview?.notes && (
             <Descriptions.Item
               label={<div className="flex items-center"><FileText size={14} className="mr-2" />Notes</div>}
               span={2}
             >
-              {interviewData.notes}
+              {interview?.notes}
             </Descriptions.Item>
           )}
         </Descriptions>
 
-        {interviewData?.status === 'scheduled' && (
+        {interview?.status === 'scheduled' && (
           <div>
             <Divider>Update Status</Divider>
             <div className="flex gap-2 justify-center">
               <Button
                 type="primary"
-                onClick={() => onStatusUpdate(interviewData?._id, 'completed')}
+                style={{
+                  backgroundColor: '#1E8449',
+                }}
+                onClick={() => onStatusUpdate(interview?._id, 'completed')}
               >
                 Mark as Completed
               </Button>
+              <Popconfirm title="Are you sure to cancel this interview?" onConfirm={() => onStatusUpdate(interview?._id, 'cancelled')} okText="Yes" cancelText="No">
+                <Button
+                  type='primary'
+                  style={{
+                    backgroundColor: '#D68910',
+                  }}
+                >
+                  Cancel Interview
+                </Button>
+              </Popconfirm>
               <Button
                 danger
-                onClick={() => onStatusUpdate(interviewData?._id, 'cancelled')}
+                onClick={() => onStatusUpdate(interview?._id, 'failed')}
               >
-                Cancel Interview
-              </Button>
-              <Button
-                onClick={() => onStatusUpdate(interviewData?._id, 'scheduled')}
-              >
-                schedule
+                Failed
               </Button>
             </div>
           </div>
         )}
 
-        {interviewData?.status === 'completed' ? (
-          interviewData?.feedback ? (
+        {interview?.status === 'completed' ? (
+          interview?.feedback ? (
             <div>
               <Divider>Feedback</Divider>
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -160,7 +168,7 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
                   <h4 className="font-medium m-0">Interview Feedback</h4>
                   {/* <Rate disabled value={interview.rating} /> */}
                 </div>
-                <p className="text-gray-600 font-medium m-0">{interviewData?.feedback}</p>
+                <p className="text-gray-600 font-medium m-0">{interview?.feedback}</p>
               </div>
             </div>
           ) : (
@@ -200,29 +208,29 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
             <Timeline.Item color="green">
               Interview Scheduled
               <p className="text-sm text-gray-500">
-                {dayjs(interviewData?.createdAt).format('MMMM D, YYYY h:mm A')}
+                {dayjs(interview?.createdAt).format('MMMM D, YYYY h:mm A')}
               </p>
             </Timeline.Item>
-            {interviewData?.status !== 'scheduled' && (
+            {interview?.status !== 'scheduled' && (
               <Timeline.Item
                 color={
-                  interviewData?.status === 'completed' ? 'green' :
-                    interviewData?.status === 'cancelled' ? 'red' :
+                  interview?.status === 'completed' ? 'green' :
+                    interview?.status === 'cancelled' ? 'red' :
                       'blue'
                 }
               >
-                Interview {makeCapitilized(interviewData?.status || '')}
+                Interview {makeCapitilized(interview?.status || '')}
 
                 <p className="text-sm text-gray-500">
-                  {dayjs(interviewData?.updatedAt).format('MMMM D, YYYY h:mm A')}
+                  {dayjs(interview?.updatedAt).format('MMMM D, YYYY h:mm A')}
                 </p>
               </Timeline.Item>
             )}
-            {interviewData?.feedback && (
+            {interview?.feedback && (
               <Timeline.Item color="blue">
                 Feedback Added
                 <p className="text-sm text-gray-500">
-                  {dayjs(interviewData?.updatedAt).format('MMMM D, YYYY h:mm A')}
+                  {dayjs(interview?.updatedAt).format('MMMM D, YYYY h:mm A')}
                 </p>
               </Timeline.Item>
             )}

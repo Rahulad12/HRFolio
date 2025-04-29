@@ -53,7 +53,7 @@ export type referenceResponse = {
 
 }
 export type candidateStatus = 'shortlisted' | 'first' | 'second' | 'third' | 'assessment' | 'offered' | 'hired' | 'rejected';
-export type interviewStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled'
+export type interviewStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'failed';
 export type candidateData = {
     name: string;
     email: string;
@@ -87,8 +87,8 @@ export type interviewer = {
 export type interviewData = {
     candidate: candidateData;
     interviewer: interviewer;
-    date: string;
-    time: string;
+    date: Dayjs;
+    time: Dayjs;
     type: 'phone' | 'video' | 'in-person';
     feedback: string;
     rating: number;
@@ -103,12 +103,12 @@ export type interviewData = {
 export type interviewResponse = {
     success: boolean;
     message: string;
-    data: interviewData;
+    data: interviewData[];
 }
 export type interviewResponseById = {
     success: boolean;
     message: string;
-    data: interviewData;
+    data: interviewData[];
 }
 
 // export type interviewerResponse = {
@@ -321,4 +321,60 @@ export type offerLetterPostData = {
     salary: string
     startDate: string
     responseDeadline: string
+}
+
+//logs
+export type interviewLogData = {
+    _id: string;
+    interviewId: interviewData
+    candidate: candidateData;
+    interviewer: interviewerData;
+    action: string;
+    details: {
+        date: Dayjs;
+        time: Dayjs;
+        type: 'phone' | 'video' | 'in-person';
+        note: string;
+        status: interviewStatus;
+        rating: number;
+        feedback: string;
+    }
+    createdAt: string;
+    updatedAt: string;
+    performedBy: string;
+    performedAt: string;
+}
+
+export type interviewLogResponse = {
+    success: boolean;
+    message: string;
+    data: interviewLogData[];
+}
+
+export type interviewLogResponseById = {
+    success: boolean;
+    message: string;
+    data: interviewLogData[];
+}
+
+export type activityLog = {
+    _id: string;
+    userID: string;
+    action: string;
+    entityType: string;
+    relatedId: string;
+    metaData: {
+        candidate: string
+        interviewer: interviewerData;
+        assessment: assessmentFormData;
+        assignment: AssignmentDataResponse;
+        feedback: string;
+        rating: number
+    }
+    createdAt: string;
+    updatedAt: string
+}
+export type activityLogResponse = {
+    success: boolean;
+    data: activityLog[];
 }

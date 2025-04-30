@@ -94,6 +94,7 @@ export type interviewData = {
     rating: number;
     notes: string;
     status: interviewStatus;
+    candidateInterviewStatus: 'first' | 'second' | 'third';
     _id: string;
     __v: number;
     createdAt: string;
@@ -178,6 +179,7 @@ export type AssignmentDataResponse = {
     emailTemplate: string;
     createdAt: string;
     updatedAt: string
+    score: number
 }
 
 export type assignmentResponse = {
@@ -321,7 +323,9 @@ export type offerLetterPostData = {
     salary: string
     startDate: string
     responseDeadline: string
+    status: 'draft' | 'sent' | 'accepted' | 'rejected'
 }
+
 
 //logs
 export type interviewLogData = {
@@ -359,17 +363,19 @@ export type interviewLogResponseById = {
 
 export type activityLog = {
     _id: string;
+    candidate: candidateData;
     userID: string;
     action: string;
     entityType: string;
     relatedId: string;
     metaData: {
-        candidate: string
+        title: string
         interviewer: interviewerData;
         assessment: assessmentFormData;
         assignment: AssignmentDataResponse;
         feedback: string;
-        rating: number
+        rating: number;
+        status: string;
     }
     createdAt: string;
     updatedAt: string
@@ -377,4 +383,77 @@ export type activityLog = {
 export type activityLogResponse = {
     success: boolean;
     data: activityLog[];
+}
+export type AssessmentLogData = {
+    _id: string;
+    assessment: AssessmentDataResponse;
+    candidate: candidateData;
+    action: string;
+    details: {
+        dueDate: Dayjs;
+        status: interviewStatus;
+        score: number;
+        feedback: string;
+    }
+    createdAt: string;
+    updatedAt: string;
+    performedBy: string;
+    performedAt: string;
+}
+
+export type AssessmentLogResponse = {
+    success: boolean;
+    message: string;
+    data: AssessmentLogData[];
+}
+
+export type candidateLog = {
+    _id: string;
+    candidate: candidateData;
+    action: string;
+    createdAt: string;
+    updatedAt: string;
+    performedAt: string;
+}
+
+export type candidateLogResponse = {
+    success: boolean;
+    message: string;
+    data: candidateLog[];
+}
+
+export type offerLog = {
+    _id: string;
+    candidate: candidateData;
+    offer: offerLetter;
+    action: string;
+    details: {
+        status: 'draft' | 'sent' | 'accepted' | 'rejected';
+        salary: string;
+        joinedDate: string;
+        responseDeadline: string;
+    }
+    createdAt: string;
+    updatedAt: string;
+    performedAt: string;
+}
+
+export type offerLogResponse = {
+    success: boolean;
+    message: string;
+    data: offerLog[];
+}
+
+export type generalEmailFormData = {
+    emailAddress: string | undefined;
+    candidate: string | undefined;
+    subject: string;
+    body: string;
+    attachment: string;
+}
+
+export type generalEmailResponse = {
+    success: boolean;
+    message: string;
+    data: generalEmailFormData[]
 }

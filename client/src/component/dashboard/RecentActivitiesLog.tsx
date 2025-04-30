@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, Timeline, Avatar, Typography, Spin, Empty } from 'antd';
+import React, { useState } from 'react';
+import { Card, Avatar, Typography, Spin, Empty, Space, Pagination } from 'antd';
 import {
     UserPlus,
     CalendarClock,
@@ -17,14 +17,17 @@ const { Text } = Typography;
 const RecentActivityLog: React.FC = () => {
     const { data: activityLog, isLoading: logsLoading } = useGetActivityLogsQuery();
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 5; // Number of logs per page
+
     const getIcon = (type: string) => {
-        const iconProps = { size: 16 };
+        const iconProps = { size: 18 };
         switch (type) {
-            case 'new_candidate': return <UserPlus {...iconProps} />;
-            case 'interview_scheduled': return <CalendarClock {...iconProps} />;
+            case 'candidates': return <UserPlus {...iconProps} />;
+            case 'interviews': return <CalendarClock {...iconProps} />;
             case 'interview_completed': return <FileCheck {...iconProps} />;
-            case 'assessment_completed': return <File {...iconProps} />;
-            case 'offer_sent': return <Check {...iconProps} />;
+            case 'assessments': return <File {...iconProps} />;
+            case 'offers': return <Check {...iconProps} />;
             case 'offer_accepted': return <UserCheck {...iconProps} />;
             default: return <UserCheck {...iconProps} />;
         }
@@ -32,13 +35,11 @@ const RecentActivityLog: React.FC = () => {
 
     const getColor = (type: string) => {
         switch (type) {
-            case 'new_candidate': return 'blue';
-            case 'interview_scheduled': return 'purple';
-            case 'interview_completed': return 'green';
-            case 'assessment_completed': return 'orange';
-            case 'offer_sent': return 'gold';
-            case 'offer_accepted': return 'green';
-            default: return 'gray';
+            case 'candidates': return '#1890ff';
+            case 'interviews': return '#722ed1';
+            case 'assessments': return '#fa8c16';
+            case 'offers': return '#faad14';
+            default: return '#d9d9d9';
         }
     };
 
@@ -46,10 +47,25 @@ const RecentActivityLog: React.FC = () => {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+    const paginatedLog = sortedLog.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    );
+
     return (
         <Card
             title="Recent Activities"
-            bodyStyle={{ padding: 16 }}
+            extra={
+                sortedLog.length > pageSize && (
+                    <Pagination
+                        current={currentPage}
+                        onChange={(page) => setCurrentPage(page)}
+                        total={sortedLog.length}
+                        pageSize={pageSize}
+                        size="small"
+                    />
+                )
+            }
         >
             {logsLoading ? (
                 <div className="flex justify-center items-center h-32">
@@ -58,34 +74,35 @@ const RecentActivityLog: React.FC = () => {
             ) : sortedLog.length === 0 ? (
                 <Empty description="No recent activities" />
             ) : (
-                <Timeline>
-                    {sortedLog.map((item, index) => (
-                        <Timeline.Item
+                <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                    {paginatedLog.map((item, index) => (
+                        <Card
                             key={index}
-                            color={getColor(item?.action)}
-                            dot={
-                                <Avatar
-                                    size={28}
-                                    className="bg-white shadow-sm text-black flex items-center justify-center"
-                                >
-                                    {getIcon(item?.action)}
-                                </Avatar>
-                            }
+                            size="small"
+                            style={{ borderLeft: `4px solid ${getColor(item?.entityType)}` }}
                         >
-                            <div className="flex flex-col gap-1">
-                                <Text strong className="text-md">
-                                    {item?.metaData?.candidate || 'Unknown Candidate'}
-                                </Text>
-                                <Text type="secondary">
-                                    {makeCapitilized(item?.entityType)} was <b>{item?.action.replace('_', ' ')}</b>
-                                </Text>
-                                <Text type="secondary" style={{ fontSize: 12 }}>
-                                    {dayjs(item?.createdAt).format('DD MMM YYYY, hh:mm A')}
-                                </Text>
+                            <div className="flex items-start gap-3">
+                                <Avatar
+                                    size={32}
+                                    className="bg-white text-black flex items-center justify-center shadow-sm border"
+                                >
+                                    {getIcon(item?.entityType)}
+                                </Avatar>
+                                <div className="flex flex-col">
+                                    <Text strong className="text-md">
+                                        {item?.metaData?.title || 'Unknown Candidate'}
+                                    </Text>
+                                    <Text type="secondary">
+                                        {makeCapitilized(item?.entityType)} was <b>{item?.action.replace('_', ' ')}</b>
+                                    </Text>
+                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                        {dayjs(item?.createdAt).format('DD MMM YYYY, hh:mm A')}
+                                    </Text>
+                                </div>
                             </div>
-                        </Timeline.Item>
+                        </Card>
                     ))}
-                </Timeline>
+                </Space>
             )}
         </Card>
     );

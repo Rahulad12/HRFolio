@@ -5,6 +5,8 @@ import sendEmail from "../utils/sendEmail.js";
 import EmailTemplate from "../model/EmailTemplate.js";
 import Candidate from "../model/Candidate.js";
 import dayjs from "dayjs";
+import AssessmentLog from "../model/AssessmentLog.js";
+import ActivityLog from "../model/ActivityLogs.js";
 
 const createAssessment = async (req, res) => {
     const { title, type, technology, level, duration, assessmentLink } = req.body
@@ -13,7 +15,6 @@ const createAssessment = async (req, res) => {
         if (!createdAssessment) {
             return res.status(400).json({ success: false, message: "Assessment not created" });
         }
-
         return res.status(200).json({ success: true, message: "Assessment created successfully", data: createdAssessment });
 
     } catch (error) {
@@ -109,11 +110,39 @@ const assignAssessment = async (req, res) => {
 
                 assignments.push(createdAssignment);
 
+                const existingCanidate = await Candidate.findById(createdAssignment.candidate);
+                await AssessmentLog.create({
+                    assessment: createdAssignment.assessment,
+                    candidate: createdAssignment.candidate,
+                    action: 'created',
+                    details: { dueDate, status },
+                    performedAt: Date.now(),
+                    performedBy: req.user._id,
+                });
+
+                await ActivityLog.create({
+                    candidate: createdAssignment.candidate,
+                    userID: req.user._id,
+                    action: 'assigned',
+                    entityType: 'assessments',
+                    relatedId: createdAssignment.assessment,
+                    metaData: {
+                        title: existingCanidate?.name,
+                        dueDate: dueDate,
+                        status: status,
+                    },
+                })
+
             } catch (error) {
                 console.error('Assignment Error:', error);
                 return res.status(500).json({ success: false, message: error.message });
             }
         }
+
+        if (assignments.length === 0) {
+            return res.status(400).json({ success: false, message: "No assessment assigned" });
+        }
+
 
         return res.status(200).json({
             success: true,
@@ -180,6 +209,16 @@ const deleteAssignment = async (req, res) => {
         if (!assignment) {
             return res.status(404).json({ success: false, message: "Assignment not found" });
         }
+        await AssessmentLog.create({
+            assessment: assignment.assessment,
+            candidate: assignment.candidate,
+            action: 'deleted',
+            details: {
+                status: "deleted"
+            },
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        })
         return res.status(200).json({ success: true, message: "Assignment deleted successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -204,6 +243,34 @@ const updateAssignmnet = async (req, res) => {
         if (!assignment) {
             return res.status(400).json({ success: false, message: "Assignment not found" });
         }
+
+        await AssessmentLog.create({
+            assessment: assignment?.assessment,
+            candidate: assignment?.candidate,
+            action: 'updated',
+            details: {
+                status: assignment?.status,
+                dueDate: assignment?.dueDate
+            },
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        })
+        const existingCandidate = await Candidate.findById(assignment.candidate);
+
+
+        await ActivityLog.create({
+            candidate: assignment?.candidate,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'assessments',
+            relatedId: assignment?.assessment._id,
+            metadata: {
+                title: existingCandidate?.name,
+                dueDate: assignment?.dueDate,
+                status: assignment?.status,
+            }
+
+        })
         return res.status(200).json({ success: true, message: "Assignment updated successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -294,6 +361,29 @@ const createScore = async (req, res) => {
             await assignment.save();
         }
 
+        await AssessmentLog.create({
+            candidate,
+            assessment,
+            action: "updated",
+            details: {
+                score,
+                status: score >= 40 ? "Passed" : "Failed",
+                feedback: note
+            }
+        })
+
+        const existingCanidate = await Candidate.findById(candidate);
+        await ActivityLog.create({
+            candidate: candidate,
+            userID: req.user.id,
+            action: 'created',
+            entityType: 'scores',
+            relatedId: createdScore?._id,
+            metaData: {
+                title: existingCanidate?.name,
+                status: createdScore.status,
+            },
+        })
         return res.status(200).json({
             success: true,
             message: "Score created successfully",
@@ -339,4 +429,24 @@ const getScore = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-export { createAssessment, assignAssessment, getAssessment, getAssignment, deleteAssessment, deleteAssignment, updateAssessment, updateAssignmnet, getAssessmentById, getAssignmentById, createScore, getScoreById, getScore, getAssignmentByCandidateId };
+
+const getAssessmentLogByCandidateId = async (req, res) => {
+    try {
+        const assessmentLog = await AssessmentLog.find({ candidate: req.params.id }).sort({ createdAt: -1 }).select(" -__v").populate({
+            path: "candidate",
+            select: "-__v"
+        }).populate({
+            path: "assessment",
+            select: " -__v"
+        });
+        if (assessmentLog.length === 0) {
+            return res.status(404).json({ success: false, message: "No assessment log found" });
+        }
+        return res.status(200).json({ success: true, message: "Assessment log fetched successfully", data: assessmentLog });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+export { createAssessment, assignAssessment, getAssessment, getAssignment, deleteAssessment, deleteAssignment, updateAssessment, updateAssignmnet, getAssessmentById, getAssignmentById, createScore, getScoreById, getScore, getAssignmentByCandidateId, getAssessmentLogByCandidateId };

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { offerLetterResponse, offerLetterResponseById, offerLetterPostData } from "../types";
+import { offerLetterResponse, offerLetterResponseById, offerLetterPostData, offerLogResponse } from "../types";
 import { OFFER_URL } from "../constant";
 
 export const offerServiceApi = api.injectEndpoints({
@@ -42,8 +42,25 @@ export const offerServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ["OfferLetter"]
         }),
+        deleteOfferLetter: builder.mutation<offerLetterResponseById, string>({
+            query: (id) => ({
+                url: `${OFFER_URL}/${id}`,
+                method: "DELETE"
+            }),
+            invalidatesTags: ["OfferLetter"]
+        }),
+
+        getOfferLogsByCandidateId: builder.query<offerLogResponse, string>({
+            query: (id) => ({
+                url: `${OFFER_URL}/log/candidate/${id}`,
+                method: "GET"
+            }),
+            providesTags: ["OfferLetter"]
+        })
 
     })
 })
 
-export const { useCreateOfferLetterMutation, useGetOfferLetterQuery, useGetOfferByIdQuery, useGetOfferLetterByCandidatesIdQuery, useUpdateOfferLetterMutation } = offerServiceApi
+export const { useCreateOfferLetterMutation, useGetOfferLetterQuery, useGetOfferByIdQuery, useGetOfferLetterByCandidatesIdQuery, useUpdateOfferLetterMutation,
+    useGetOfferLogsByCandidateIdQuery, useDeleteOfferLetterMutation
+} = offerServiceApi

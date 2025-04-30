@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const activityLogSchema = new mongoose.Schema({
+    candidate: { type: mongoose.Schema.Types.ObjectId, ref: 'candidates' },
     userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     action: {
         type: String,

@@ -1,8 +1,9 @@
 import { Button, Card } from 'antd'
 import { Calendar, FileCheck, FileText, Mail } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 const CandidateQuickAction = () => {
     const navigate = useNavigate();
+    const { id } = useParams<string>();
     return (
         <Card title="Quick Actions" className="mb-6">
             <div className="space-y-3">
@@ -12,7 +13,7 @@ const CandidateQuickAction = () => {
                 <Button block icon={<FileCheck size={16} />} className="flex items-center justify-center" onClick={() => navigate('/dashboard/assessments/assign')}>
                     Assign Assessment
                 </Button>
-                <Button block icon={<Mail size={16} />} className="flex items-center justify-center">
+                <Button block icon={<Mail size={16} />} className="flex items-center justify-center" onClick={() => navigate(`/dashboard/candidates/email/${id}`)}>
                     Send Email
                 </Button>
                 <Button block icon={<FileText size={16} />} className="flex items-center justify-center" onClick={() => navigate('/dashboard/offers/new')}>

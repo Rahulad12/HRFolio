@@ -1,9 +1,10 @@
 import Candidate from "../model/Candidate.js";
+import CandidateLog from "../model/CandidateLogs.js";
 import EmailTemplate from "../model/EmailTemplate.js";
 import Offer from "../model/Offer.js";
 import Reference from "../model/Reference.js";
 import sendEmail from "../utils/sendEmail.js";
-
+import ActivityLog from "../model/ActivityLogs.js";
 const createCandidate = async (req, res) => {
     const {
         name, email, phone,
@@ -42,6 +43,24 @@ const createCandidate = async (req, res) => {
             savedCandidate.references = referenceDocs;
             await savedCandidate.save();
         }
+
+        await CandidateLog.create({
+            candidate: savedCandidate._id,
+            action: 'created',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        })
+
+        await ActivityLog.create({
+            candidate: savedCandidate._id,
+            userID: req.user._id,
+            action: 'created',
+            entityType: 'candidates',
+            relatedId: savedCandidate._id,
+            metaData: {
+                title: savedCandidate.name
+            }
+        })
 
         // Step 4: Respond
         return res.status(201).json({
@@ -146,6 +165,12 @@ const deleteCandidate = async (req, res) => {
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
+        await CandidateLog.create({
+            candidate: candidate._id,
+            action: 'deleted',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        })
         return res.status(200).json({ success: true, message: "Candidate deleted successfully" });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -183,6 +208,25 @@ const updateCandidate = async (req, res) => {
                 await sendEmail(candidateEmail, emailSubject, emailBody);
             }
         }
+
+        await CandidateLog.create({
+            candidate: candidate._id,
+            action: 'updated',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        })
+
+        await ActivityLog.create({
+            candidate: candidate._id,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'candidates',
+            relatedId: candidate._id,
+            metaData: {
+                title: candidate.name,
+            }
+        })
+
 
         return res.status(200).json({ success: true, message: "Candidate updated successfully", data: candidate });
 
@@ -238,5 +282,20 @@ const filterCandidate = async (req, res) => {
     }
 };
 
+const getCandidateLogsByCandidateId = async (req, res) => {
+    try {
+        const candidateLogs = await CandidateLog.find({ candidate: req.params.id }).sort({ createdAt: -1 }).select(' -__v').populate({
+            path:"candidate",
+            select: "-__v"
+        });
+        if (!candidateLogs) {
+            return res.status(404).json({ success: false, message: "Candidate logs not found" });
+        }
+        return res.status(200).json({ success: true, message: "Candidate logs fetched successfully", data: candidateLogs });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
 
-export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, filterCandidate, updateCandidate };
+export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, filterCandidate, updateCandidate, getCandidateLogsByCandidateId };

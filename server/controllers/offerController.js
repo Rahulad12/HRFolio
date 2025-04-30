@@ -1,7 +1,9 @@
 import Candidate from "../model/Candidate.js";
 import EmailTemplate from "../model/EmailTemplate.js";
 import Offer from "../model/Offer.js";
+import OfferLog from "../model/offerLogs.js";
 import sendEmail from "../utils/sendEmail.js";
+import ActivityLog from "../model/ActivityLogs.js";
 
 const createOffer = async (req, res) => {
     const { candidate, email, position, salary, startDate, responseDeadline, status } = req.body;
@@ -30,8 +32,8 @@ const createOffer = async (req, res) => {
             status,
         });
 
+        const candidateInfo = await Candidate.findById(candidate);
         if (newOffer.status === 'sent') {
-            const candidateInfo = await Candidate.findById(candidate);
             const emailTemplate = await EmailTemplate.findById(email);
 
             if (candidateInfo && emailTemplate) {
@@ -51,6 +53,32 @@ const createOffer = async (req, res) => {
                 });
             }
         }
+
+        //logs of offer
+        await OfferLog.create({
+            candidate: candidate,
+            offer: newOffer?._id,
+            action: 'created',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+            details: {
+                status: newOffer?.status,
+                salary: newOffer?.salary,
+                joinedDate: newOffer?.startDate,
+                responseDeadline: newOffer?.responseDeadline
+            }
+        })
+        await ActivityLog.create({
+            candidate: candidate,
+            userID: req.user._id,
+            action: 'created',
+            entityType: 'offers',
+            relatedId: newOffer?._id,
+            metaData: {
+                title: candidateInfo?.name,
+                status: newOffer?.status,
+            }
+        })
 
         return res.status(201).json({
             success: true,
@@ -115,6 +143,34 @@ const updateOffer = async (req, res) => {
         if (!offer) {
             return res.status(404).json({ success: false, message: "Offer not found" });
         }
+
+        //logs of offer
+        await OfferLog.create({
+            candidate: offer?.candidate,
+            offer: offer?._id,
+            action: 'updated',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+            details: {
+                status: offer?.status,
+                salary: offer?.salary,
+                joinedDate: offer?.startDate,
+                responseDeadline: offer?.responseDeadline
+            }
+        })
+
+        const candidateInfo = await Candidate.findById(offer?.candidate);
+        await ActivityLog.create({
+            candidate: offer?.candidate,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'offers',
+            relatedId: offer?._id,
+            metaData: {
+                title: candidateInfo?.name,
+                status: offer?.status
+            }
+        })
         return res.status(200).json({ success: true, message: "Offer updated successfully", data: offer });
     } catch (error) {
         console.log(error);
@@ -122,5 +178,52 @@ const updateOffer = async (req, res) => {
     }
 }
 
-export { createOffer, getOffer, getOfferByCandidates, getOfferById, updateOffer }
+const delteOffer = async (req, res) => {
+    try {
+        const offer = await Offer.findByIdAndDelete(req.params.id);
+        if (!offer) {
+            return res.status(404).json({ success: false, message: "Offer not found" });
+        }
+
+        //offer logs
+        await OfferLog.create({
+            candidate: offer?.candidate,
+            offer: offer?._id,
+            action: 'deleted',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+            details: {
+                status: offer?.status,
+                salary: offer?.salary,
+                joinedDate: offer?.startDate,
+                responseDeadline: offer?.responseDeadline
+            }
+        })
+
+        return res.status(200).json({ success: true, message: "Offer deleted successfully", data: offer });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+const getOfferLogsByCandidate = async (req, res) => {
+    try {
+        const offerLogs = await OfferLog.find({ candidate: req.params.id }).sort({ createdAt: -1 }).select(' -__v').populate({
+            path: 'candidate',
+            select: '-__v'
+        }).populate({
+            path: 'offer',
+            select: '-__v'
+        });
+        if (!offerLogs) {
+            return res.status(404).json({ success: false, message: "Offer logs not found" });
+        }
+        return res.status(200).json({ success: true, message: "Offer logs fetched successfully", data: offerLogs });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+export { createOffer, getOffer, getOfferByCandidates, getOfferById, updateOffer, delteOffer, getOfferLogsByCandidate }
 

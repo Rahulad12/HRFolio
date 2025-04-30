@@ -14,7 +14,8 @@ import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import Predefineddata from '../../data/PredefinedData';
-
+import CandidateTimeLine from '../../component/candidate/CandidateTimeLine';
+const { Title, Text } = Typography;
 const CandidateDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ const CandidateDetails = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button type="text" icon={<ArrowLeft size={18} />} onClick={() => navigate('/dashboard/candidates')} />
-          <Typography.Title level={3} className="!mb-0">Candidate Details</Typography.Title>
+          <Title level={3} className="!mb-0">Candidate Details</Title>
         </div>
         <Select
           placeholder="Update Status"
@@ -146,7 +147,7 @@ const CandidateDetails = () => {
         <Row gutter={24}>
           <Col md={16} xs={24}>
             <div className="flex items-start gap-4">
-              <div className="h-20 w-20 rounded-full bg-blue-900 text-white flex items-center justify-center text-3xl capitalize">
+              <div className="h-20 w-20 rounded-full bg-blue-950 text-white flex items-center justify-center text-3xl capitalize">
                 {candidate?.name?.charAt(0)}
               </div>
               <div>
@@ -159,10 +160,14 @@ const CandidateDetails = () => {
               <Col span={12}>
                 <Descriptions column={1} size="small" bordered>
                   <Descriptions.Item label="Email">
-                    <a href={`mailto:${candidate?.email}`}>{candidate?.email}</a>
+                    <a href={`mailto:${candidate?.email}`}>
+                      <Text>
+                        {candidate?.email}
+                      </Text>
+                    </a>
                   </Descriptions.Item>
                   <Descriptions.Item label="Phone">
-                    <a href={`tel:${candidate?.phone}`}>{candidate?.phone}</a>
+                    <a href={`tel:${candidate?.phone}`}><Text>{candidate?.phone}</Text></a>
                   </Descriptions.Item>
                   <Descriptions.Item label="Experience">
                     {candidate?.experience} {candidate?.experience === 1 ? 'year' : 'years'}
@@ -174,13 +179,15 @@ const CandidateDetails = () => {
                   <Descriptions.Item label="Resume">
                     {candidate?.resume ? (
                       <a href={candidate?.resume} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
-                        View Resume <ExternalLink size={14} />
+                        <Text className='flex items-center gap-0.5'>
+                          View Resume <ExternalLink size={14} />
+                        </Text>
                       </a>
                     ) : 'Not provided'}
                   </Descriptions.Item>
                   <Descriptions.Item label="References">
                     {candidate?.references?.length ? candidate?.references.map((r, i) => (
-                      <div key={i}>{r.name}</div>
+                      <div key={i}>{r.name} - {r.contact} - {r.relation} </div>
                     )) : 'No references'}
                   </Descriptions.Item>
                 </Descriptions>
@@ -188,9 +195,11 @@ const CandidateDetails = () => {
             </Row>
           </Col>
 
-          <Col md={8} xs={24}>
+
+          <Col md={8} xs={16}>
             <CandidateQuickAction />
           </Col>
+
         </Row>
       </Card>
 
@@ -205,7 +214,16 @@ const CandidateDetails = () => {
       </Card>
 
       {/* Full Profile Section */}
-      <CandidateProfile />
+
+      <Row gutter={[16, 16]}>
+        <Col md={16} xs={24} lg={16}>
+
+          <CandidateProfile />
+        </Col>
+        <Col md={8} xs={24} lg={8}>
+          <CandidateTimeLine />
+        </Col>
+      </Row>
     </div>
   );
 

@@ -70,7 +70,7 @@ export const Sidebar = () => {
   return (
     <Sider
       breakpoint='lg'
-      width={200}
+      width={220}
       collapsible
       collapsed={collapse}
       onCollapse={() => diapatch(toggleSideBarCollapsed())}
@@ -92,6 +92,11 @@ export const Sidebar = () => {
         mode="inline"
         selectedKeys={[currentPath]}
         items={links}
+        className='h-full'
+        style={{
+          marginTop: '1rem',
+          borderRight: 'none'
+        }}
       />
     </Sider>
   );

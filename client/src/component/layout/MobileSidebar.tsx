@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, Menu,Button } from 'antd';
+import { Drawer, Menu, Button } from 'antd';
 import { CalendarClock, FileText, LayoutDashboard, UserPlus, UserRound, Users, X } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
@@ -75,13 +75,13 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose })
       style={{
         position: 'absolute',
         height: '100vh',
-        backgroundColor: '#1A365D',
+        backgroundColor: '#001529',
 
       }}
     >
       {/* Close Button */}
       <div className="flex justify-end mb-4">
-        <Logo/>
+        <Logo />
         <Button onClick={onClose} type="text">
           <X size={20} />
         </Button>
@@ -89,9 +89,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose })
 
       {/* Sidebar Links */}
       <div className="flex flex-col gap-2">
-        <Menu mode="inline" items={links} theme="dark" style={{
-          backgroundColor: '#1A365D',
-        }} />
+        <Menu mode="inline" items={links} theme="dark" />
       </div>
     </Drawer>
   );

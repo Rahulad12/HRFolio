@@ -24,7 +24,7 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
   const { token } = antTheme.useToken();
 
   const items: MenuProps['items'] = [
-    { label: 'Sign out', key: 'logout' },
+    { label: 'Sign out', key: 'logout',danger: true },
   ];
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {

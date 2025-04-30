@@ -5,14 +5,8 @@ import InterviewLog from "../model/interviewLog.js";
 import dayjs from "dayjs";
 
 const createInterview = async (req, res) => {
-    const { candidate, interviewer, date, time, type, notes, status } = req.body;
-    // console.log(req.body)
-    // console.log(dayjs(date).isBefore(dayjs()))
-    // console.log(dayjs(time).isBefore(dayjs()))
-    // console.log(dayjs(` ${date} ${time}`).isBefore(dayjs()))
-    // console.log(dayjs().format('YYYY-MM-DD'))
-    // console.log(dayjs(date).format('h:mm A'))
-    // console.log(dayjs(time).format('h:mm A'))
+    const { candidate, interviewer, date, time, type, notes, status, candidateInterviewStatus } = req.body;
+
     if (!candidate || !interviewer || !date || !time || !type || !status) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
@@ -20,17 +14,17 @@ const createInterview = async (req, res) => {
         if (dayjs(` ${date} ${time}`).isBefore(dayjs())) {
             return res.status(400).json({ success: false, message: "Cannot schedule interview in the past" });
         }
-        const existingInterview = await Interview.findOne({ candidate, date, time }).lean();
+        const existingInterview = await Interview.findOne({ candidateInterviewStatus }).lean();
 
         if (existingInterview && existingInterview.status === "scheduled") {
-            return res.status(400).json({ success: false, message: "Interview already send on this date for this candidate" });
+            return res.status(400).json({ success: false, message: `Check your schedule ${candidateInterviewStatus} Interview is not completed` });
         }
 
         if (existingInterview && existingInterview.status === "draft") {
             await Interview.findByIdAndDelete(existingInterview._id);
         }
 
-        const interview = await Interview.create({ candidate, interviewer, date, time, type, notes, status });
+        const interview = await Interview.create({ candidate, interviewer, date, time, type, notes, status, candidateInterviewStatus });
 
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not created" });
@@ -46,18 +40,17 @@ const createInterview = async (req, res) => {
             details: {
                 date, time, type, notes, status,
             },
-            performedBy: req.user.id // optional
         });
 
         //log the activity
         await ActivityLog.create({
+            candidate: candidate,
             userID: req.user.id,
             action: 'created',
             entityType: 'interviews',
             relatedId: interview._id,
             metaData: {
-                candidate: exstingCandidate?.name,
-                feedback: interview.feedback,
+                title: exstingCandidate?.name,
             },
         })
 
@@ -160,24 +153,24 @@ const updateInterview = async (req, res) => {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
         await InterviewLog.create({
-            interviewId: updatedInterview._id,
-            candidate: updatedInterview.candidate,
-            interviewer: updatedInterview.interviewer,
+            interviewId: updatedInterview?._id,
+            candidate: updatedInterview?.candidate,
+            interviewer: updatedInterview?.interviewer,
             action: 'updated',
             details: {
-                date: updatedInterview.date, time: updatedInterview.time, type: updatedInterview.type, notes: updatedInterview.notes, status: updatedInterview.status,
-                feedback: updatedInterview.feedback, rating: updatedInterview.rating
+                date: updatedInterview?.date, time: updatedInterview?.time, type: updatedInterview?.type, notes: updatedInterview?.notes, status: updatedInterview?.status,
+                feedback: updatedInterview?.feedback, rating: updatedInterview?.rating
             },
-            performedBy: req.user.id
         });
+        const existingCandidate = await Candidate.findById(updatedInterview?.candidate);
         await ActivityLog.create({
+            candidate: updatedInterview?.candidate,
             userID: req.user.id,
             action: 'updated',
             entityType: 'interviews',
-            relatedId: updatedInterview._id,
+            relatedId: updatedInterview?._id,
             metaData: {
-                candidate: updatedInterview.candidate.name,
-                feedback: updatedInterview.feedback,
+                title: existingCandidate?.name,
             },
         })
         return res.status(200).json({
@@ -197,6 +190,16 @@ const deleteInterview = async (req, res) => {
         if (!deleteInterview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
+        await InterviewLog.create({
+            interviewId: deleteInterview._id,
+            candidate: deleteInterview.candidate,
+            interviewer: deleteInterview.interviewer,
+            action: 'deleted',
+            details: {
+                date: deleteInterview.date, time: deleteInterview.time, type: deleteInterview.type, notes: deleteInterview.notes, status: deleteInterview.status,
+                feedback: deleteInterview.feedback, rating: deleteInterview.rating
+            },
+        });
         return res.status(200).json({
             success: true,
             message: "Interview deleted successfully",

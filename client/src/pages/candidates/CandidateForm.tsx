@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, MinusCircle, PlusCircle, X } from 'lucide-react';
 import { UploadOutlined } from "@ant-design/icons";
-import { motion } from 'framer-motion';
 import { Button, Col, DatePicker, Form, Input, InputNumber, message, Row, Select, Typography, Upload, Card } from 'antd';
 import { candidateFormData } from '../../types';
 import {
@@ -106,13 +105,9 @@ const CandidateForm: React.FC = () => {
     }
   };
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="mb-6 flex items-center">
-        <div className="mb-6 flex items-center">
+    <div>
+      <div className=" flex items-center">
+        <div className="flex items-center">
           <Button
             type="text"
             icon={<ArrowLeft size={18} />}
@@ -122,10 +117,6 @@ const CandidateForm: React.FC = () => {
           <Title level={3}>{
             isEditing ? 'Edit Candidate' : 'Add New Candidate'}</Title>
         </div>
-
-        {/* <h1 className="text-2xl font-bold text-gray-900">
-          {isEditing ? 'Edit Candidate' : 'Add New Candidate'}
-        </h1> */}
       </div>
 
       <Card>
@@ -361,7 +352,7 @@ const CandidateForm: React.FC = () => {
           </div>
         </Form>
       </Card>
-    </motion.div>
+    </div>
   );
 };
 

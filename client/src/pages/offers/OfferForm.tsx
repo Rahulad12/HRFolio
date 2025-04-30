@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
-import { motion } from 'framer-motion';
 import {
   Form,
   Button,
@@ -125,7 +124,7 @@ const OfferForm: React.FC = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+    <div>
       <div className="mb-6 flex items-center">
         <Button
           type="text"
@@ -235,7 +234,7 @@ const OfferForm: React.FC = () => {
           )}
         </Card>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

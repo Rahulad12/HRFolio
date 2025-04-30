@@ -1,5 +1,5 @@
 import { EMAIL_TEMPLATE_URL } from "../constant";
-import { emailTemplateData, emailTemplateResponse, emailTemplateResponseById } from "../types";
+import { emailTemplateData, emailTemplateResponse, emailTemplateResponseById, generalEmailFormData, generalEmailResponse } from "../types";
 import { api } from "./api";
 
 const emailServiceApi = api.injectEndpoints({
@@ -43,8 +43,15 @@ const emailServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ['EmailTemplate']
 
+        }),
+        createGeneralEmail: builder.mutation<generalEmailResponse, generalEmailFormData>({
+            query: (data) => ({
+                url: `${EMAIL_TEMPLATE_URL}/general/send`,
+                method: 'POST',
+                body: data
+            }),
         })
     })
 })
 
-export const { useGetAllEmailTemplateQuery, useGetEmailTemplateByIdQuery, useCreateEmailTemplateMutation, useUpdateEmailTemplateMutation, useDeleteEmailTemplateMutation } = emailServiceApi
+export const { useGetAllEmailTemplateQuery, useGetEmailTemplateByIdQuery, useCreateEmailTemplateMutation, useUpdateEmailTemplateMutation, useDeleteEmailTemplateMutation, useCreateGeneralEmailMutation } = emailServiceApi

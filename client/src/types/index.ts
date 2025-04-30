@@ -442,3 +442,17 @@ export type offerLogResponse = {
     message: string;
     data: offerLog[];
 }
+
+export type generalEmailFormData = {
+    emailAddress: string | undefined;
+    candidate: string | undefined;
+    subject: string;
+    body: string;
+    attachment: string;
+}
+
+export type generalEmailResponse = {
+    success: boolean;
+    message: string;
+    data: generalEmailFormData[]
+}

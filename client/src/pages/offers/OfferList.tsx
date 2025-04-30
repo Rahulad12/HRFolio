@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Search, Filter, Download, Eye, Pencil, Send, Trash, MoreVertical, Check, } from 'lucide-react';
-import { offerLetter, offerLetterPostData } from '../../types';
+import { FileText, Search, Filter, Download, Eye, Send, MoreVertical, } from 'lucide-react';
+import { offerLetter } from '../../types';
 import PrimaryButton from '../../component/ui/button/Primary';
 import { Button, Card, Input, message, Select, Typography, Tag, Dropdown, Popconfirm } from 'antd';
 import CustomTable from '../../component/common/Table';
@@ -15,8 +15,8 @@ const OfferList: React.FC = () => {
 
   const { data: offerLetters, isLoading: isLoadingOfferLetter, refetch } = useGetOfferLetterQuery();
   const [createOfferLetter, { isLoading: offerSending }] = useCreateOfferLetterMutation();
-  const [updateOfferLetter, { isLoading: offerUpdating }] = useUpdateOfferLetterMutation();
-  const [deleteOfferLetter, { isLoading: offerDeleting }] = useDeleteOfferLetterMutation();
+  const [updateOfferLetter] = useUpdateOfferLetterMutation();
+  const [deleteOfferLetter] = useDeleteOfferLetterMutation();
 
 
   const filteredOffers = offerLetters?.data?.filter(offer => {

@@ -17,6 +17,7 @@ import EmailTemplateForm from '../pages/emails/EmailTemplateForm';
 import NotFound from '../pages/NotFound';
 import AssignAssessment from '../pages/assessments/AssignAssessment';
 import Interviews from '../pages/interviews/Interviews';
+import GeneralEmailForm from '../pages/emails/GeneralEmailForm';
 const Protected = () => {
     const isAuth = useAppSelector(state => state.auth.user.token);
     if (!isAuth) return <Navigate to="/" replace />
@@ -30,6 +31,7 @@ const Protected = () => {
                 <Route path=":id" element={<CandidateDetail />} />
                 <Route path="new" element={<CandidateForm />} />
                 <Route path="edit/:id" element={<CandidateForm />} />
+                <Route path="email/:id" element={<GeneralEmailForm />} />
             </Route>
 
             {/* Interviews */}

@@ -1,9 +1,8 @@
-import { Timeline, Typography, Skeleton, Empty, Tag, Card } from "antd";
+import { Timeline, Typography, Skeleton, Empty, Card } from "antd";
 import { useAppSelector } from "../../Hooks/hook";
 import { useGetActivityLogByCandidateIdQuery } from "../../services/activityLogs";
 import { ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from "dayjs";
-import { makeCapitilized } from "../../utils/TextAlter";
 
 const { Text } = Typography;
 

@@ -12,7 +12,7 @@ import { storeCandidate } from '../../action/StoreCandidate';
 import CandidateProfile from '../../component/candidate/CandidateProfile';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
-import { ArrowLeft, ExternalLink, Space } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import Predefineddata from '../../data/PredefinedData';
 import CandidateTimeLine from '../../component/candidate/CandidateTimeLine';
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, MinusCircle, PlusCircle, X } from 'lucide-react';
 import { UploadOutlined } from "@ant-design/icons";
-import { motion } from 'framer-motion';
 import { Button, Col, DatePicker, Form, Input, InputNumber, message, Row, Select, Typography, Upload, Card } from 'antd';
 import { candidateFormData } from '../../types';
 import {

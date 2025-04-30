@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Button, Card, Form, Input, message, Typography } from 'antd';
 import { interviewerData } from '../../types';
 import { useCreateInterviewerMutation, useGetInterviewerByIdQuery, useUpdateInterviewerMutation } from '../../services/interviewServiceApi';
@@ -57,11 +56,8 @@ const InterviewerForm: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div>
+
       <div className="mb-6 flex items-center">
         <Button
           type='text'
@@ -143,7 +139,8 @@ const InterviewerForm: React.FC = () => {
           </div>
         </Form>
       </Card>
-    </motion.div>
+    </div>
+
   );
 };
 

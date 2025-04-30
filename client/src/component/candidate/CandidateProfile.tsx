@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useAppSelector } from '../../Hooks/hook';
 import { Clock, CheckCircle, AlertCircle, XCircle, Star } from 'lucide-react';
 import { Card, Tabs, Empty, Skeleton } from 'antd';
-import { interviewLogData } from '../../types';
+import { AssessmentLogData, interviewLogData } from '../../types';
 import { useGetInterviewLogByCanidateIdQuery } from '../../services/interviewServiceApi';
+import { useGetAssessmentLogByCandidateIdQuery } from '../../services/assessmentServiceApi';
 import dayjs from 'dayjs';
 import { makeCapitilized } from '../../utils/TextAlter';
 
@@ -17,8 +18,12 @@ const getColor = (status: string) => {
             return 'text-green-600';
         case 'cancelled':
             return 'text-orange-600';
-        case 'failed':
+        case "assigned":
+            return 'text-amber-600';
+        case 'Failed':
             return 'text-red-600';
+        case 'Passed':
+            return 'text-green-600';
         default:
             return 'text-gray-600';
     }
@@ -45,6 +50,9 @@ const CandidateProfile = () => {
     const { data: interviewsLog, isLoading: interviewLogLoading } = useGetInterviewLogByCanidateIdQuery(candidate?.[0]?._id, {
         skip: !candidate?.[0]?._id,
     });
+    const { data: assessmentLog, isLoading: assessmentLogLoading } = useGetAssessmentLogByCandidateIdQuery(candidate?.[0]?._id, {
+        skip: !candidate?.[0]?._id,
+    })
 
     const logs = interviewsLog?.data || [];
 
@@ -117,6 +125,85 @@ const CandidateProfile = () => {
                     )}
                 </div>
             )}
+
+            {
+                activeTab === 'assessments' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        {assessmentLogLoading ? (
+                            <Skeleton active className="mx-auto" />
+                        ) : assessmentLog?.data.length === 0 ? (
+                            <Empty description="No assessments found." className="col-span-2" />
+                        ) : (
+                            assessmentLog?.data.map((log: AssessmentLogData) => (
+                                <Card
+                                    key={log._id}
+                                    className="shadow-md border rounded-lg"
+                                    title={
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex gap-1">
+                                                <span className="text-sm font-semibold">
+                                                    {dayjs(log.performedAt).format('MMM DD, YYYY')}
+                                                </span>
+                                                <span className="text-xs text-gray-400">({log?.action})</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {getStatusIcon(log?.details?.status)}
+                                                <span className={`capitalize text-sm font-medium ${getColor(log?.details?.status)}`}>
+                                                    {dayjs(log?.createdAt).format('h:mm A')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                >
+                                    <div className="space-y-2 text-sm">
+                                        <p>
+                                            <strong>Assessment:</strong>{' '}
+                                            <span className="capitalize ">{log?.assessment?.title}</span>
+                                        </p>
+                                        <p>
+                                            <strong>Type:</strong>{' '}
+                                            <span className="capitalize">{log?.assessment?.type}</span>
+                                        </p>
+                                        <p>
+                                            <strong>Link:</strong>{' '}
+                                            <a
+                                                href={log?.assessment?.assessmentLink}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                Open Assessment
+                                            </a>
+                                        </p>
+                                        <p>
+                                            <strong>Status:</strong>{' '}
+                                            <span className={`capitalize ${getColor(log?.details?.status)}`}>
+                                                {log?.details?.status}
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <strong>Due Date:</strong>{' '}
+                                            <span>{dayjs(log?.details?.dueDate).format('MMM DD, YYYY')}</span>
+                                        </p>
+                                        {log?.details?.score && (
+                                            <p>
+                                                <strong>Score:</strong>{' '}
+                                                <span className="text-green-600 font-semibold">{log?.details?.score}</span>
+                                            </p>
+                                        )}
+                                        {log?.details?.feedback && (
+                                            <p>
+                                                <strong>Feedback:</strong>{' '}
+                                                <span className=" italic">"{log?.details?.feedback}"</span>
+                                            </p>
+                                        )}
+                                    </div>
+                                </Card>
+                            ))
+
+                        )}
+                    </div>
+                )
+            }
         </Card>
     );
 };

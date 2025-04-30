@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Eye, CheckCircle, Clock, AlertCircle, X, Check } from 'lucide-react';
+import { Search, Eye, CheckCircle, Clock, AlertCircle, X, Check, MoreVertical } from 'lucide-react';
 import { AssessmentDataResponse, AssignmentDataResponse, candidateData, AssignmentScoreFromData } from '../../types';
 import { motion } from 'framer-motion';
 import { useAssignedAssessment } from '../../action/StoreAssessment';
 import { useAppSelector } from '../../Hooks/hook';
 import { makeCapitilized } from '../../utils/TextAlter';
 import CustomTable from '../../component/common/Table';
-import { Button, Input, Card, Select, Modal, Form, InputNumber, message, Typography, Tag } from 'antd';
+import { Button, Input, Card, Select, Modal, Form, InputNumber, message, Typography, Tag, Dropdown, Skeleton } from 'antd';
 import dayjs from 'dayjs';
-import { useCreateAssignmentScoreMutation } from '../../services/assessmentServiceApi';
+import { useCreateAssignmentScoreMutation, useDeleteAssignmentMutation } from '../../services/assessmentServiceApi';
 import PrimaryButton from '../../component/ui/button/Primary';
 import ExportButton from '../../component/common/Export';
 const { TextArea } = Input;
-
 const AssessmentAssignmentList: React.FC = () => {
   const [form] = Form.useForm();
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,6 +24,7 @@ const AssessmentAssignmentList: React.FC = () => {
   const { isLoading: assessmentLoading } = useAssignedAssessment();
 
   const [createAssignmentScore, { isLoading: scoreLoading }] = useCreateAssignmentScoreMutation();
+  const [deleteAssignment, { isLoading: deleteLoading }] = useDeleteAssignmentMutation();
 
   const { assignedAssessments } = useAppSelector((state) => state.assessments);
 
@@ -43,12 +43,7 @@ const AssessmentAssignmentList: React.FC = () => {
     setSelectedAssignment({ ...record });
     setIsModalOpen(true);
   }
-  // const handleAssignmentComplete = (record: AssignmentDataResponse) => {
-  //   setSelectedAssignment({
-  //     ...record,
-  //   });
-  //   setIsModalOpen(true);
-  // };
+
 
   const handleSaveFeedback = async (value: AssignmentScoreFromData) => {
     if (!selectedAssignment) return;
@@ -57,12 +52,10 @@ const AssessmentAssignmentList: React.FC = () => {
       candidate: selectedAssignment?.candidate?._id,
       assessment: selectedAssignment?.assessment?._id
     };
-    console.log(payload)
     try {
       const res = await createAssignmentScore(payload).unwrap();
       if (res?.success && res.data) {
         message.success(res.message);
-        console.log("Feedback submitted:", res);
         setIsModalOpen(false);
         form.resetFields()
       }
@@ -72,7 +65,21 @@ const AssessmentAssignmentList: React.FC = () => {
     }
   };
 
+  const handleDeleteAssignment = async (id: string) => {
+    try {
+      const res = await deleteAssignment(id).unwrap();
+      if (res?.success) {
+        message.success(res.message);
+      }
+    } catch (error: any) {
+      console.error('Failed to delete assignment', error);
+      message.error(error?.data?.message);
+    }
+  };
 
+  const handleUpdateAssignment = async (id: string) => {
+    navigate(`/dashboard/assessments/assign/edit/${id}`);
+  }
   const statusOptions = [
     { value: '', label: 'All Statuses' },
     { value: 'assigned', label: 'Assigned' },
@@ -98,8 +105,8 @@ const AssessmentAssignmentList: React.FC = () => {
       title: 'CANDIDATE',
       dataIndex: "candidate",
       render: (candidate: candidateData) => (
-        <div className='flex flex-col'>
-          <span className='tfont-medium'>{makeCapitilized(candidate?.name)}</span>
+        <div className='flex flex-col cursor-pointer' onClick={() => navigate(`/dashboard/candidates/${candidate._id}`)}>
+          <span className='tfont-medium' >{makeCapitilized(candidate?.name)}</span>
           <span className='text-xs text-gray-500'>{makeCapitilized(candidate.email)}</span>
         </div>
       )
@@ -155,10 +162,41 @@ const AssessmentAssignmentList: React.FC = () => {
           ) : (
             <AlertCircle size={16} className="text-amber-500" />
           )}
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: '1',
+                  label: 'Delete',
+                  onClick: () => handleDeleteAssignment(record?._id),
+                  danger: true,
+                  disabled: record.status === 'completed'
+                },
+                {
+                  key: '2',
+                  label: 'Update',
+                  onClick: () => handleUpdateAssignment(record?._id),
+                  disabled: record.status === 'completed'
+                }
+              ]
+            }}
+          >
+            <Button type='text'>
+              <MoreVertical size={16} className="text-gray-600" />
+            </Button>
+          </Dropdown>
+
         </div>
       )
     }
   ];
+
+  if (deleteLoading) return (
+    <div className="flex items-center justify-center h-screen">
+      <Skeleton children />
+    </div>
+  )
+
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
@@ -221,6 +259,7 @@ const AssessmentAssignmentList: React.FC = () => {
             <h3 className="text-sm font-medium text-gray-700">Assessment:</h3>
             <p className="text-sm text-gray-900 capitalize">{selectedAssignment?.assessment?.title}</p>
           </div>
+
           <Form
             onFinish={handleSaveFeedback}
             layout='vertical'

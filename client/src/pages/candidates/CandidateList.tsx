@@ -6,18 +6,12 @@ import { setCandidate } from '../../slices/candidateSlices';
 import { useNavigate } from 'react-router-dom';
 import { candidateData } from '../../types';
 import { makeCapitilized } from '../../utils/TextAlter';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { TableColumnsType } from 'antd';
 import CustomTable from '../../component/common/Table';
 import TableSearch from '../../component/common/TableSearch';
 import PrimaryButton from '../../component/ui/button/Primary';
 import Predefineddata from '../../data/PredefinedData';
-
-
-// interface TableProps {
-//   loading: boolean;
-//   error: boolean;
-// }
 
 const statusColors: Record<string, string> = {
   shortlisted: 'blue',
@@ -56,13 +50,13 @@ const CandidateTable = () => {
       api.success({
         message: res.message,
         placement: "topRight",
-        duration: 3000,
+        duration: 2000,
       })
     } catch (err: any) {
       api.error({
         message: err?.data?.message || "Error deleting candidate",
         placement: "topRight",
-        duration: 3000,
+        duration: 2000,
       })
     }
   };
@@ -190,7 +184,6 @@ const CandidateTable = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="bg-white rounded-lg shadow p-4"
       >
         <Skeleton
           active
@@ -202,11 +195,8 @@ const CandidateTable = () => {
 
   //main content return
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <>
+      {contextHolder}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Typography.Title level={2} >Candidates</Typography.Title>
@@ -225,7 +215,6 @@ const CandidateTable = () => {
       </div>
 
       <Card>
-        {contextHolder}
         <div className="flex justify-between items-center mb-4">
           <TableSearch
             items={Predefineddata?.Status || []}
@@ -233,24 +222,18 @@ const CandidateTable = () => {
           />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, type: "spring" }}
-          className="bg-white rounded-lg shadow overflow-hidden"
-        >
-          <AnimatePresence>
-            <CustomTable
-              loading={candidateLoading}
-              data={data?.data || []}
-              columns={columns}
-              pageSize={10}
-              key="candidateTable"
-            />
-          </AnimatePresence>
-        </motion.div>
+        <CustomTable
+          loading={candidateLoading}
+          data={data?.data || []}
+          columns={columns}
+          pageSize={10}
+          key="candidateTable"
+        />
+
       </Card>
-    </motion.div>
+    </>
+
+
   );
 };
 

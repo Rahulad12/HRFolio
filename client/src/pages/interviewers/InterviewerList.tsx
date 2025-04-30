@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Search, Pencil, Trash2 } from 'lucide-react';
 import { interviewerData } from '../../types';
-import { motion } from 'framer-motion';
 import { Button, Card, Input, message, Popconfirm, Select, Tooltip, Typography } from 'antd';
 import CustomTable from '../../component/common/Table';
 import { useGetInterviewerQuery, useDeleteInterviewerMutation } from '../../services/interviewServiceApi';
@@ -126,10 +125,8 @@ const InterviewerList: React.FC = () => {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+    <div
+
     >
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -181,7 +178,7 @@ const InterviewerList: React.FC = () => {
           pageSize={10}
         />
       </Card>
-    </motion.div>
+    </div>
   );
 };
 

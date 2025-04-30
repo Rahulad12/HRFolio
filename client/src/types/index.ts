@@ -178,6 +178,7 @@ export type AssignmentDataResponse = {
     emailTemplate: string;
     createdAt: string;
     updatedAt: string
+    score: number
 }
 
 export type assignmentResponse = {
@@ -377,4 +378,26 @@ export type activityLog = {
 export type activityLogResponse = {
     success: boolean;
     data: activityLog[];
+}
+export type AssessmentLogData = {
+    _id: string;
+    assessment: AssessmentDataResponse;
+    candidate: candidateData;
+    action: string;
+    details: {
+        dueDate: Dayjs;
+        status: interviewStatus;
+        score: number;
+        feedback: string;
+    }
+    createdAt: string;
+    updatedAt: string;
+    performedBy: string;
+    performedAt: string;
+}
+
+export type AssessmentLogResponse = {
+    success: boolean;
+    message: string;
+    data: AssessmentLogData[];
 }

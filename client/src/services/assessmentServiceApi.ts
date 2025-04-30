@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { assessmentFormData, assessmentResponse, assessmentResponseById, AssgnmentScoreResponse, AssignmentData, assignmentResponse, assignmentResponseById, AssignmentScoreFromData } from "../types/index"
+import { assessmentFormData, assessmentResponse, assessmentResponseById, AssgnmentScoreResponse, AssignmentData, assignmentResponse, assignmentResponseById, AssignmentScoreFromData, AssessmentLogResponse } from "../types/index"
 import { ASSESSMENT_URL } from "../constant";
 export const assessmentServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -92,6 +92,14 @@ export const assessmentServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ['Score', 'Assignment']
         }),
+
+        getAssessmentLogByCandidateId: builder.query<AssessmentLogResponse, string>({
+            query: (id) => ({
+                url: `${ASSESSMENT_URL}/logs/candidate/${id}`,
+                method: "GET",
+            }),
+            providesTags: ['Assessment', 'Assignment']
+        })
     }),
 });
 
@@ -107,5 +115,6 @@ export const {
     useGetAssessmentByIdQuery,
     useGetAssignmentByIdQuery,
     useGetAssignmentByCandidateQuery,
-    useCreateAssignmentScoreMutation
+    useCreateAssignmentScoreMutation,
+    useGetAssessmentLogByCandidateIdQuery
 } = assessmentServiceApi;

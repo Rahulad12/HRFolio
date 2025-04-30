@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Search, Filter, Download, Eye, Pencil, Send, } from 'lucide-react';
 import { offerLetter } from '../../types';
-import { motion } from 'framer-motion';
 import PrimaryButton from '../../component/ui/button/Primary';
 import { Button, Card, Input, message, Select, Typography, Tag } from 'antd';
 import CustomTable from '../../component/common/Table';
@@ -162,11 +161,7 @@ const OfferList: React.FC = () => {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Typography.Title level={2} className="text-2xl font-bold text-gray-900">Offer Letters</Typography.Title>
@@ -227,7 +222,7 @@ const OfferList: React.FC = () => {
           pageSize={5}
         />
       </Card>
-    </motion.div>
+    </div>
   );
 };
 

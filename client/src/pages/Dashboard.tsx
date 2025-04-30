@@ -177,7 +177,7 @@ export const Dashboard: React.FC = () => {
           </motion.div>
         </Col> */}
 
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={12} md={12}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

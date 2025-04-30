@@ -46,6 +46,7 @@ const Protected = () => {
                 <Route path="edit/:id" element={<AssessmentForm />} />
                 <Route path="assignments" element={<AssessmentAssignmentList />} />
                 <Route path="assign" element={<AssignAssessment />} />
+                <Route path="assign/edit/:id" element={<AssignAssessment />} />
             </Route>
 
             {/* Interviewers */}

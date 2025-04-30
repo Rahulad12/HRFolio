@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Search, Filter, Download, Eye, Pencil, Send, } from 'lucide-react';
-import { offerLetter } from '../../types';
+import { FileText, Search, Filter, Download, Eye, Pencil, Send, Trash, MoreVertical, Check, } from 'lucide-react';
+import { offerLetter, offerLetterPostData } from '../../types';
 import PrimaryButton from '../../component/ui/button/Primary';
-import { Button, Card, Input, message, Select, Typography, Tag } from 'antd';
+import { Button, Card, Input, message, Select, Typography, Tag, Dropdown, Popconfirm } from 'antd';
 import CustomTable from '../../component/common/Table';
-import { useGetOfferLetterQuery, useCreateOfferLetterMutation } from '../../services/offerService';
+import { useGetOfferLetterQuery, useCreateOfferLetterMutation, useDeleteOfferLetterMutation, useUpdateOfferLetterMutation } from '../../services/offerService';
 
 const OfferList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +15,8 @@ const OfferList: React.FC = () => {
 
   const { data: offerLetters, isLoading: isLoadingOfferLetter, refetch } = useGetOfferLetterQuery();
   const [createOfferLetter, { isLoading: offerSending }] = useCreateOfferLetterMutation();
+  const [updateOfferLetter, { isLoading: offerUpdating }] = useUpdateOfferLetterMutation();
+  const [deleteOfferLetter, { isLoading: offerDeleting }] = useDeleteOfferLetterMutation();
 
 
   const filteredOffers = offerLetters?.data?.filter(offer => {
@@ -41,6 +43,7 @@ const OfferList: React.FC = () => {
       message.warning("Incomplete offer. Please edit and complete the draft first.");
       return;
     }
+    setSendingOfferId(offer._id);
     const payload = {
       candidate: offer?.candidate?._id,
       email: offer?.email,
@@ -48,7 +51,7 @@ const OfferList: React.FC = () => {
       salary: offer?.salary,
       startDate: offer?.startDate,
       responseDeadline: offer?.responseDeadline,
-      status: 'sent'
+      status: 'sent' as offerLetter['status']
     }
     try {
       const res = await createOfferLetter(payload).unwrap();
@@ -64,6 +67,46 @@ const OfferList: React.FC = () => {
       setSendingOfferId(null);
     }
   };
+  const handleDeleteOffer = async (offer: offerLetter) => {
+    try {
+      const res = await deleteOfferLetter(offer._id).unwrap();
+      if (res?.success) {
+        message.success(res?.message);
+        refetch();
+      }
+    } catch (error: any) {
+      console.error('Failed to delete offer', error);
+      message.error(error?.data?.message);
+    }
+  };
+  const handleStatusUpdate = async (offer: offerLetter, status: offerLetter['status']) => {
+    setSendingOfferId(offer._id);
+    try {
+      const payload = {
+        candidate: offer?.candidate?._id,
+        email: offer?.email,
+        position: offer?.position,
+        salary: offer?.salary,
+        startDate: offer?.startDate,
+        responseDeadline: offer?.responseDeadline,
+        status: status
+      }
+      const res = await updateOfferLetter({
+        id: offer._id,
+        data: payload
+      }).unwrap();
+      if (res?.success) {
+        message.success(res?.message);
+        refetch();
+      }
+    } catch (error: any) {
+      console.error('Failed to update offer status', error);
+      message.error(error?.data?.message);
+    }
+    finally {
+      setSendingOfferId(null);
+    }
+  }
 
   const statusOptions = [
     { value: '', label: 'All Statuses' },
@@ -117,6 +160,17 @@ const OfferList: React.FC = () => {
     {
       title: 'Status',
       render: (offer: offerLetter) => getStatusBadge(offer?.status as offerLetter['status'])
+      // render: (offer: offerLetter) => (
+      //   <div>
+      //     <Select
+      //       value={offer?.status}
+      //       options={statusOptions}
+      //       onChange={(value) => handleStatusUpdate(offer, value)}
+      //       className='w-30'
+      //       loading={sendingOfferId === offer._id}
+      //     />
+      //   </div>
+      // )
     },
     {
       title: 'Actions',
@@ -131,18 +185,42 @@ const OfferList: React.FC = () => {
           >
             <Eye size={16} className="text-blue-600" />
           </Button>
+
+          {
+            offer?.status === 'sent' && (
+              <>
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: '1',
+                        label: "Accepted",
+                        onClick: () => handleStatusUpdate(offer, 'accepted'),
+                      },
+                      {
+                        key: '2',
+                        label: "Rejected",
+                        danger: true,
+                        onClick: () => handleStatusUpdate(offer, 'rejected'),
+                      }
+                    ]
+                  }}
+                >
+                  <Button
+                    type="text"
+                    size="small"
+                    className="p-1"
+                  >
+                    <MoreVertical size={16} className="text-gray-600" />
+                  </Button>
+                </Dropdown>
+              </>
+            )
+          }
+
+
           {offer?.status === 'draft' && (
             <>
-              <Button
-                type='text'
-                size="small"
-                className="p-1"
-                onClick={() => handleEditOffer(offer)}
-                aria-label="Edit offer"
-                disabled={offerSending}
-              >
-                <Pencil size={16} className="text-blue-600" />
-              </Button>
               <Button
                 type="text"
                 size="small"
@@ -153,6 +231,40 @@ const OfferList: React.FC = () => {
               >
                 <Send size={16} className="text-green-600" />
               </Button>
+
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: '1',
+                      label: <>
+                        <Popconfirm
+                          title="Are you sure you want to delete this offer?"
+                          onConfirm={() => handleDeleteOffer(offer)}
+                          okText="Yes"
+                          cancelText="No"
+                        >
+                          Delete
+                        </Popconfirm>
+                      </>,
+                      danger: true
+                    }
+                    , {
+                      key: '2',
+                      label: 'Edit Offer',
+                      onClick: () => handleEditOffer(offer)
+                    }
+                  ]
+                }}
+              >
+                <Button
+                  type="text"
+                  size="small"
+                  className="p-1"
+                >
+                  <MoreVertical size={16} className="text-gray-600" />
+                </Button>
+              </Dropdown>
             </>
           )}
         </div>

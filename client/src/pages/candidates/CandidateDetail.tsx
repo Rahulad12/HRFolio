@@ -12,8 +12,9 @@ import { storeCandidate } from '../../action/StoreCandidate';
 import CandidateProfile from '../../component/candidate/CandidateProfile';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Space } from 'lucide-react';
 import Predefineddata from '../../data/PredefinedData';
+import CandidateTimeLine from '../../component/candidate/CandidateTimeLine';
 
 const CandidateDetails = () => {
   const { id } = useParams();
@@ -188,9 +189,11 @@ const CandidateDetails = () => {
             </Row>
           </Col>
 
-          <Col md={8} xs={24}>
+
+          <Col md={8} xs={16}>
             <CandidateQuickAction />
           </Col>
+
         </Row>
       </Card>
 
@@ -205,7 +208,16 @@ const CandidateDetails = () => {
       </Card>
 
       {/* Full Profile Section */}
-      <CandidateProfile />
+
+      <Row gutter={[16, 16]}>
+        <Col md={16} xs={24} lg={16}>
+
+          <CandidateProfile />
+        </Col>
+        <Col md={8} xs={24} lg={8}>
+          <CandidateTimeLine />
+        </Col>
+      </Row>
     </div>
   );
 

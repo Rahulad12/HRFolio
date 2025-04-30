@@ -9,7 +9,14 @@ export const activityLogServiceApi = api.injectEndpoints({
             }),
             providesTags: ['ActivityLog', 'Interview', 'Candidate', 'Assessment', 'OfferLetter'],
         }),
+        getActivityLogByCandidateId: builder.query<activityLogResponse, string>({
+            query: (id) => ({
+                url: `/activity-log/candidate/${id}`,
+                method: 'GET',
+            }),
+            providesTags: ['ActivityLog', 'Interview', 'Candidate', 'Assessment', 'OfferLetter'],
+        }),
     }),
 })
 
-export const { useGetActivityLogsQuery } = activityLogServiceApi;
+export const { useGetActivityLogsQuery, useGetActivityLogByCandidateIdQuery } = activityLogServiceApi;

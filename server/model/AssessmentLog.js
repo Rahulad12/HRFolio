@@ -6,7 +6,7 @@ const assessmentLogSchema = new mongoose.Schema({
     action: { type: String, enum: ['created', 'updated', 'deleted'], required: true },
     details: { type: Object },
     performedAt: { type: Date, default: Date.now },
-    performedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    performedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
 }, {
     timestamps: true
 });

@@ -46,18 +46,17 @@ const createInterview = async (req, res) => {
             details: {
                 date, time, type, notes, status,
             },
-            performedBy: req.user.id // optional
         });
 
         //log the activity
         await ActivityLog.create({
+            candidate: candidate,
             userID: req.user.id,
             action: 'created',
             entityType: 'interviews',
             relatedId: interview._id,
             metaData: {
-                candidate: exstingCandidate?.name,
-                feedback: interview.feedback,
+                title: exstingCandidate?.name,
             },
         })
 
@@ -160,24 +159,24 @@ const updateInterview = async (req, res) => {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
         await InterviewLog.create({
-            interviewId: updatedInterview._id,
-            candidate: updatedInterview.candidate,
-            interviewer: updatedInterview.interviewer,
+            interviewId: updatedInterview?._id,
+            candidate: updatedInterview?.candidate,
+            interviewer: updatedInterview?.interviewer,
             action: 'updated',
             details: {
-                date: updatedInterview.date, time: updatedInterview.time, type: updatedInterview.type, notes: updatedInterview.notes, status: updatedInterview.status,
-                feedback: updatedInterview.feedback, rating: updatedInterview.rating
+                date: updatedInterview?.date, time: updatedInterview?.time, type: updatedInterview?.type, notes: updatedInterview?.notes, status: updatedInterview?.status,
+                feedback: updatedInterview?.feedback, rating: updatedInterview?.rating
             },
-            performedBy: req.user.id
         });
+        const existingCandidate = await Candidate.findById(updatedInterview?.candidate);
         await ActivityLog.create({
+            candidate: updatedInterview?.candidate,
             userID: req.user.id,
             action: 'updated',
             entityType: 'interviews',
-            relatedId: updatedInterview._id,
+            relatedId: updatedInterview?._id,
             metaData: {
-                candidate: updatedInterview.candidate.name,
-                feedback: updatedInterview.feedback,
+                title: existingCandidate?.name,
             },
         })
         return res.status(200).json({
@@ -197,6 +196,16 @@ const deleteInterview = async (req, res) => {
         if (!deleteInterview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
+        await InterviewLog.create({
+            interviewId: deleteInterview._id,
+            candidate: deleteInterview.candidate,
+            interviewer: deleteInterview.interviewer,
+            action: 'deleted',
+            details: {
+                date: deleteInterview.date, time: deleteInterview.time, type: deleteInterview.type, notes: deleteInterview.notes, status: deleteInterview.status,
+                feedback: deleteInterview.feedback, rating: deleteInterview.rating
+            },
+        });
         return res.status(200).json({
             success: true,
             message: "Interview deleted successfully",

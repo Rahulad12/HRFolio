@@ -16,6 +16,7 @@ const { Text } = Typography;
 
 const RecentActivityLog: React.FC = () => {
     const { data: activityLog, isLoading: logsLoading } = useGetActivityLogsQuery();
+    console.log(activityLog);
 
     const getIcon = (type: string) => {
         const iconProps = { size: 18 };
@@ -70,7 +71,7 @@ const RecentActivityLog: React.FC = () => {
                                 </Avatar>
                                 <div className="flex flex-col">
                                     <Text strong className="text-md">
-                                        {item?.metaData?.candidate || 'Unknown Candidate'}
+                                        {item?.metaData?.title || 'Unknown Candidate'}
                                     </Text>
                                     <Text type="secondary">
                                         {makeCapitilized(item?.entityType)} was <b>{item?.action.replace('_', ' ')}</b>

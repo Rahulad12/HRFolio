@@ -121,12 +121,13 @@ const assignAssessment = async (req, res) => {
                 });
 
                 await ActivityLog.create({
+                    candidate: createdAssignment.candidate,
                     userID: req.user._id,
                     action: 'assigned',
                     entityType: 'assessments',
                     relatedId: createdAssignment.assessment,
                     metaData: {
-                        candidate: existingCanidate?.name,
+                        title: existingCanidate?.name,
                         dueDate: dueDate,
                         status: status,
                     },
@@ -208,6 +209,16 @@ const deleteAssignment = async (req, res) => {
         if (!assignment) {
             return res.status(404).json({ success: false, message: "Assignment not found" });
         }
+        await AssessmentLog.create({
+            assessment: assignment.assessment,
+            candidate: assignment.candidate,
+            action: 'deleted',
+            details: {
+                status: "deleted"
+            },
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        })
         return res.status(200).json({ success: true, message: "Assignment deleted successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -232,6 +243,34 @@ const updateAssignmnet = async (req, res) => {
         if (!assignment) {
             return res.status(400).json({ success: false, message: "Assignment not found" });
         }
+
+        await AssessmentLog.create({
+            assessment: assignment?.assessment,
+            candidate: assignment?.candidate,
+            action: 'updated',
+            details: {
+                status: assignment?.status,
+                dueDate: assignment?.dueDate
+            },
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        })
+        const existingCandidate = await Candidate.findById(assignment.candidate);
+
+
+        await ActivityLog.create({
+            candidate: assignment?.candidate,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'assessments',
+            relatedId: assignment?.assessment._id,
+            metadata: {
+                title: existingCandidate?.name,
+                dueDate: assignment?.dueDate,
+                status: assignment?.status,
+            }
+
+        })
         return res.status(200).json({ success: true, message: "Assignment updated successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -333,20 +372,18 @@ const createScore = async (req, res) => {
             }
         })
 
+        const existingCanidate = await Candidate.findById(candidate);
         await ActivityLog.create({
+            candidate: candidate,
             userID: req.user.id,
             action: 'created',
             entityType: 'scores',
-            relatedId: createdScore._id,
+            relatedId: createdScore?._id,
             metaData: {
-                candidate: createdScore.candidate.name,
-                assessment: createdScore.assessment.name,
-                score: createdScore.score,
+                title: existingCanidate?.name,
                 status: createdScore.status,
-                feedback: createdScore.note,
             },
         })
-
         return res.status(200).json({
             success: true,
             message: "Score created successfully",
@@ -394,7 +431,6 @@ const getScore = async (req, res) => {
 }
 
 const getAssessmentLogByCandidateId = async (req, res) => {
-    console.log(req.params.id);
     try {
         const assessmentLog = await AssessmentLog.find({ candidate: req.params.id }).sort({ createdAt: -1 }).select(" -__v").populate({
             path: "candidate",

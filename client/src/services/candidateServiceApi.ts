@@ -1,6 +1,6 @@
 import { CANDIDATE_URL } from "../constant";
 import { api } from "./api";
-import { candidateResponse, candidateFormData, globalResponse, candidateData, candidateFilter } from "../types";
+import { candidateResponse, candidateFormData, globalResponse, candidateData, candidateFilter, candidateLogResponse } from "../types";
 
 interface candidateIdResposne {
     success: boolean,
@@ -54,8 +54,15 @@ export const candidateServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Candidate"],
         }),
+        getCandidateLogsByCandidateId: builder.query<candidateLogResponse, string>({
+            query: (id) => ({
+                url: `${CANDIDATE_URL}/logs/${id}`,
+                method: "GET",
+            }),
+            providesTags: ["Candidate"],
+        }),
 
     }),
 });
 
-export const { useCreateCandidateMutation, useGetCandidateQuery, useGetCandidateByIdQuery, useDeleteCandidateMutation, useUpdateCandidateMutation } = candidateServiceApi;
+export const { useCreateCandidateMutation, useGetCandidateQuery, useGetCandidateByIdQuery, useDeleteCandidateMutation, useUpdateCandidateMutation, useGetCandidateLogsByCandidateIdQuery } = candidateServiceApi;

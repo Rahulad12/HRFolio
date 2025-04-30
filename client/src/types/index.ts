@@ -322,7 +322,9 @@ export type offerLetterPostData = {
     salary: string
     startDate: string
     responseDeadline: string
+    status: 'draft' | 'sent' | 'accepted' | 'rejected'
 }
+
 
 //logs
 export type interviewLogData = {
@@ -360,17 +362,19 @@ export type interviewLogResponseById = {
 
 export type activityLog = {
     _id: string;
+    candidate: candidateData;
     userID: string;
     action: string;
     entityType: string;
     relatedId: string;
     metaData: {
-        candidate: string
+        title: string
         interviewer: interviewerData;
         assessment: assessmentFormData;
         assignment: AssignmentDataResponse;
         feedback: string;
-        rating: number
+        rating: number;
+        status: string;
     }
     createdAt: string;
     updatedAt: string
@@ -400,4 +404,41 @@ export type AssessmentLogResponse = {
     success: boolean;
     message: string;
     data: AssessmentLogData[];
+}
+
+export type candidateLog = {
+    _id: string;
+    candidate: candidateData;
+    action: string;
+    createdAt: string;
+    updatedAt: string;
+    performedAt: string;
+}
+
+export type candidateLogResponse = {
+    success: boolean;
+    message: string;
+    data: candidateLog[];
+}
+
+export type offerLog = {
+    _id: string;
+    candidate: candidateData;
+    offer: offerLetter;
+    action: string;
+    details: {
+        status: 'draft' | 'sent' | 'accepted' | 'rejected';
+        salary: string;
+        joinedDate: string;
+        responseDeadline: string;
+    }
+    createdAt: string;
+    updatedAt: string;
+    performedAt: string;
+}
+
+export type offerLogResponse = {
+    success: boolean;
+    message: string;
+    data: offerLog[];
 }

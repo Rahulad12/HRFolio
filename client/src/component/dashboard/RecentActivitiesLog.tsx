@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, Avatar, Typography, Spin, Empty, Space } from 'antd';
+import React, { useState } from 'react';
+import { Card, Avatar, Typography, Spin, Empty, Space, Pagination } from 'antd';
 import {
     UserPlus,
     CalendarClock,
@@ -16,7 +16,9 @@ const { Text } = Typography;
 
 const RecentActivityLog: React.FC = () => {
     const { data: activityLog, isLoading: logsLoading } = useGetActivityLogsQuery();
-    console.log(activityLog);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 5; // Number of logs per page
 
     const getIcon = (type: string) => {
         const iconProps = { size: 18 };
@@ -32,13 +34,12 @@ const RecentActivityLog: React.FC = () => {
     };
 
     const getColor = (type: string) => {
-        console.log(type);
         switch (type) {
-            case 'candidates': return '#1890ff'; // blue
-            case 'interviews': return '#722ed1'; // purple
-            case 'assessments': return '#fa8c16'; // orange
-            case 'offers': return '#faad14'; // gold
-            default: return '#d9d9d9'; // gray
+            case 'candidates': return '#1890ff';
+            case 'interviews': return '#722ed1';
+            case 'assessments': return '#fa8c16';
+            case 'offers': return '#faad14';
+            default: return '#d9d9d9';
         }
     };
 
@@ -46,8 +47,26 @@ const RecentActivityLog: React.FC = () => {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+    const paginatedLog = sortedLog.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    );
+
     return (
-        <Card title="Recent Activities" bodyStyle={{ padding: 16 }}>
+        <Card
+            title="Recent Activities"
+            extra={
+                sortedLog.length > pageSize && (
+                    <Pagination
+                        current={currentPage}
+                        onChange={(page) => setCurrentPage(page)}
+                        total={sortedLog.length}
+                        pageSize={pageSize}
+                        size="small"
+                    />
+                )
+            }
+        >
             {logsLoading ? (
                 <div className="flex justify-center items-center h-32">
                     <Spin size="large" />
@@ -56,7 +75,7 @@ const RecentActivityLog: React.FC = () => {
                 <Empty description="No recent activities" />
             ) : (
                 <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                    {sortedLog.map((item, index) => (
+                    {paginatedLog.map((item, index) => (
                         <Card
                             key={index}
                             size="small"

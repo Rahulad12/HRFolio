@@ -99,7 +99,7 @@ const InterviewSchedule: React.FC = () => {
               name="candidate"
               rules={[{ required: true, message: 'Candidate is required' }]}
             >
-              <Select placeholder="Select Candidate"showSearch>
+              <Select placeholder="Select Candidate" showSearch>
                 {candidates?.data?.filter((c) => c?.status === 'first')?.map((c) => (
                   <Option key={c._id} value={c._id}>
                     {makeCapitilized(c.name)} - {makeCapitilized(c.technology)} ({makeCapitilized(c.level)})
@@ -107,7 +107,20 @@ const InterviewSchedule: React.FC = () => {
                 ))}
               </Select>
             </Form.Item>
-
+            <Form.Item
+              name="candidateInterviewStatus"
+              label="Interview"
+            >
+              <Select
+                placeholder="Select Interview Status"
+                options={[
+                  { value: 'first', label: 'First Interview' },
+                  { value: 'second', label: 'Second Interview' },
+                  { value: 'third', label: 'Third Interview' },
+                ]}
+                allowClear
+              />
+            </Form.Item>
             <Form.Item
               label="Interviewer"
               name="interviewer"

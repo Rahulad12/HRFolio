@@ -33,6 +33,9 @@ const App = () => {
       colorError: '#FF4D4F',
       colorInfo: '#1A365D',
       borderRadius: 6,
+      colorText: mode === 'dark' ? '#fff' : '#1A365D',
+      colorIcon: '#1A365D',
+      colorBgContainer: mode === 'dark' ? '#0D1117' : '#fff',
     },
     components: {
       Button: {

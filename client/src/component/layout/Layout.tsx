@@ -25,7 +25,7 @@ export const Layout: React.FC = () => {
       <MobileSidebar isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden ">
         <HeaderComponent openMobileMenu={openMobileMenu} />
         <Content style={{
           padding: 24,
@@ -33,6 +33,8 @@ export const Layout: React.FC = () => {
           background: isDarkMode ? token.colorBgContainer : '#fff',
           borderRadius: token.borderRadius,
           overflowY: 'auto',
+          scrollbarColor: isDarkMode ? '#0D1117' : '#f1f1f1',
+          scrollbarWidth: 'thin',
         }}>
           <Outlet />
         </Content>

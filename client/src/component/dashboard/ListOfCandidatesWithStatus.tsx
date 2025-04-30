@@ -4,12 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
+// const statusGroups = [
+//     { title: 'Shortlisted', key: 'shortlisted', color: '#2471A3' },
+//     { title: 'Assessment', key: 'assessment', color: '#2f54eb' },
+//     { title: 'First Interview', key: 'first', color: '#D35400' },
+//     { title: 'Second Interview', key: 'second', color: '#7D3C98' },
+//     { title: 'Third Interview', key: 'third', color: '#3498DB' },
+//     { title: 'Offered', key: 'offered', color: '#7F8C8D ' },
+//     { title: 'Hired', key: 'hired', color: '#237804' },
+//     { title: 'Rejected', key: 'rejected', color: '#a8071a' },
+// ];
 const statusGroups = [
     { title: 'Shortlisted', key: 'shortlisted', color: '#2471A3' },
     { title: 'Assessment', key: 'assessment', color: '#2f54eb' },
-    { title: 'First Interview', key: 'first', color: '#D35400' },
-    { title: 'Second Interview', key: 'second', color: '#7D3C98' },
-    { title: 'Third Interview', key: 'third', color: '#3498DB' },
+    { title: 'Interviewing', key: 'interviewing', color: '#7D3C98' },
     { title: 'Offered', key: 'offered', color: '#7F8C8D ' },
     { title: 'Hired', key: 'hired', color: '#237804' },
     { title: 'Rejected', key: 'rejected', color: '#a8071a' },
@@ -26,10 +34,18 @@ const ListOfCandidatesWithStatus = () => {
     };
 
     const getCandidatesByStatus = (status: string) => {
+        let filteredCandidates = candidate;
+
+        if (status === 'interviewing') {
+            const interviewStatuses = ['first', 'second', 'third'];
+            filteredCandidates = candidate?.filter((can) => interviewStatuses.includes(can.status));
+        } else {
+            filteredCandidates = candidate?.filter((can) => can?.status === status);
+        }
+
         return (
-            candidate
-                ?.filter((can) => can?.status === status)
-                .filter((can) => {
+            filteredCandidates
+                ?.filter((can) => {
                     if (dateRange?.[0] && dateRange?.[1]) {
                         const createdAt = dayjs(can?.createdAt);
                         return createdAt.isAfter(dateRange[0].startOf('day')) && createdAt.isBefore(dateRange[1].endOf('day'));
@@ -46,10 +62,10 @@ const ListOfCandidatesWithStatus = () => {
         >
             <Row gutter={[16, 16]}>
                 {statusGroups.map((group) => (
-                    <Col xs={24} sm={12} md={8} lg={6} key={group.key}>
+                    <Col xs={24} sm={12} md={8} lg={4} key={group.key}>
                         <Card
                             title={group.title}
-                            style={{ height: '100%' }}
+                            style={{ height: '100%', minHeight: '400px' }}
                             headStyle={{
                                 backgroundColor: group.color,
                                 color: '#fff',
@@ -61,15 +77,6 @@ const ListOfCandidatesWithStatus = () => {
                             <List
                                 dataSource={getCandidatesByStatus(group.key)}
                                 locale={{ emptyText: 'No candidates' }}
-                                pagination={
-                                    {
-                                        style: {
-                                            textAlign: 'center',
-                                            fontSize: '.8rem',
-                                        },
-                                        pageSize: 5,
-                                    }
-                                }
                                 renderItem={(item) => (
                                     <List.Item>
                                         <List.Item.Meta
@@ -86,13 +93,13 @@ const ListOfCandidatesWithStatus = () => {
                                                     {item.name}
                                                 </span>
                                             }
-                                            description={
-                                                <span className="capitalize">{item.technology}</span>
-                                            }
+                                            description={<span className="capitalize">{item.technology}</span>}
                                         />
                                     </List.Item>
                                 )}
+                                style={{ maxHeight: '400px', overflowY: 'auto',scrollbarWidth: 'thin',scrollbarColor: '#ffff' }}
                             />
+
                         </Card>
                     </Col>
                 ))}

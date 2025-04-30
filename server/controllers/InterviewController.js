@@ -5,14 +5,8 @@ import InterviewLog from "../model/interviewLog.js";
 import dayjs from "dayjs";
 
 const createInterview = async (req, res) => {
-    const { candidate, interviewer, date, time, type, notes, status } = req.body;
-    // console.log(req.body)
-    // console.log(dayjs(date).isBefore(dayjs()))
-    // console.log(dayjs(time).isBefore(dayjs()))
-    // console.log(dayjs(` ${date} ${time}`).isBefore(dayjs()))
-    // console.log(dayjs().format('YYYY-MM-DD'))
-    // console.log(dayjs(date).format('h:mm A'))
-    // console.log(dayjs(time).format('h:mm A'))
+    const { candidate, interviewer, date, time, type, notes, status, candidateInterviewStatus } = req.body;
+
     if (!candidate || !interviewer || !date || !time || !type || !status) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
@@ -20,17 +14,17 @@ const createInterview = async (req, res) => {
         if (dayjs(` ${date} ${time}`).isBefore(dayjs())) {
             return res.status(400).json({ success: false, message: "Cannot schedule interview in the past" });
         }
-        const existingInterview = await Interview.findOne({ candidate, date, time }).lean();
+        const existingInterview = await Interview.findOne({ candidateInterviewStatus }).lean();
 
         if (existingInterview && existingInterview.status === "scheduled") {
-            return res.status(400).json({ success: false, message: "Interview already send on this date for this candidate" });
+            return res.status(400).json({ success: false, message: `Check your schedule ${candidateInterviewStatus} Interview is not completed` });
         }
 
         if (existingInterview && existingInterview.status === "draft") {
             await Interview.findByIdAndDelete(existingInterview._id);
         }
 
-        const interview = await Interview.create({ candidate, interviewer, date, time, type, notes, status });
+        const interview = await Interview.create({ candidate, interviewer, date, time, type, notes, status, candidateInterviewStatus });
 
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not created" });

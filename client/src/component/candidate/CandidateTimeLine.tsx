@@ -7,15 +7,32 @@ import dayjs from "dayjs";
 const { Text } = Typography;
 
 const getStatusColor = (status: string) => {
+    console.log(status);
     switch (status) {
         case "assigned":
-            return "blue";
+            return "orange";
+        case "created":
+            return "#193152";
         case "completed":
             return "green";
         case "pending":
             return "orange";
         case "cancelled":
             return "red";
+        case "failed":
+            return "red";
+        case "passed":
+            return "green";
+        case "sent":
+            return "blue";
+        case "draft":
+            return "#F54A00";
+        case "accepted":
+            return "green";
+        case "rejected":
+            return "red";
+        case "updated":
+            return "#F54A00";
         default:
             return "gray";
     }
@@ -29,6 +46,7 @@ const CandidateTimeLine = () => {
     });
     console.log(candidateLogs);
     const logs = candidateLogs?.data || [];
+    console.log(logs);
 
     return (
         <Card
@@ -42,7 +60,7 @@ const CandidateTimeLine = () => {
                 <Timeline
                     mode="left"
                     items={logs.map((log) => ({
-                        dot: <ClockCircleOutlined style={{ fontSize: '16px', color: getStatusColor(log.metaData?.status) }} />,
+                        dot: <ClockCircleOutlined style={{ fontSize: '16px', color: getStatusColor(log?.action) }} />,
                         label: dayjs(log.createdAt).format('MMM DD, YYYY h:mm A'),
                         children: (
                             <div>

@@ -94,6 +94,7 @@ export type interviewData = {
     rating: number;
     notes: string;
     status: interviewStatus;
+    candidateInterviewStatus: 'first' | 'second' | 'third';
     _id: string;
     __v: number;
     createdAt: string;

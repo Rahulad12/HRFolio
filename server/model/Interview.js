@@ -29,10 +29,10 @@ const interviewSchema = new mongoose.Schema({
         default: "in-person",
         required: true
     },
-    candidateStatus: {
+    candidateInterviewStatus: {
         type: String,
-        enum: ["First", "Second", "Third"],
-        default: "First",
+        enum: ["first", "second", "third"],
+        default: "first",
         required: true
     },
     notes: {
@@ -48,18 +48,26 @@ const interviewSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// interviewSchema.pre("save", async function (next) {
-//     if (this.status === "scheduled") {
-//         const candidateId = this.candidate;
-//         const candidate = await candidate.findById(candidateId);
+interviewSchema.pre("save", async function (next) {
+    if (this.status === "scheduled") {
+        const candidateId = this.candidate;
+        const candidateInfo = await candidate.findById(candidateId);
 
-//         if (candidate) {
-//             candidate.status = "First";
-//             await candidate.save();
-//         }
-//     }
-//     next();
-// });
+        if (this.candidateInterviewStatus === "first") {
+            candidateInfo.status = "first";
+            await candidateInfo.save();
+        }
+        else if (this.candidateInterviewStatus === "second") {
+            candidateInfo.status = "second";
+            await candidateInfo.save();
+        }
+        else if (this.candidateInterviewStatus === "third") {
+            candidateInfo.status = "third";
+            await candidateInfo.save();
+        }
+    }
+    next();
+});
 
 const Interview = mongoose.model("interviews", interviewSchema);
 

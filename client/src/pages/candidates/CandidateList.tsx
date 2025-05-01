@@ -12,6 +12,7 @@ import CustomTable from '../../component/common/Table';
 import TableSearch from '../../component/common/TableSearch';
 import PrimaryButton from '../../component/ui/button/Primary';
 import Predefineddata from '../../data/PredefinedData';
+import { useMemo, useState } from 'react';
 
 const statusColors: Record<string, string> = {
   shortlisted: 'blue',
@@ -19,7 +20,7 @@ const statusColors: Record<string, string> = {
   first: 'orange',
   second: 'purple',
   third: 'cyan',
-  offerd: "volcano",
+  offered: "volcano",
   hired: 'green',
   rejected: 'red',
 };
@@ -29,8 +30,9 @@ const CandidateTable = () => {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [deleteId, setDeleteId] = useState<string>("");
   // const filter = useAppSelector((state) => state.search);
-  const [deleteCandidate, { isLoading: isDeleting }] = useDeleteCandidateMutation();
+  const [deleteCandidate] = useDeleteCandidateMutation();
 
   const { candidateSearch: searchTerms } = useAppSelector((state) => state.search);
   const { data, isLoading: candidateLoading } = useGetCandidateQuery({
@@ -41,9 +43,16 @@ const CandidateTable = () => {
   }
   );
 
+  const sortedCandidates = useMemo(() => {
+    return data?.data?.slice().sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [data]);
+  
   const [api, contextHolder] = notification.useNotification();
 
   const handleDelete = async (id: string) => {
+    setDeleteId(id);
     try {
       const res = await deleteCandidate(id).unwrap();
       dispatch(setCandidate([]));
@@ -58,6 +67,9 @@ const CandidateTable = () => {
         placement: "topRight",
         duration: 2000,
       })
+    }
+    finally {
+      setDeleteId("");
     }
   };
 
@@ -163,7 +175,7 @@ const CandidateTable = () => {
                 onConfirm={() => handleDelete(record._id)}
                 okText="Yes"
                 cancelText="No"
-                okButtonProps={{ loading: isDeleting }}
+                okButtonProps={{ loading: deleteId === record._id }}
               >
                 <Button
                   type="text"
@@ -192,6 +204,9 @@ const CandidateTable = () => {
       </motion.div>
     );
   }
+
+  //sorted Candidate based on createdAt
+
 
   //main content return
   return (
@@ -224,12 +239,11 @@ const CandidateTable = () => {
 
         <CustomTable
           loading={candidateLoading}
-          data={data?.data || []}
+          data={sortedCandidates || []}
           columns={columns}
           pageSize={10}
-          key="candidateTable"
+          key={sortedCandidates?.map(c => c._id).join(',')}
         />
-
       </Card>
     </>
 

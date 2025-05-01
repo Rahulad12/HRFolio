@@ -39,7 +39,7 @@ const candidateSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        enum: ["shortlisted", "first", "second", "third", "assessment", "offered", "hired", "rejected",],
+        enum: ["shortlisted", "assessment", "first", "second", "third", "offered", "hired", "rejected"],
         default: "shortlisted"
     },
     applieddate: {

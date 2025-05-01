@@ -4,21 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
-// const statusGroups = [
-//     { title: 'Shortlisted', key: 'shortlisted', color: '#2471A3' },
-//     { title: 'Assessment', key: 'assessment', color: '#2f54eb' },
-//     { title: 'First Interview', key: 'first', color: '#D35400' },
-//     { title: 'Second Interview', key: 'second', color: '#7D3C98' },
-//     { title: 'Third Interview', key: 'third', color: '#3498DB' },
-//     { title: 'Offered', key: 'offered', color: '#7F8C8D ' },
-//     { title: 'Hired', key: 'hired', color: '#237804' },
-//     { title: 'Rejected', key: 'rejected', color: '#a8071a' },
-// ];
 const statusGroups = [
     { title: 'Shortlisted', key: 'shortlisted', color: '#2471A3' },
     { title: 'Assessment', key: 'assessment', color: '#2f54eb' },
     { title: 'Interviewing', key: 'interviewing', color: '#7D3C98' },
-    { title: 'Offered', key: 'offered', color: '#7F8C8D ' },
+    { title: 'Offered', key: 'offered', color: '#F54A00 ' },
     { title: 'Hired', key: 'hired', color: '#237804' },
     { title: 'Rejected', key: 'rejected', color: '#a8071a' },
 ];

@@ -52,22 +52,31 @@ interviewSchema.pre("save", async function (next) {
     if (this.status === "scheduled") {
         const candidateId = this.candidate;
         const candidateInfo = await candidate.findById(candidateId);
+        const Interview = mongoose.model("interviews");
 
-        if (this.candidateInterviewStatus === "first") {
-            candidateInfo.status = "first";
-            await candidateInfo.save();
+        // Check for existing completed interviews for this candidate
+        const interviews = await Interview.find({ candidate: candidateId });
+
+        const stageCompleted = (stage) =>
+            interviews.some(int => int.candidateInterviewStatus === stage && int.status === "completed");
+
+        // Validate stage progression
+        if (this.candidateInterviewStatus === "second" && !stageCompleted("first")) {
+            return next(new Error("First round interview must be completed before scheduling second round."));
         }
-        else if (this.candidateInterviewStatus === "second") {
-            candidateInfo.status = "second";
-            await candidateInfo.save();
+
+        if (this.candidateInterviewStatus === "third" && !stageCompleted("second")) {
+            return next(new Error("Second round interview must be completed before scheduling third round."));
         }
-        else if (this.candidateInterviewStatus === "third") {
-            candidateInfo.status = "third";
-            await candidateInfo.save();
-        }
+
+        // Update candidate status accordingly
+        candidateInfo.status = this.candidateInterviewStatus;
+        await candidateInfo.save();
     }
+
     next();
 });
+
 
 const Interview = mongoose.model("interviews", interviewSchema);
 

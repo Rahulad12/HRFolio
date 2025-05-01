@@ -150,9 +150,14 @@ const AssignAssessment = () => {
                 <Typography.Title level={2} className="ml-2 text-lg font-semibold">{
                     isEditing ? 'Edit Assignment' : 'Assign Assessment'
                 }</Typography.Title>
-                <Typography.Text className='ml-3'>
-                    ({makeCapitilized(assignedAssessments?.data?.candidate?.name || '')})
-                </Typography.Text>
+                {
+                    isEditing && (
+                        <Typography.Text className='ml-3'>
+                            ({makeCapitilized(assignedAssessments?.data?.candidate?.name || '')})
+                        </Typography.Text>
+                    )
+                }
+
             </div>
             <Row gutter={16}>
                 <Col xs={24} md={12} lg={14}>

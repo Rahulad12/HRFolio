@@ -105,9 +105,9 @@ const AssessmentAssignmentList: React.FC = () => {
       title: 'CANDIDATE',
       dataIndex: "candidate",
       render: (candidate: candidateData) => (
-        <div className='flex flex-col cursor-pointer' onClick={() => navigate(`/dashboard/candidates/${candidate._id}`)}>
+        <div className='flex flex-col cursor-pointer' onClick={() => navigate(`/dashboard/candidates/${candidate?._id}`)}>
           <span className='tfont-medium' >{makeCapitilized(candidate?.name)}</span>
-          <span className='text-xs text-gray-500'>{makeCapitilized(candidate.email)}</span>
+          <span className='text-xs text-gray-500'>{makeCapitilized(candidate?.email)}</span>
         </div>
       )
     },

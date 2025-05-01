@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAppSelector } from '../../Hooks/hook';
 import { Clock, CheckCircle, AlertCircle, XCircle, Star } from 'lucide-react';
-import { Card, Tabs, Empty, Skeleton } from 'antd';
+import { Card, Tabs, Empty, Skeleton, Tag } from 'antd';
 import { AssessmentLogData, interviewLogData, offerLog } from '../../types';
 import { useGetInterviewLogByCanidateIdQuery } from '../../services/interviewServiceApi';
 import { useGetAssessmentLogByCandidateIdQuery } from '../../services/assessmentServiceApi';
@@ -53,7 +53,20 @@ const getStatusIcon = (status: string) => {
     }
 };
 
-const CandidateProfile = () => {
+const getInterviewRoundTagColor = (round: string) => {
+    switch (round) {
+        case 'first':
+            return 'blue';
+        case 'second':
+            return 'purple';
+        case 'third':
+            return 'warning';
+        default:
+            return 'volcano';
+    }
+}
+
+const CandidateHistory = () => {
     const [activeTab, setActiveTab] = useState('assessments');
     const { candidate } = useAppSelector((state) => state.candidate);
     const { data: interviewsLog, isLoading: interviewLogLoading } = useGetInterviewLogByCanidateIdQuery(candidate?.[0]?._id, {
@@ -112,6 +125,17 @@ const CandidateProfile = () => {
                                 <p className="mb-1">
                                     <strong>Type:</strong> {log?.details?.type}
                                 </p>
+                                {
+                                    log?.details?.interviewRound && (
+                                        <p className="mb-1">
+                                            <strong>Round: </strong>
+
+                                            <Tag color={getInterviewRoundTagColor(log?.details?.interviewRound)}>
+                                                {log?.details?.interviewRound}
+                                            </Tag>
+                                        </p>
+                                    )
+                                }
                                 {log?.details?.feedback && (
                                     <p className="mb-1">
                                         <strong>Feedback:</strong>
@@ -278,4 +302,4 @@ const CandidateProfile = () => {
     );
 };
 
-export default CandidateProfile;
+export default CandidateHistory;

@@ -28,7 +28,7 @@ export const checkUserExist = async (req, res, next) => {
         const userId = req.user.id;
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ success: false, message: "user not found" })
+            return res.status(401).json({ success: false, message: "Unauthorized" })
         }
         next();
 

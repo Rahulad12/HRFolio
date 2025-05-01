@@ -69,6 +69,16 @@ export type candidateData = {
     applieddate: string;
     resume: string;
     updatedAt: string
+    progress: {
+        shortlisted: { completed: boolean, date: string };
+        first: { completed: boolean, date: string };
+        second: { completed: boolean, date: string };
+        third: { completed: boolean, date: string };
+        assessment: { completed: boolean, date: string };
+        offered: { completed: boolean, date: string };
+        hired: { completed: boolean, date: string };
+        rejected: { completed: boolean, date: string };
+    }
 }
 export type candidateResponse = {
     success: boolean;
@@ -342,6 +352,7 @@ export type interviewLogData = {
         status: interviewStatus;
         rating: number;
         feedback: string;
+        interviewRound: 'first' | 'second' | 'third';
     }
     createdAt: string;
     updatedAt: string;
@@ -376,6 +387,8 @@ export type activityLog = {
         feedback: string;
         rating: number;
         status: string;
+        description: string
+        interviewRound: 'first' | 'second' | 'third';
     }
     createdAt: string;
     updatedAt: string

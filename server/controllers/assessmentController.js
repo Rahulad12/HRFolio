@@ -130,6 +130,7 @@ const assignAssessment = async (req, res) => {
                         title: existingCanidate?.name,
                         dueDate: dueDate,
                         status: status,
+                        description: existingCanidate?.status
                     },
                 })
 
@@ -219,6 +220,20 @@ const deleteAssignment = async (req, res) => {
             performedAt: Date.now(),
             performedBy: req.user._id,
         })
+
+        const existingCandidate = await Candidate.findById(assignment.candidate);
+        await ActivityLog.create({
+            candidate: assignment.candidate,
+            userID: req.user._id,
+            action: 'deleted',
+            entityType: 'assessments',
+            relatedId: assignment?.assessment,
+            metaData: {
+                title: existingCandidate?.name,
+                status: "deleted",
+                description: existingCandidate?.status
+            },
+        })
         return res.status(200).json({ success: true, message: "Assignment deleted successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -268,6 +283,7 @@ const updateAssignmnet = async (req, res) => {
                 title: existingCandidate?.name,
                 dueDate: assignment?.dueDate,
                 status: assignment?.status,
+                description: existingCandidate?.status
             }
 
         })
@@ -382,6 +398,7 @@ const createScore = async (req, res) => {
             metaData: {
                 title: existingCanidate?.name,
                 status: createdScore.status,
+                description: existingCanidate?.status
             },
         })
         return res.status(200).json({

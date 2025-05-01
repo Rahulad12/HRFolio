@@ -4,6 +4,7 @@ import Offer from "../model/Offer.js";
 import OfferLog from "../model/offerLogs.js";
 import sendEmail from "../utils/sendEmail.js";
 import ActivityLog from "../model/ActivityLogs.js";
+import dayjs from "dayjs";
 
 const createOffer = async (req, res) => {
     const { candidate, email, position, salary, startDate, responseDeadline, status } = req.body;
@@ -42,7 +43,9 @@ const createOffer = async (req, res) => {
                     .replace(/{{position}}/g, position)
                     .replace(/{{salary}}/g, salary)
                     .replace(/{{startDate}}/g, startDate)
-                    .replace(/{{responseDeadline}}/g, responseDeadline);
+                    .replace(/{{responseDeadline}}/g, responseDeadline)
+                    .replace(/{{offerDate}}/g, dayjs().format('MMMM D, YYYY'))
+                    .replace(/{{offerTime}}/g, dayjs().format('hh:mm A'));
 
                 const subject = emailTemplate.subject.replace(/{{position}}/g, position);
 
@@ -168,7 +171,8 @@ const updateOffer = async (req, res) => {
             relatedId: offer?._id,
             metaData: {
                 title: candidateInfo?.name,
-                status: offer?.status
+                status: offer?.status,
+                description: candidateInfo?.status
             }
         })
         return res.status(200).json({ success: true, message: "Offer updated successfully", data: offer });
@@ -197,6 +201,20 @@ const delteOffer = async (req, res) => {
                 salary: offer?.salary,
                 joinedDate: offer?.startDate,
                 responseDeadline: offer?.responseDeadline
+            }
+        })
+        const candidateInfo = await Candidate.findById(offer?.candidate);
+
+        await ActivityLog.create({
+            candidate: offer?.candidate,
+            userID: req.user._id,
+            action: 'deleted',
+            entityType: 'offers',
+            relatedId: offer?._id,
+            metaData: {
+                title: candidateInfo?.name,
+                status: offer?.status,
+                description: candidateInfo?.status
             }
         })
 

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import candidate from "./Candidate.js";
-
+import Candidate from "./Candidate.js";
+import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
 const interviewSchema = new mongoose.Schema({
     candidate: {
         type: mongoose.Schema.Types.ObjectId,
@@ -48,37 +48,16 @@ const interviewSchema = new mongoose.Schema({
     timestamps: true
 });
 
-interviewSchema.pre("save", async function (next) {
-    if (this.status === "scheduled") {
-        const candidateId = this.candidate;
-        const candidateInfo = await candidate.findById(candidateId);
-        const Interview = mongoose.model("interviews");
-
-        // Check for existing completed interviews for this candidate
-        const interviews = await Interview.find({ candidate: candidateId });
-
-        const stageCompleted = (stage) =>
-            interviews.some(int => int.InterviewRound === stage && int.status === "completed");
-
-        // Validate stage progression
-        if (this.InterviewRound === "second" && !stageCompleted("first")) {
-            return next(new Error("First round interview must be completed before scheduling second round."));
-        }
-
-        if (this.InterviewRound === "third" && !stageCompleted("second")) {
-            return next(new Error("Second round interview must be completed before scheduling third round."));
-        }
-
-        // Update candidate status accordingly
-        candidateInfo.status = this.InterviewRound;
-        await candidateInfo.save();
-    }
-
-    next();
-});
-
+// interviewSchema.pre("save", async function (next) {
+//     try {
+//         if (this.status === "completed") {
+//             await updateCandidateProgress(this.candidate, this.InterviewRound);
+//         }
+//         next();
+//     } catch (err) {
+//         next(err);
+//     }
+// })
 
 const Interview = mongoose.model("interviews", interviewSchema);
-
-
 export default Interview;

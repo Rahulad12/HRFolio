@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
 import Candidate from "./Candidate.js";
 const assessmentAssignmentSchema = new mongoose.Schema({
     candidate: {
@@ -33,23 +34,20 @@ const assessmentAssignmentSchema = new mongoose.Schema({
 });
 
 assessmentAssignmentSchema.pre('save', async function (next) {
-    const now = new Date();
-    if (this, this.status === "assigned" && this.date < now) {
-        this.status = "pending";
-    };
-
-    if (this.status === "assigned") {
-        const candidate = await Candidate.findById(this.candidate);
-        if (candidate && candidate.status !== 'assessment') {
-            candidate.status = 'assessment';
-            await candidate.save();
+    try {
+        if (this.status === "assigned") {
+            const candidateInfo = await Candidate.findById(this.candidate);
+            candidateInfo.status = "assessment";
+            await candidateInfo.save();
         }
-        candidate.status = "assessment";
-        await candidate.save();
+        if (this.status === "completed") {
+            await updateCandidateProgress(this.candidate, 'assessment');
+        }
+        next();
+    } catch (err) {
+        next(err);
     }
-    next();
-}
-)
+})
 
 const AssessmentAssignment = mongoose.model("assessmentAssignments", assessmentAssignmentSchema);
 export default AssessmentAssignment;

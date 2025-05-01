@@ -130,7 +130,7 @@ const InterviewerList: React.FC = () => {
     >
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Typography.Title className="text-2xl font-bold text-gray-900">Interviewers</Typography.Title>
+          <Typography.Title level ={2} className="text-2xl font-bold text-gray-900">Interviewers</Typography.Title>
           <Typography.Text className="mt-1 text-sm text-gray-500">
             Manage staff members who conduct interviews
           </Typography.Text>

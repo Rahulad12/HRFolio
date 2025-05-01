@@ -73,6 +73,18 @@ const InterviewListView = ({
         }
     };
 
+    const getInterviewRoundColor = (round: string) => {
+        switch (round) {
+            case 'first':
+                return 'blue';
+            case 'second':
+                return 'purple';
+            case 'third':
+                return 'volcano';
+        }
+    }
+
+
     const handleViewDetails = (interview: interviewData) => {
         setSelectedInterview(interview);
         setIsDetailsModalVisible(true);
@@ -233,6 +245,7 @@ const InterviewListView = ({
                                     <Tag color={getInterviewStatusColor(interview?.status)} className='capitalize'>
                                         {interview?.status.charAt(0).toUpperCase() + interview?.status.slice(1)}
                                     </Tag>
+                                    <Tag color={getInterviewRoundColor(interview?.InterviewRound)} className='capitalize'>{interview?.InterviewRound} Interview</Tag>
                                 </div>
                                 <Text type="secondary" className='capitalize'>{interview?.candidate?.level}</Text>
                                 <div className="mt-2 flex flex-wrap gap-3">

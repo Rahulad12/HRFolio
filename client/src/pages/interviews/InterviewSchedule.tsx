@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCreateInterviewMutation } from '../../services/interviewServiceApi';
 import { Button, DatePicker, Form, Input, Select, TimePicker, Typography, message, Card } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { interviewData, interviewStatus } from '../../types';
-import { useInterviewer } from '../../action/StoreInterview';
+import { useInterview, useInterviewer } from '../../action/StoreInterview';
 import { useCandidate } from '../../action/StoreCandidate';
 import { makeCapitilized } from '../../utils/TextAlter';
 import SecondaryButton from '../../component/ui/button/Secondary';
 const { Option } = Select;
 const { TextArea } = Input;
 const { Title } = Typography;
+
 
 const InterviewSchedule: React.FC = () => {
   const navigate = useNavigate();
@@ -21,12 +22,9 @@ const InterviewSchedule: React.FC = () => {
   const [createInterview, { isLoading: createInterviewLoading }] = useCreateInterviewMutation();
   const { interviewers } = useInterviewer();
   const { data: candidates } = useCandidate();
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
+  const { interview: interviews } = useInterview(null, null);
+  console.log(interviews);
 
-  const handleDateChange = (date: any) => {
-    setSelectedDate(dayjs(date));
-    form.setFieldsValue({ date: date });
-  };
 
   const handleDraftInterview = async () => {
     const payload = form.getFieldsValue();
@@ -88,10 +86,6 @@ const InterviewSchedule: React.FC = () => {
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          initialValues={{
-            type: 'video',
-            date: selectedDate,
-          }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Form.Item
@@ -100,7 +94,7 @@ const InterviewSchedule: React.FC = () => {
               rules={[{ required: true, message: 'Candidate is required' }]}
             >
               <Select placeholder="Select Candidate" showSearch>
-                {candidates?.data?.filter((c) => c?.status === 'first')?.map((c) => (
+                {candidates?.data?.filter((c) => c?.progress?.assessment?.completed === true)?.map((c) => (
                   <Option key={c._id} value={c._id}>
                     {makeCapitilized(c.name)} - {makeCapitilized(c.technology)} ({makeCapitilized(c.level)})
                   </Option>
@@ -110,6 +104,25 @@ const InterviewSchedule: React.FC = () => {
             <Form.Item
               name="InterviewRound"
               label="Interview Round"
+              rules={[
+                { required: true, message: 'Interview round is required' },
+                {
+                  validator: (_, value) => {
+                    const candidateId = form.getFieldValue('candidate');
+                    console.log(candidateId);
+                    const interview = interviews?.data?.find((i) => i.candidate._id === candidateId);
+                    console.log(interview);
+
+                    if (!candidateId || !value) return Promise.resolve();
+
+                    if (interview?.InterviewRound?.includes(value)) {
+                      return Promise.reject(new Error('Candidate is already scheduled for this round'));
+                    }
+
+                    return Promise.resolve();
+                  }
+                }
+              ]}
             >
               <Select
                 placeholder="Select Interview Status"
@@ -121,6 +134,7 @@ const InterviewSchedule: React.FC = () => {
                 allowClear
               />
             </Form.Item>
+
             <Form.Item
               label="Interviewer"
               name="interviewer"
@@ -138,17 +152,30 @@ const InterviewSchedule: React.FC = () => {
             <Form.Item
               label="Date"
               name="date"
-              rules={[{ required: true, message: 'Date is required' }]}
+              rules={[{ required: true, message: 'Date is required' }, {
+                validator: (_, value) => {
+                  if (dayjs(value).isBefore(dayjs())) {
+                    return Promise.reject(new Error('Please select a future date'));
+                  }
+                  return Promise.resolve();
+                },
+              }]}
             >
               <DatePicker
                 className="w-full"
-                onChange={handleDateChange}
               />
             </Form.Item>
             <Form.Item
               label="Time Slot"
               name="time"
-              rules={[{ required: true, message: 'Time slot is required' }]}
+              rules={[{ required: true, message: 'Time slot is required' }, {
+                validator: (_, value) => {
+                  if (dayjs(value).isBefore(dayjs())) {
+                    return Promise.reject(new Error('Please select a future time'));
+                  }
+                  return Promise.resolve();
+                },
+              }]}
             >
               <TimePicker format={'h:mm A'} />
             </Form.Item>

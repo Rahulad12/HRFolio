@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 
 const sendEmail = async ({ to, subject, html }) => {
+    console.log(to, subject, html);
     // Use your SMTP credentials or Gmail OAuth
     const transporter = nodemailer.createTransport({
         service: 'gmail',

@@ -5,11 +5,9 @@ import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../../serv
 import { candidateFormData } from '../../types/index';
 import CandidateProfileLoading from '../../component/Loding/CandidateProfileLoading';
 import { makeCapitilized } from '../../utils/TextAlter';
-import { useGetInterviewByCandidateIdQuery } from '../../services/interviewServiceApi';
-import { storeInterview } from '../../action/StoreInterview';
 import { useAppDispatch } from '../../Hooks/hook';
 import { storeCandidate } from '../../action/StoreCandidate';
-import CandidateProfile from '../../component/candidate/CandidateProfile';
+import CandidateHistory from '../../component/candidate/CandidateHistory';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
@@ -20,12 +18,11 @@ const CandidateDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { data, isLoading } = useGetCandidateByIdQuery(id);
-  const [updateCandidate] = useUpdateCandidateMutation();
-  const { data: interviewData } = useGetInterviewByCandidateIdQuery(id, {
-    refetchOnMountOrArgChange: true,
+  const { data, isLoading, refetch } = useGetCandidateByIdQuery(id, {
+    skip: !id
   });
 
+  const [updateCandidate] = useUpdateCandidateMutation();
 
   const [candidate, setCandidate] = useState<candidateFormData>({
     name: "",
@@ -47,11 +44,8 @@ const CandidateDetails = () => {
       const candidateList = Array.isArray(data.data) ? data.data : [data.data];
       dispatch(storeCandidate(candidateList));
     }
-    if (interviewData?.success && interviewData?.data) {
-      const interviewList = Array.isArray(interviewData.data) ? interviewData.data : [interviewData.data];
-      dispatch(storeInterview(interviewList));
-    }
-  }, [data, interviewData]);
+
+  }, [data]);
 
   const StatusFlow = [
     'shortlisted',
@@ -64,20 +58,19 @@ const CandidateDetails = () => {
     'rejected'
   ] as const;
 
-  type CandidateStatusFlow = typeof StatusFlow[number];
-  const canMoveToNextStatus = (currentStatus: CandidateStatusFlow, nextStatus: CandidateStatusFlow) => {
-    if (nextStatus === 'rejected') return true; // special case: rejection allowed anytime
+  const canMoveToStatus = (targetStatus: candidateStatus) => {
+    const stageOrder = StatusFlow;
+    const currentIndex = stageOrder.indexOf(candidate.status);
+    const targetIndex = stageOrder.indexOf(targetStatus);
 
-    const currentIndex = StatusFlow.indexOf(currentStatus);
-    const nextIndex = StatusFlow.indexOf(nextStatus);
+    if (targetStatus === "rejected") return true;
 
-    if (currentIndex === -1 || nextIndex === -1) return false;
-
-    return nextIndex === currentIndex + 1; // Only next step allowed
+    // Allow only next immediate step or staying on current
+    return targetIndex <= currentIndex + 1;
   };
 
   const updateStatus = async (newStatus: candidateStatus) => {
-    if (!canMoveToNextStatus(candidate.status as CandidateStatusFlow, newStatus as CandidateStatusFlow)) {
+    if (!canMoveToStatus(newStatus)) {
       api.error({
         message: "You cannot skip steps! Complete the current stage first.",
         placement: "topRight",
@@ -85,6 +78,7 @@ const CandidateDetails = () => {
       });
       return;
     }
+
     setCandidate({ ...candidate, status: newStatus });
 
     try {
@@ -94,20 +88,20 @@ const CandidateDetails = () => {
           message: res.message,
           placement: "topRight",
           duration: 3000,
-        })
+        });
         dispatch(storeCandidate([res.data]));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       api.error({
-        message: "Error updating status",
+        message: `Error updating candidate status: ${err?.data?.message}`,
         placement: "topRight",
         duration: 3000,
-      })
+      });
+    } finally {
+      refetch();
     }
   };
-
-
 
   const currentStep = StatusFlow.indexOf(candidate.status);
 
@@ -120,8 +114,9 @@ const CandidateDetails = () => {
       key: index,
       label: makeCapitilized(step),
       value: step,
-      // disabled: !canMoveToNextStatus(candidate.status as CandidateStatusFlow, step as CandidateStatusFlow)
+      disabled: !canMoveToStatus(step as candidateStatus)
     }));
+
 
   return (
     <div className="space-y-6 flex flex-col gap-3">
@@ -206,11 +201,15 @@ const CandidateDetails = () => {
       {/* Progress Steps */}
       <Card className="rounded-2xl shadow-sm">
         <Typography.Title level={5}>Candidate Progress</Typography.Title>
-        <Steps current={currentStep} responsive size="small">
-          {StatusFlow.map((step) => (
-            <Steps.Step key={step} title={makeCapitilized(step)} />
-          ))}
+        <Steps current={currentStep} responsive size="default">
+          {StatusFlow.map((step, index) => {
+            const stepStatus = index < currentStep ? "finish" : index === currentStep ? "process" : "wait";
+            return (
+              <Steps.Step key={step} title={makeCapitilized(step)} status={stepStatus} disabled={!canMoveToStatus(step as candidateStatus)} />
+            );
+          })}
         </Steps>
+
       </Card>
 
       {/* Full Profile Section */}
@@ -218,7 +217,7 @@ const CandidateDetails = () => {
       <Row gutter={[16, 16]}>
         <Col md={16} xs={24} lg={16}>
 
-          <CandidateProfile />
+          <CandidateHistory />
         </Col>
         <Col md={8} xs={24} lg={8}>
           <CandidateTimeLine />

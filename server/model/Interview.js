@@ -29,7 +29,7 @@ const interviewSchema = new mongoose.Schema({
         default: "in-person",
         required: true
     },
-    candidateInterviewStatus: {
+    InterviewRound: {
         type: String,
         enum: ["first", "second", "third"],
         default: "first",
@@ -58,19 +58,19 @@ interviewSchema.pre("save", async function (next) {
         const interviews = await Interview.find({ candidate: candidateId });
 
         const stageCompleted = (stage) =>
-            interviews.some(int => int.candidateInterviewStatus === stage && int.status === "completed");
+            interviews.some(int => int.InterviewRound === stage && int.status === "completed");
 
         // Validate stage progression
-        if (this.candidateInterviewStatus === "second" && !stageCompleted("first")) {
+        if (this.InterviewRound === "second" && !stageCompleted("first")) {
             return next(new Error("First round interview must be completed before scheduling second round."));
         }
 
-        if (this.candidateInterviewStatus === "third" && !stageCompleted("second")) {
+        if (this.InterviewRound === "third" && !stageCompleted("second")) {
             return next(new Error("Second round interview must be completed before scheduling third round."));
         }
 
         // Update candidate status accordingly
-        candidateInfo.status = this.candidateInterviewStatus;
+        candidateInfo.status = this.InterviewRound;
         await candidateInfo.save();
     }
 

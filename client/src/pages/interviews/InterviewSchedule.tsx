@@ -108,8 +108,8 @@ const InterviewSchedule: React.FC = () => {
               </Select>
             </Form.Item>
             <Form.Item
-              name="candidateInterviewStatus"
-              label="Interview"
+              name="InterviewRound"
+              label="Interview Round"
             >
               <Select
                 placeholder="Select Interview Status"

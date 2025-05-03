@@ -6,6 +6,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
 import { useState } from 'react';
 
+
 const statusGroups = [
     { title: 'Shortlisted', key: 'shortlisted', color: '#2471A3' },
     { title: 'Assessment', key: 'assessment', color: '#2f54eb' },
@@ -19,6 +20,7 @@ const ListOfCandidatesWithStatus = () => {
     const navigate = useNavigate();
 
     const { candidate } = useAppSelector((state) => state.candidate);
+    const { mode } = useAppSelector(state => state.theme);
 
     const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
 
@@ -111,7 +113,7 @@ const ListOfCandidatesWithStatus = () => {
                                             />
                                         </List.Item>
                                     )}
-                                    style={{ maxHeight: '320px', overflowY: 'auto' }}
+                                    style={{ maxHeight: '400px', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: mode === 'dark' ? '#0000 #0000' : '#ffff #ffff' }}
                                 />
                             </Card>
 

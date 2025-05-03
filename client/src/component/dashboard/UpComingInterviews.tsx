@@ -4,6 +4,7 @@ import { interviewData } from '../../types';
 import dayjs from 'dayjs';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { Button, Card, Pagination, Row, Tag, Typography } from 'antd';
+import { Radio, RadioChangeEvent } from 'antd';
 
 interface UpcomingInterviewsProps {
   interviews: interviewData[];
@@ -25,26 +26,61 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
     setCurrentPage(page);
   };
 
+  // 1. Add view filter state
+  const [filterType, setFilterType] = useState<'today' | 'week' | 'all'>('week');
+
+  // 2. Handle view toggle
+  const handleFilterChange = (e: RadioChangeEvent) => {
+    setFilterType(e.target.value);
+  };
+
+  // 3. Update interview filtering logic
   const filterInterview = interviews.filter((interview) => {
-    const afterDate = dayjs(interview.date).isAfter(dayjs());
-    const scheduled = interview.status === 'scheduled';
-    return afterDate && scheduled;
-  })
+    const interviewDate = dayjs(interview.date);
+    const today = dayjs().startOf('day');
+    const startOfWeek = today.startOf('week').add(1, 'day'); 
+    const endOfWeek = today.endOf('week').add(1, 'day');     
 
+    const isScheduled = interview.status === 'scheduled';
 
+    if (!isScheduled) return false;
+
+    if (filterType === 'today') {
+      return interviewDate.isSame(today, 'day');
+    }
+
+    if (filterType === 'week') {
+      return (
+        (interviewDate.isSame(startOfWeek, 'day') ||
+          (interviewDate.isAfter(startOfWeek) && interviewDate.isBefore(endOfWeek)) ||
+          interviewDate.isSame(endOfWeek, 'day'))
+      );
+    }
+
+    return interviewDate.isAfter(today);
+  });
 
   const paginatedInterviews = filterInterview?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  console.log('All interviews:', interviews);
-  console.log('Filtered interviews:', filterInterview);
-  console.log('Paginated interviews:', paginatedInterviews);
   return (
     <Card
       title="Upcoming Interviews"
       className={className}
       extra={
-        <Button type="link" onClick={onViewAllClick}>
-          View All
-        </Button>
+        <div className="flex gap-2 items-center">
+          <Radio.Group
+            size="small"
+            value={filterType}
+            onChange={handleFilterChange}
+            options={[
+              { label: 'Today', value: 'today' },
+              { label: 'This Week', value: 'week' },
+              { label: 'All Upcoming', value: 'all' }
+            ]}
+            optionType="button"
+            buttonStyle="solid"
+          />
+          <Button type="link" onClick={onViewAllClick}>View All</Button>
+        </div>
       }
       loading={loading}
     >

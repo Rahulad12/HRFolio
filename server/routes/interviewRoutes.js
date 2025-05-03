@@ -11,6 +11,7 @@ import {
 } from "../controllers/InterviewController.js";
 
 import { authenticate, checkUserExist } from "../middleware/auhtMiddleware.js";
+import { canCandidateProgress, canInterviewProgress } from "../middleware/CandidateProgress.js";
 
 const interviewRouter = express.Router();
 
@@ -19,7 +20,7 @@ interviewRouter.get("/log", authenticate, checkUserExist, getInterviewLog);
 interviewRouter.get("/log/candidate/:id", authenticate, checkUserExist, getInterviewLogByCandidate);
 
 //Create and list routes
-interviewRouter.post("/", authenticate, checkUserExist, createInterview);
+interviewRouter.post("/", authenticate, checkUserExist, canInterviewProgress(), createInterview);
 interviewRouter.get("/", authenticate, checkUserExist, getAllInterviews);
 
 //  Candidate-specific route (static segment first)

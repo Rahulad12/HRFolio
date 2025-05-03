@@ -1,9 +1,15 @@
 import { Button, Card } from 'antd'
-import { Calendar, FileCheck, FileText, Mail } from 'lucide-react'
+import { Calendar, FileCheck, FileText, Mail,Ban } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
-const CandidateQuickAction = () => {
+interface Props {
+    rejectCandidateHandlers?: () => void
+}
+const CandidateQuickAction: React.FC<Props> = ({
+    rejectCandidateHandlers
+}) => {
     const navigate = useNavigate();
     const { id } = useParams<string>();
+
     return (
         <Card title="Quick Actions" className="mb-6">
             <div className="space-y-3">
@@ -18,6 +24,9 @@ const CandidateQuickAction = () => {
                 </Button>
                 <Button block icon={<FileText size={16} />} className="flex items-center justify-center" onClick={() => navigate('/dashboard/offers/new')}>
                     Create Offer Letter
+                </Button>
+                <Button danger block icon={<Ban size={16} />} className="flex items-center justify-center" onClick={rejectCandidateHandlers}>
+                    Reject Candidate
                 </Button>
             </div>
         </Card>

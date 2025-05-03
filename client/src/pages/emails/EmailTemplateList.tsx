@@ -53,17 +53,20 @@ const EmailTemplateList: React.FC = () => {
     { value: 'interview', label: 'Interview' },
     { value: 'assessment', label: 'Assessment' },
     { value: 'rejection', label: 'Rejection' },
+    { value: 'hired', label: 'Hired' },
     { value: 'other', label: 'Other' }
   ];
 
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'offer':
-        return <Tag color='blue'>Offer Letter</Tag>;
+        return <Tag color='orange'>Offer Letter</Tag>;
       case 'interview':
-        return <Tag color='orange'>Interview</Tag>;
+        return <Tag color='purple'>Interview</Tag>;
       case 'assessment':
-        return <Tag color='green'>Assessment</Tag>;
+        return <Tag color='blue'>Assessment</Tag>;
+      case 'hired':
+        return <Tag color='green'>Hired</Tag>;
       case 'rejection':
         return <Tag color='red'>Rejection</Tag>;
       case 'other':

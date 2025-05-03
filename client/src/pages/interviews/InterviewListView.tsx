@@ -1,13 +1,13 @@
 import { Button, Card, Divider, Popconfirm, Space, Tag, Typography, message, notification } from 'antd'
 import { Calendar, CalendarIcon, Check, Clock, Eye, MapPin, Phone, Send, Trash2, Users, Video } from 'lucide-react'
-import { useAppSelector } from '../../Hooks/hook'
+import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import dayjs, { Dayjs } from 'dayjs'
 import InterviewDetailsModal from './InterviewDetailsModal'
-
 import { interviewData, interviewStatus } from '../../types'
 import { useMemo, useState } from 'react'
 const { Title, Text } = Typography
 import { useUpdateInterviewMutation, useDeleteInterviewMutation, useCreateInterviewMutation } from '../../services/interviewServiceApi';
+import { storeInterview } from '../../action/StoreInterview'
 interface interviewSearchTerms {
     searchTerm?: string;
     interviewStatus?: string | null;
@@ -29,6 +29,7 @@ const InterviewListView = ({
     const [deleteInterview] = useDeleteInterviewMutation();
     const [createInterview] = useCreateInterviewMutation();
 
+    const dispatch = useAppDispatch();
     //selected Interview
     const { interviews } = useAppSelector(state => state.interview);
 
@@ -68,81 +69,110 @@ const InterviewListView = ({
                 return 'red';
             case 'rescheduled':
                 return 'orange';
+            case 'failed':
+                return 'red';
             default:
                 return 'default';
         }
     };
 
+    const getInterviewRoundColor = (round: string) => {
+        switch (round) {
+            case 'first':
+                return 'blue';
+            case 'second':
+                return 'purple';
+            case 'third':
+                return 'volcano';
+        }
+    }
+
+
     const handleViewDetails = (interview: interviewData) => {
         setSelectedInterview(interview);
         setIsDetailsModalVisible(true);
     }
-    // const handleCloseDetailsModal = () => {
-    //     setSelectedInterview(null);
-    //     setIsDetailsModalVisible(false);
-    // }
     const handleStatusUpdate = async (id: string, status: interviewStatus) => {
-        setSelectedInterviews(selectedInterviews.filter((interview) => interview._id == id));
+        // setSelectedInterviews(selectedInterviews.filter((interview) => interview._id == id));
+        const interviewData = interviews?.find((i) => i._id === id);
+        if (!interviewData) {
+            api.error({
+                message: "Interview data not found.",
+                placement: "topRight",
+                duration: 3000
+            });
+            return;
+        }
+
         try {
             const res = await updateInterview({
                 id,
                 data: {
-                    ...selectedInterviews.filter((interview) => interview._id == id)[0],
+                    ...interviewData,
                     status
                 }
-            });
-            if (res?.data?.success) {
+            }).unwrap();
+            if (res?.success) {
                 api.success({
-                    message: res?.data?.message,
+                    message: res?.message,
                     placement: "topRight",
                     duration: 3000,
                 })
+                const interviewData = Array.isArray(res.data) ? res.data : [res.data];
+                dispatch(storeInterview(interviewData as interviewData[]));
             }
-            else {
-                api.error({
-                    message: res?.data?.message,
+
+        } catch (error: any) {
+            api.error({
+                message: `Error updating candidate status: ${error?.data?.message || error?.message || 'An unknown error occurred.'}`,
+                placement: "topRight",
+                duration: 3000
+            })
+        }
+        finally {
+            setSelectedInterviews(selectedInterviews.filter((interview) => interview._id !== id));
+        }
+    }
+
+    //feedback for particular interview
+    const handleFeedbackSubmit = async (id: string, feedback: string, rating: number) => {
+        const interviewData = interviews?.find((i) => i._id === id);
+        if (!interviewData) {
+            api.error({
+                message: "Interview data not found.",
+                placement: "topRight",
+                duration: 3000
+            });
+            return;
+        }
+        try {
+            const res = await updateInterview({
+                id,
+                data: {
+                    ...interviewData,
+                    feedback,
+                    rating
+                }
+            }).unwrap();
+
+            if (res?.success) {
+                api.success({
+                    message: res?.message,
                     placement: "topRight",
                     duration: 3000,
                 })
+
+                const interviewData = Array.isArray(res.data) ? res.data : [res.data];
+                dispatch(storeInterview(interviewData as interviewData[]));
             }
 
         } catch (error: any) {
             console.log(error);
             api.error({
-                message: "Error updating status",
+                message: `Error updating candidate status: ${error?.data?.message || error?.message || 'An unknown error occurred.'}`,
                 placement: "topRight",
-                duration: 3000,
+                duration: 3000
             })
-        }
-    }
-    const handleFeedbackSubmit = async (id: string, feedback: string, rating: number) => {
-        setSelectedInterviews(selectedInterviews.filter((interview) => interview._id == id));
-        try {
-            const res = await updateInterview({
-                id,
-                data: {
-                    ...selectedInterviews.filter((interview) => interview._id == id)[0],
-                    feedback,
-                    rating
-                }
-            });
-
-            if (res?.data?.success) {
-                api.success({
-                    message: res?.data?.message,
-                    placement: "topRight",
-                    duration: 3000,
-                })
-            }
-            else {
-                api.error({
-                    message: res?.data?.message,
-                    placement: "topRight",
-                    duration: 3000,
-                })
-            }
-        } catch (error: any) {
-            console.log(error);
         }
     }
     const handleInterviewDelete = async (id: string) => {
@@ -151,6 +181,7 @@ const InterviewListView = ({
             if (res?.data?.success) {
                 message.success(res?.data?.message);
             }
+
         } catch (error: any) {
             console.log(error);
             console.log(error.data.message)
@@ -230,9 +261,10 @@ const InterviewListView = ({
                                     <Tag color={getInterviewTypeColor(interview?.type)} className='capitalize'>
                                         {interview?.type.charAt(0).toUpperCase() + interview.type.slice(1)}
                                     </Tag>
-                                    <Tag color={getInterviewStatusColor(interview?.status)} className='capitalize'>
-                                        {interview?.status.charAt(0).toUpperCase() + interview?.status.slice(1)}
+                                    <Tag color={getInterviewStatusColor(interview?.status || '')} className='capitalize'>
+                                        {interview?.status || ''}
                                     </Tag>
+                                    <Tag color={getInterviewRoundColor(interview?.InterviewRound || '')} className='capitalize'>{interview?.InterviewRound} Interview</Tag>
                                 </div>
                                 <Text type="secondary" className='capitalize'>{interview?.candidate?.level}</Text>
                                 <div className="mt-2 flex flex-wrap gap-3">
@@ -248,15 +280,32 @@ const InterviewListView = ({
                                     </div>
                                     <div className="flex items-center">
                                         <Users size={14} className="mr-1 text-gray-500" />
-                                        <Text type="secondary" className='capitalize'>{interview?.interviewer.name}</Text>
+                                        <Text type="secondary" className="capitalize">
+                                            {interview?.interviewer?.name}
+                                        </Text>
                                     </div>
                                 </div>
+
+                                {interview?.meetingLink && (
+                                    <div className="mt-2">
+                                        <a
+                                            href={interview.meetingLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            Join Interview
+                                        </a>
+                                    </div>
+                                )}
+
                             </div>
                         </div>
                     </div>
 
                     {interview.notes && (
-                        <div className="mt-3 p-3 bg-gray-50  rounded-lg">
+                        <div className="mt-3 p-3 rounded-lg">
+                            <Divider plain>Scheduled Notes</Divider>
                             <Text type="secondary">{interview?.notes}</Text>
                         </div>
                     )}

@@ -41,6 +41,7 @@ const CandidateForm: React.FC = () => {
         expectedsalary: candidate.data.expectedsalary,
         applieddate: dayjs(candidate.data.applieddate),
       });
+      setResumeUrl(candidate.data.resume);
     }
   }, [id, candidate, form]);
 
@@ -92,6 +93,7 @@ const CandidateForm: React.FC = () => {
           navigate('/dashboard/candidates');
           return;
         }
+        console.log(res);
       } else {
         const res = await createCandidate(filterFormData).unwrap();
         if (res.success) {
@@ -237,7 +239,16 @@ const CandidateForm: React.FC = () => {
               <Form.Item
                 name="applieddate"
                 label="Applied Date"
-                rules={[{ required: true, message: "Please select applied date" }]}
+                rules={[{ required: true, message: "Please select applied date" }, {
+                  validator: (_, value) => {
+                    if (!value) return Promise.resolve();
+                    if (value.isAfter(dayjs().startOf('day'))) {
+                      return Promise.reject(new Error('Applied date must be in the past'));
+                    }
+                    return Promise.resolve();
+                  }
+                }]}
+
               >
                 <DatePicker
                   size="large"
@@ -258,6 +269,19 @@ const CandidateForm: React.FC = () => {
                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                   customRequest={handleResumeUpload}
                   showUploadList={true}
+                  fileList={
+                    resumeUrl
+                      ? [
+                        {
+                          uid: '-1',
+                          name: resumeUrl.split('/').pop() || 'Resume',
+                          status: 'done',
+                          url: resumeUrl,
+                        },
+                      ]
+                      : []
+                  }
+                  onRemove={() => setResumeUrl('')} // Clear the resume when removed
                 >
                   <Button
                     icon={<UploadOutlined />}
@@ -296,7 +320,6 @@ const CandidateForm: React.FC = () => {
                         {...restField}
                         name={[name, "name"]}
                         label="Name"
-                        rules={[{ required: true, message: "Please enter name" }]}
                       >
                         <Input placeholder="Reference name" />
                       </Form.Item>

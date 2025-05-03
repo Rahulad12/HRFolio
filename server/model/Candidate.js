@@ -1,4 +1,26 @@
 import mongoose from "mongoose";
+
+// Define the candidate pipeline stages
+const STAGES = [
+    "shortlisted",
+    "assessment",
+    "first",
+    "second",
+    "third",
+    "offered",
+    "hired"
+];
+
+// Dynamically generate the progress schema for each stage
+const progressSchema = {};
+STAGES.forEach(stage => {
+    progressSchema[stage] = {
+        completed: { type: Boolean, default: stage === "shortlisted" },
+        date: Date
+    };
+});
+
+
 const candidateSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -7,10 +29,11 @@ const candidateSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"]
     },
     phone: {
-        type: Number,
+        type: String,
         required: true
     },
     technology: {
@@ -20,7 +43,7 @@ const candidateSchema = new mongoose.Schema({
     level: {
         type: String,
         required: true,
-        emnum: ["junior", "mid", "senior"]
+        enum: ["junior", "mid", "senior"]
     },
     experience: {
         type: Number,
@@ -31,25 +54,33 @@ const candidateSchema = new mongoose.Schema({
         required: true
     },
     resume: {
-        type: String,
+        type: String
     },
     references: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "references"
+        name: {
+            type: String,
+        },
+        contact: {
+            type: String,
+        },
+        relation: {
+            type: String,
+        },
     }],
+    progress: progressSchema,
+
     status: {
         type: String,
-        enum: ["shortlisted", "first", "second", "third", "assessment", "offered", "hired", "rejected",],
+        enum: [...STAGES, "rejected"],
         default: "shortlisted"
     },
     applieddate: {
-        type: String,
+        type: Date,
         required: true
-    },
-},
-    {
-        timestamps: true
-    });
+    }
+}, {
+    timestamps: true
+});
 
 const Candidate = mongoose.model("candidates", candidateSchema);
 export default Candidate;

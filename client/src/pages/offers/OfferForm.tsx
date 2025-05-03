@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
@@ -29,7 +29,7 @@ import { offerLetter, offerLetterPostData } from '../../types';
 
 const { Title } = Typography;
 
-const OfferForm: React.FC = () => {
+const OfferForm = () => {
   const { id } = useParams<{ id: string }>();
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -183,13 +183,28 @@ const OfferForm: React.FC = () => {
               </Col>
 
               <Col xs={24} md={12}>
-                <Form.Item label="Start Date" name="startDate" rules={[{ required: true, message: 'Start date is required' }]}>
+                <Form.Item label="Start Date" name="startDate" rules={[{ required: true, message: 'Start date is required' }, {
+                  validator: (_, value) => {
+                    if (value && dayjs(value).isBefore(dayjs().startOf('day'))) {
+                      return Promise.reject(new Error('Start date must be in the future'));
+                    }
+                    return Promise.resolve();
+                  }
+                }]}>
                   <DatePicker className="w-full" />
                 </Form.Item>
               </Col>
 
               <Col xs={24} md={12}>
-                <Form.Item label="Response Deadline" name="responseDeadline" rules={[{ required: true, message: 'Response deadline is required' }]}>
+                <Form.Item label="Response Deadline" name="responseDeadline" rules={[{ required: true, message: 'Response deadline is required' }, {
+                  validator: (_, value) => {
+                    const startDate = form.getFieldValue('startDate');
+                    if (value && startDate && dayjs(value).isAfter(dayjs(startDate).startOf('day'))) {
+                      return Promise.reject(new Error('Response deadline must be before start date'));
+                    }
+                    return Promise.resolve();
+                  }
+                }]}>
                   <DatePicker className="w-full" />
                 </Form.Item>
               </Col>

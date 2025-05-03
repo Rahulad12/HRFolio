@@ -1,16 +1,52 @@
 import Candidate from "../model/Candidate.js";
 import CandidateLog from "../model/CandidateLogs.js";
-import EmailTemplate from "../model/EmailTemplate.js";
 import Offer from "../model/Offer.js";
 import Reference from "../model/Reference.js";
-import sendEmail from "../utils/sendEmail.js";
 import ActivityLog from "../model/ActivityLogs.js";
+import dayjs from "dayjs";
+import { sendCandidateEmail } from "../utils/sendCandidateEmailHelper.js";
+import { updateCandidateStage, canMoveToStage } from "../utils/updateCandidateStage.js";
+/**
+ * Creates a new candidate and associated references.
+ * Returns a 400 status code if the candidate could not be created or if the
+ * applied date is in the future.
+ * Returns a 201 status code if the candidate is created successfully.
+ * @param {Object} req.body - The request body containing the candidate data.
+ * @param {string} req.body.name - The name of the candidate.
+ * @param {string} req.body.email - The email address of the candidate.
+ * @param {number} req.body.phone - The phone number of the candidate.
+ * @param {string} req.body.technology - The technology of the candidate.
+ * @param {string} req.body.level - The level of the candidate (junior, mid, senior).
+ * @param {number} req.body.experience - The experience of the candidate in years.
+ * @param {number} req.body.expectedsalary - The expected salary of the candidate.
+ * @param {string} req.body.applieddate - The date the candidate applied.
+ * @param {string} req.body.resume - The resume file of the candidate.
+ * @param {Object[]} req.body.references - The references of the candidate.
+ * @param {string} req.body.references.name - The name of the reference.
+ * @param {string} req.body.references.email - The email address of the reference.
+ * @param {string} req.body.references.phone - The phone number of the reference.
+ * @param {string} req.body.references.relationship - The relationship of the reference to the candidate.
+ */
 const createCandidate = async (req, res) => {
     const {
         name, email, phone,
         technology, level, experience,
         expectedsalary, references, applieddate, resume
     } = req.body;
+
+    if (!name || !email || !phone || !technology || !level || !experience || !expectedsalary || !applieddate || !resume) {
+        return res.status(400).json({
+            success: false,
+            message: "All fields are required"
+        });
+    }
+    if (dayjs(applieddate).isAfter(dayjs())) {
+        return res.status(400).json({
+            success: false,
+            message: "Applied date cannot be in the future"
+        });
+    }
+
     try {
         const existingCandidate = await Candidate.findOne({ email });
         if (existingCandidate) {
@@ -27,6 +63,12 @@ const createCandidate = async (req, res) => {
             expectedsalary, applieddate, resume
         })
 
+        if (!newCandidate) {
+            return res.status(400).json({
+                success: false,
+                message: "Candidate could not be created"
+            });
+        }
         const savedCandidate = await newCandidate.save();
 
         // Step 2: Create references and associate with candidate
@@ -58,7 +100,8 @@ const createCandidate = async (req, res) => {
             entityType: 'candidates',
             relatedId: savedCandidate._id,
             metaData: {
-                title: savedCandidate.name
+                title: savedCandidate.name,
+                description: savedCandidate.status
             }
         })
 
@@ -77,13 +120,17 @@ const createCandidate = async (req, res) => {
     }
 };
 
+/**
+ * Gets a candidate by ID.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>}
+ * @throws {Error} If there is an error while fetching the candidate.
+ */
 const getCandidateById = async (req, res) => {
     const { id } = req.params;
     try {
-        const candidate = await Candidate.findById(id).select("  -__v").populate({
-            path: "references",
-            select: "-createdAt -updatedAt -__v -candidate"
-        });
+        const candidate = await Candidate.findById(id).select("  -__v");
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
@@ -97,30 +144,20 @@ const getCandidateById = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 }
-// const getAllCandidates = async (req, res) => {
-//     try {
-//         const candidates = await Candidate.find().select("-createdAt -updatedAt -__v").populate({
-//             path: "references",
-//             select: "-createdAt -updatedAt -__v -candidate"
-//         })
-//         if (candidates.length === 0) {
-//             return res.status(404).json({ success: false, message: "No candidates found" });
-//         }
-//         res.status(200).json({
-//             success: true,
-//             message: "Candidates fetched successfully",
-//             data: candidates
-//         });
 
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: error.message });
-//     }
-// }
+/**
+ * Gets all candidates with optional filtering by search text and/or status.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {string} [req.query.searchText] - The search text to filter candidates by.
+ * @param {string} [req.query.status] - The status to filter candidates by.
+ * @returns {Promise<void>}
+ * @throws {Error} If there is an error while fetching the candidates.
+ */
 const getAllCandidates = async (req, res) => {
     const { searchText, status } = req.query;
 
     try {
-        // If no filter is passed, you can return an error or return all
         const query = {};
 
         if (searchText) {
@@ -159,6 +196,20 @@ const getAllCandidates = async (req, res) => {
     }
 };
 
+/**
+ * Deletes a candidate by ID.
+ * 
+ * This function finds and deletes a candidate from the database using the provided ID.
+ * It also logs the deletion activity in both CandidateLog and ActivityLog.
+ *
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the candidate is not found, or a 200 status if the candidate is deleted successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
+
 const deleteCandidate = async (req, res) => {
     try {
         const candidate = await Candidate.findByIdAndDelete(req.params.id);
@@ -171,50 +222,49 @@ const deleteCandidate = async (req, res) => {
             performedAt: Date.now(),
             performedBy: req.user._id,
         })
+
+        await ActivityLog.create({
+            candidate: candidate._id,
+            userID: req.user._id,
+            action: 'deleted',
+            entityType: 'candidates',
+            relatedId: candidate._id,
+            metaData: {
+                title: candidate.name,
+                description: candidate.status
+            }
+        })
         return res.status(200).json({ success: true, message: "Candidate deleted successfully" });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
 
+/**
+ * Updates a candidate with the given ID.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>}
+ * @throws {Error} If the candidate is not found.
+ * @throws {Error} If the new status is not allowed based on the current progress.
+ * @throws {Error} If there is an error while saving the candidate.
+ * @throws {Error} If there is an error while sending the email.
+ */
 const updateCandidate = async (req, res) => {
     try {
         const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
-
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
+        // Send email if candidate is hired or rejected
 
-        if (candidate.status === "hired") {
-            const candidateInfo = candidate.name;
-            const candidateEmail = candidate.email;
-
-            if (candidateInfo && candidateEmail) {
-                const emailTemplate = await EmailTemplate.findOne({ type: "hired" });
-                const candidateOffer = await Offer.findOne({ candidate: candidate._id });
-
-                if (!emailTemplate) {
-                    return res.status(400).json({ success: false, message: "Hired email template not found" });
-                }
-                if (!candidateOffer) {
-                    return res.status(400).json({ success: false, message: "Candidate offer not found" });
-                }
-
-                const emailSubject = emailTemplate.subject;
-                const emailBody = emailTemplate.body
-                    .replace("{{candidateName}}", candidateInfo)
-                    .replace("{{position}}", candidateOffer.position);
-
-                await sendEmail(candidateEmail, emailSubject, emailBody);
-            }
-        }
-
+        // Log the update
         await CandidateLog.create({
             candidate: candidate._id,
             action: 'updated',
             performedAt: Date.now(),
             performedBy: req.user._id,
-        })
+        });
 
         await ActivityLog.create({
             candidate: candidate._id,
@@ -224,11 +274,15 @@ const updateCandidate = async (req, res) => {
             relatedId: candidate._id,
             metaData: {
                 title: candidate.name,
-            }
-        })
+                description: candidate.status
+            },
+        });
 
-
-        return res.status(200).json({ success: true, message: "Candidate updated successfully", data: candidate });
+        return res.status(200).json({
+            success: true,
+            message: "Candidate updated successfully",
+            data: candidate,
+        });
 
     } catch (err) {
         console.error(err);
@@ -236,56 +290,94 @@ const updateCandidate = async (req, res) => {
     }
 };
 
-
-
-const filterCandidate = async (req, res) => {
-    const { name, technology, level, status } = req.query;
-
+/**
+ * Changes the stage of a candidate to a new status.
+ * 
+ * @param {Object} req - The request object containing the candidate ID in req.params and the new status in req.body.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 400 status if the new status is the same as the current status, or if the candidate cannot be moved to the new stage.
+ * Responds with a 404 status if the candidate is not found.
+ * Responds with a 200 status if the candidate is updated successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
+const changeCandidateStage = async (req, res) => {
     try {
-        // If no filter is passed, you can return an error or return all
-        const query = {};
+        const { id: candidateId } = req.params;
+        const { status: newStatus } = req.body;
 
-        if (name) {
-            query.name = { $regex: name, $options: "i" };
+        const candidate = await Candidate.findById(candidateId);
+
+        if (candidate.status === newStatus) {
+            return res.status(400).json({ success: false, message: "Cannot move to same stage" });
         }
-        if (technology) {
-            query.technology = { $regex: technology, $options: "i" };
-        }
-        if (level) {
-            query.level = { $regex: level, $options: "i" };
-        }
-        if (status) {
-            query.status = { $regex: status, $options: "i" };
+        if (!candidate) {
+            return res.status(404).json({ success: false, message: "Candidate not found" });
         }
 
-        const candidates = await Candidate.find(query).select(
-            "-createdAt -updatedAt -__v -references"
-        );
-
-        if (!candidates.length) {
-            return res
-                .status(404)
-                .json({ success: false, message: "No candidates found" });
+        // Check if the candidate can be moved to the new stage
+        const canUpdate = canMoveToStage(candidate.status, newStatus, candidate.progress);
+        if (!canUpdate) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot move to '${newStatus}' from '${candidate.status}'`,
+            });
         }
+
+        // Update candidate stage
+        const updatedCandidate = await updateCandidateStage(candidateId, newStatus);
+        const offer = await Offer.findOne({ candidate: candidateId });
+
+        if (newStatus === 'hired') {
+            await sendCandidateEmail('hired', updatedCandidate, offer);
+        }
+        // General update logs (for all status changes)
+        await CandidateLog.create({
+            candidate: candidate._id,
+            action: 'updated',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        });
+
+        await ActivityLog.create({
+            candidate: candidate._id,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'candidates',
+            relatedId: candidate._id,
+            metaData: {
+                title: candidate.name,
+                description: newStatus,
+            },
+        });
 
         return res.status(200).json({
             success: true,
-            message: "Candidates fetched successfully",
-            data: candidates,
+            message: `Candidate updated successfully to ${newStatus}`,
+            data: updatedCandidate,
         });
-
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message || "Internal Server Error",
-        });
+    } catch (err) {
+        console.error("Error in changeCandidateStage:", err);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 
+
+/**
+ * Gets all logs for a given candidate ID.
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the candidate logs are not found.
+ * Responds with a 200 status if the candidate logs are fetched successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 const getCandidateLogsByCandidateId = async (req, res) => {
     try {
         const candidateLogs = await CandidateLog.find({ candidate: req.params.id }).sort({ createdAt: -1 }).select(' -__v').populate({
-            path:"candidate",
+            path: "candidate",
             select: "-__v"
         });
         if (!candidateLogs) {
@@ -298,4 +390,74 @@ const getCandidateLogsByCandidateId = async (req, res) => {
     }
 }
 
-export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, filterCandidate, updateCandidate, getCandidateLogsByCandidateId };
+/**
+ * Rejects a candidate with the given ID.
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the candidate is not found.
+ * Responds with a 400 status if the candidate is already rejected.
+ * Responds with a 200 status if the candidate is rejected successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
+const rejectCandidate = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const candidate = await Candidate.findById(id);
+
+        if (!candidate) {
+            return res.status(404).json({ success: false, message: "Candidate not found" });
+        }
+
+        if (candidate.status === "rejected") {
+            return res.status(400).json({ success: false, message: "Candidate already rejected" });
+        }
+
+        const offer = await Offer.findOne({ candidate: id }).lean();
+
+        const emailStatus = await sendCandidateEmail("rejection", candidate, offer);
+
+        if (!emailStatus.success) {
+            return res.status(400).json({ success: false, message: "Cannot send email and reject candidate" });
+        }
+
+        await CandidateLog.create({
+            candidate: candidate._id,
+            action: 'updated',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+            metaData: {
+                emailStatus: emailStatus.message,
+                emailType: "rejection",
+            },
+        });
+
+        await ActivityLog.create({
+            candidate: candidate._id,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'candidates',
+            relatedId: candidate._id,
+            metaData: {
+                title: candidate.name,
+                description: candidate.status,
+                emailType: "rejection",
+            },
+        });
+
+        candidate.status = "rejected";
+        candidate.progress = {};
+
+        await candidate.save();
+        return res.status(200).json({ success: true, message: "Candidate rejected successfully" });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+
+    }
+}
+
+
+export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage, rejectCandidate };

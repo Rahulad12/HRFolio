@@ -47,6 +47,18 @@ export const candidateServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Candidate"],
         }),
+        changeCandidateStage: builder.mutation<candidateIdResposne, {
+            id: string | null, data: {
+                status: string
+            }
+        }>({
+            query: ({ id, data }) => ({
+                url: `${CANDIDATE_URL}/stage/${id}`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags: ["Candidate"],
+        }),
         deleteCandidate: builder.mutation<globalResponse, string>({
             query: (id) => ({
                 url: `${CANDIDATE_URL}/${id}`,
@@ -61,8 +73,23 @@ export const candidateServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Candidate"],
         }),
+        rejectCandidate : builder.mutation<globalResponse, string>({
+            query: (id) => ({
+                url: `${CANDIDATE_URL}/reject/${id}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Candidate"],
+        }),
 
     }),
 });
 
-export const { useCreateCandidateMutation, useGetCandidateQuery, useGetCandidateByIdQuery, useDeleteCandidateMutation, useUpdateCandidateMutation, useGetCandidateLogsByCandidateIdQuery } = candidateServiceApi;
+export const { useCreateCandidateMutation, 
+    useGetCandidateQuery, 
+    useGetCandidateByIdQuery, 
+    useDeleteCandidateMutation, 
+    useUpdateCandidateMutation, 
+    useGetCandidateLogsByCandidateIdQuery, 
+    useChangeCandidateStageMutation,
+    useRejectCandidateMutation
+} = candidateServiceApi;

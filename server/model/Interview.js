@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import candidate from "./Candidate.js";
-
+import Candidate from "./Candidate.js";
+import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
 const interviewSchema = new mongoose.Schema({
     candidate: {
         type: mongoose.Schema.Types.ObjectId,
@@ -25,11 +25,11 @@ const interviewSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ["in-person", "phone", "video"],
+        enum: ["in-person", "video"],
         default: "in-person",
         required: true
     },
-    candidateInterviewStatus: {
+    InterviewRound: {
         type: String,
         enum: ["first", "second", "third"],
         default: "first",
@@ -43,33 +43,13 @@ const interviewSchema = new mongoose.Schema({
     },
     rating: {
         type: Number
+    },
+    meetingLink: {
+        type: String
     }
 }, {
     timestamps: true
 });
 
-interviewSchema.pre("save", async function (next) {
-    if (this.status === "scheduled") {
-        const candidateId = this.candidate;
-        const candidateInfo = await candidate.findById(candidateId);
-
-        if (this.candidateInterviewStatus === "first") {
-            candidateInfo.status = "first";
-            await candidateInfo.save();
-        }
-        else if (this.candidateInterviewStatus === "second") {
-            candidateInfo.status = "second";
-            await candidateInfo.save();
-        }
-        else if (this.candidateInterviewStatus === "third") {
-            candidateInfo.status = "third";
-            await candidateInfo.save();
-        }
-    }
-    next();
-});
-
 const Interview = mongoose.model("interviews", interviewSchema);
-
-
 export default Interview;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppSelector } from '../../Hooks/hook';
-import { Card } from 'antd';
+import { Card, Progress, theme } from 'antd';
 
 interface PipelineStage {
   id: string;
@@ -19,58 +19,46 @@ export const CandidateByStatus: React.FC<CandidatePipelineProps> = ({
   stages,
   loading = false
 }) => {
-
   const { candidate } = useAppSelector((state) => state.candidate);
-  const total = candidate?.length;
+  const total = candidate?.length || 0;
+  const { token } = theme.useToken();
 
   return (
     <Card
       title="Candidate By Status"
       loading={loading}
+      className="shadow-sm"
       extra={
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Total</span>
-          <span className="text-sm text-gray-500">{total}</span>
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-300">Total</span>
+          <span className="text-sm text-gray-500 dark:text-gray-300">{total}</span>
         </div>
-
       }
     >
-      <div className="mt-2">
-        <div className="flex h-4 mb-6">
-          {stages.map((stage) => {
-            const width = total > 0 ? `${(stage.count / total) * 100}%` : '0%';
-            return (
-              <div
-                key={stage.id}
-                className="first:rounded-l-full last:rounded-r-full"
-                style={{ backgroundColor: stage.color, width }}
-              />
-            );
-          })}
-        </div>
-
-        <div className="space-y-4">
-          {stages.map((stage) => (
-            <div key={stage.id} className="flex items-center">
-              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: stage.color }} />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700">{stage.name}</span>
-                  <span className="text-sm text-gray-500">{stage.count}</span>
-                </div>
-                <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5">
+      <div className="space-y-4">
+        {stages.map((stage) => {
+          const percent = total > 0 ? (stage.count / total) * 100 : 0;
+          return (
+            <div key={stage.id} className="flex flex-col gap-1">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
                   <div
-                    className="h-1.5 rounded-full"
-                    style={{
-                      backgroundColor: stage.color,
-                      width: total > 0 ? `${(stage.count / total) * 100}%` : '0%',
-                    }}
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: stage.color }}
                   />
+                  <span className="text-sm font-medium  ">{stage.name}</span>
                 </div>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{stage.count}</span>
               </div>
+              <Progress
+                percent={Math.round(percent)}
+                showInfo={false}
+                strokeColor={stage.color}
+                trailColor={token.colorBorderSecondary}
+              />
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </Card>
   );

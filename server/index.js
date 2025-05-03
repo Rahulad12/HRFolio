@@ -36,6 +36,7 @@ import emailRouter from "./routes/emailRoutes.js";
 import offerRouter from "./routes/offerRoutes.js";
 import searchRouter from './routes/searchRoutes.js';
 import activityLogRouter from './routes/activityLogRoutes.js';
+import hiredRouter from './routes/hiredRoutes.js';
 app.use('/api/auth', authRouter);
 app.use('/api/candidate', candidateRouter);
 app.use('/api/interview', interviewRouter);
@@ -47,6 +48,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/uploads", uploadRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/activity-log", activityLogRouter);
+app.use("/api/hired", hiredRouter);
 
 app.get('/', (req, res) => {
     logger.info("Server is running");

@@ -44,9 +44,7 @@ const CandidateTimeLine = () => {
     const { data: candidateLogs, isLoading } = useGetActivityLogByCandidateIdQuery(candidate?.[0]?._id, {
         skip: !candidate?.[0]?._id,
     });
-    console.log(candidateLogs);
     const logs = candidateLogs?.data || [];
-    console.log(logs);
 
     return (
         <Card
@@ -63,10 +61,25 @@ const CandidateTimeLine = () => {
                         dot: <ClockCircleOutlined style={{ fontSize: '16px', color: getStatusColor(log?.action) }} />,
                         label: dayjs(log.createdAt).format('MMM DD, YYYY h:mm A'),
                         children: (
-                            <div>
+                            <div className="flex flex-col">
                                 <Text strong className="capitalize">
                                     {log.action} {log.entityType}
                                 </Text>
+
+                                {
+                                    log?.metaData?.description && log?.action === 'updated' ? (
+                                        <Text type="secondary">
+                                            Candidate is updated to <span className="font-bold">{log?.metaData?.description}</span>
+                                        </Text>
+                                    ) : (
+
+
+                                        <Text type="secondary" className='capitalize'>Candidate {
+                                            log?.action === 'deleted' ? 'was' : 'is'
+                                        } in <span className="font-bold">{log?.metaData?.description}</span> stage </Text>
+                                    )
+                                }
+
                                 <div>
                                 </div>
                             </div>

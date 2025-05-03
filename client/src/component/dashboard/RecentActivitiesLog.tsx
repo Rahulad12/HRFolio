@@ -43,9 +43,10 @@ const RecentActivityLog: React.FC = () => {
         }
     };
 
-    const sortedLog = [...(activityLog?.data || [])].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    const sortedLog = [...(activityLog?.data || [])].filter((item) => dayjs(item?.createdAt).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')).
+        sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
 
     const paginatedLog = sortedLog.slice(
         (currentPage - 1) * pageSize,
@@ -89,12 +90,27 @@ const RecentActivityLog: React.FC = () => {
                                     {getIcon(item?.entityType)}
                                 </Avatar>
                                 <div className="flex flex-col">
-                                    <Text strong className="text-md">
+                                    <Text strong className="text-md capitalize">
                                         {item?.metaData?.title || 'Unknown Candidate'}
                                     </Text>
                                     <Text type="secondary">
                                         {makeCapitilized(item?.entityType)} was <b>{item?.action.replace('_', ' ')}</b>
                                     </Text>
+
+                                    {
+                                        item?.metaData?.description && item?.action === 'updated' ? (
+                                            <Text type="secondary">
+                                                Candidate is updated to <span className="font-bold">{item?.metaData?.description}</span> stage in pipeline
+                                            </Text>
+                                        ) : (
+
+
+                                            <Text type="secondary" className='capitalize'>Candidate {
+                                                item?.action === 'deleted' ? 'was' : 'is'
+                                            } in <span className="font-bold">{item?.metaData?.description}</span> stage </Text>
+                                        )
+                                    }
+
                                     <Text type="secondary" style={{ fontSize: 12 }}>
                                         {dayjs(item?.createdAt).format('DD MMM YYYY, hh:mm A')}
                                     </Text>

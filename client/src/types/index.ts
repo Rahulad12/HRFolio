@@ -29,7 +29,7 @@ export type referenceData = {
 export type candidateFormData = {
     name: string;
     email: string;
-    phone: number;
+    phone: string;
     technology: string;
     level: string;
     experience: number;
@@ -38,6 +38,16 @@ export type candidateFormData = {
     applieddate: string | null;
     resume: string | null;
     status: candidateStatus
+    progress: {
+        shortlisted: { completed: boolean, date: string };
+        first: { completed: boolean, date: string };
+        second: { completed: boolean, date: string };
+        third: { completed: boolean, date: string };
+        assessment: { completed: boolean, date: string };
+        offered: { completed: boolean, date: string };
+        hired: { completed: boolean, date: string };
+        rejected: { completed: boolean, date: string };
+    }
 }
 
 export type candidateFilter = {
@@ -52,12 +62,22 @@ export type referenceResponse = {
     relation: string
 
 }
-export type candidateStatus = 'shortlisted' | 'first' | 'second' | 'third' | 'assessment' | 'offered' | 'hired' | 'rejected';
+export type candidateStatus =
+    | "shortlisted"
+    | "assessment"
+    | "first"
+    | "second"
+    | "third"
+    | "offered"
+    | "hired"
+    | "rejected";
+
+
 export type interviewStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'failed';
 export type candidateData = {
     name: string;
     email: string;
-    phone: number;
+    phone: string;
     technology: string;
     level: string;
     experience: number;
@@ -69,6 +89,16 @@ export type candidateData = {
     applieddate: string;
     resume: string;
     updatedAt: string
+    progress: {
+        shortlisted: { completed: boolean, date: string };
+        first: { completed: boolean, date: string };
+        second: { completed: boolean, date: string };
+        third: { completed: boolean, date: string };
+        assessment: { completed: boolean, date: string };
+        offered: { completed: boolean, date: string };
+        hired: { completed: boolean, date: string };
+        rejected: { completed: boolean, date: string };
+    }
 }
 export type candidateResponse = {
     success: boolean;
@@ -87,14 +117,15 @@ export type interviewer = {
 export type interviewData = {
     candidate: candidateData;
     interviewer: interviewer;
-    date: Dayjs;
-    time: Dayjs;
+    date: Dayjs | null;
+    time: Dayjs | null;
     type: 'phone' | 'video' | 'in-person';
     feedback: string;
     rating: number;
     notes: string;
     status: interviewStatus;
-    candidateInterviewStatus: 'first' | 'second' | 'third';
+    InterviewRound: 'first' | 'second' | 'third';
+    meetingLink: string;
     _id: string;
     __v: number;
     createdAt: string;
@@ -104,19 +135,13 @@ export type interviewData = {
 export type interviewResponse = {
     success: boolean;
     message: string;
-    data: interviewData[];
+    data?: interviewData[];
 }
 export type interviewResponseById = {
     success: boolean;
     message: string;
-    data: interviewData[];
+    data?: interviewData[];
 }
-
-// export type interviewerResponse = {
-//     success?: boolean;
-//     message?: string;
-//     data?: interviewer[]
-// }
 
 //assessmet types
 export type assessmentFormData = {
@@ -342,6 +367,7 @@ export type interviewLogData = {
         status: interviewStatus;
         rating: number;
         feedback: string;
+        interviewRound: 'first' | 'second' | 'third';
     }
     createdAt: string;
     updatedAt: string;
@@ -376,6 +402,8 @@ export type activityLog = {
         feedback: string;
         rating: number;
         status: string;
+        description: string
+        interviewRound: 'first' | 'second' | 'third';
     }
     createdAt: string;
     updatedAt: string

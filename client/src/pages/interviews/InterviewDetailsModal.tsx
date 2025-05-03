@@ -8,7 +8,6 @@ import { makeCapitilized } from '../../utils/TextAlter';
 
 const { TextArea } = Input;
 const { Title } = Typography;
-
 interface InterviewDetailsModalProps {
   interview: interviewData | null;
   visible: boolean;
@@ -27,14 +26,6 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
 
   const navigate = useNavigate();
   const [feedbackForm] = Form.useForm();
-  // const [interviewData, setInterviewData] = React.useState<interviewData | null>(null);
-  // const { data: interviewById } = useGetInterviewByIdQuery(interview?._id || '');
- 
-  // useEffect(() => {
-  //   if (interviewById?.success && interviewById?.data) {
-  //     setInterviewData(interviewById.data);
-  //   }
-  // }, [interviewById]);
 
   const getInterviewTypeIcon = (type: string | undefined) => {
     switch (type) {

@@ -60,7 +60,7 @@ export const assessmentServiceApi = api.injectEndpoints({
                 method: "PUT",
                 body: data
             }),
-            invalidatesTags: ["Assessment"]
+            invalidatesTags: ["Assessment", "Assignment", 'Candidate']
         }),
         updateAssignmnet: builder.mutation<assignmentResponse, { data: AssignmentData, id: string }>({
             query: ({ data, id }) => ({
@@ -90,7 +90,7 @@ export const assessmentServiceApi = api.injectEndpoints({
                 method: "POST",
                 body: data
             }),
-            invalidatesTags: ['Score', 'Assignment']
+            invalidatesTags: ['Score', 'Assignment', 'Candidate']
         }),
 
         getAssessmentLogByCandidateId: builder.query<AssessmentLogResponse, string>({
@@ -98,7 +98,7 @@ export const assessmentServiceApi = api.injectEndpoints({
                 url: `${ASSESSMENT_URL}/logs/candidate/${id}`,
                 method: "GET",
             }),
-            providesTags: ['Assessment', 'Assignment']
+            providesTags: ['Assessment', 'Assignment', 'Interview', 'Candidate']
         })
     }),
 });

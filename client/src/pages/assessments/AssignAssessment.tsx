@@ -150,9 +150,14 @@ const AssignAssessment = () => {
                 <Typography.Title level={2} className="ml-2 text-lg font-semibold">{
                     isEditing ? 'Edit Assignment' : 'Assign Assessment'
                 }</Typography.Title>
-                <Typography.Text className='ml-3'>
-                    ({makeCapitilized(assignedAssessments?.data?.candidate?.name || '')})
-                </Typography.Text>
+                {
+                    isEditing && (
+                        <Typography.Text className='ml-3'>
+                            ({makeCapitilized(assignedAssessments?.data?.candidate?.name || '')})
+                        </Typography.Text>
+                    )
+                }
+
             </div>
             <Row gutter={16}>
                 <Col xs={24} md={12} lg={14}>
@@ -184,7 +189,17 @@ const AssignAssessment = () => {
                                     <Form.Item
                                         name="dueDate"
                                         label="Due Date"
-                                        rules={[{ required: true, message: 'Please select a due date' }]}
+                                        rules={[{ required: true, message: 'Please select a due date' },
+
+                                        {
+                                            validator: (_, value) => {
+                                                if (value && dayjs(value).isBefore(dayjs().startOf('day'))) {
+                                                    return Promise.reject(new Error('Due date cannot be in the past'));
+                                                }
+                                                return Promise.resolve();
+                                            }
+                                        }
+                                        ]}
                                     >
                                         <DatePicker style={{ width: '100%' }} />
                                     </Form.Item>

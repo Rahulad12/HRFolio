@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import EmailTemplate from "../model/EmailTemplate.js";
 import sendEmail from "../utils/sendEmail.js";
+import { makeCapitilized } from "./makeCapitilize.js";
 
 /**
  * Sends an email to a candidate based on the specified type and offer details.
@@ -19,25 +20,28 @@ import sendEmail from "../utils/sendEmail.js";
  */
 
 export const sendCandidateEmail = async (type, candidate, offer) => {
+    console.log("come in send Email");
     try {
         const template = await EmailTemplate.findOne({ type }).lean();
         if (!template) return { success: false, message: `Email template for '${type}' not found.` };
-        if (!offer) return { success: false, message: `Offer not found for candidate.` };
 
         let body = template.body
-            .replace("{{candidateName}}", candidate.name)
-            .replace("{{position}}", offer.position);
+            .replace("{{candidateName}}", makeCapitilized(candidate?.name) || candidate?.name)
+            .replace("{{position}}", offer?.position)
+            .replace("{{technology}}", candidate?.technology);
+
+
+        const subject = template.subject.replace("{{position}}", makeCapitilized(offer?.position) || offer?.position).replace("{{technology}}", makeCapitilized(offer?.technology) || candidate?.technology);
 
         if (type === "rejection") {
             body = body
                 .replace("{{rejectionDate}}", dayjs().format("MMMM D, YYYY"))
                 .replace("{{rejectionTime}}", dayjs().format("h:mm A"));
         } else if (type === "hired") {
-            body = body.replace("{{startDate}}", offer.startDate);
-
+            body = body.replace("{{startDate}}", offer?.startDate);
         }
 
-        await sendEmail({ to: candidate.email, subject: template.subject, html: body });
+        await sendEmail({ to: candidate?.email, subject: subject, html: body });
         return { success: true };
     } catch (err) {
         console.error("Error sending candidate email:", err);

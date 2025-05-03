@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetCandidateByIdQuery, useUpdateCandidateMutation, useChangeCandidateStageMutation } from '../../services/candidateServiceApi';
-import { candidateData, candidateFormData } from '../../types/index';
+import { useGetCandidateByIdQuery, useRejectCandidateMutation, useChangeCandidateStageMutation } from '../../services/candidateServiceApi';
+import { candidateFormData } from '../../types/index';
 import CandidateProfileLoading from '../../component/Loding/CandidateProfileLoading';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { useAppDispatch } from '../../Hooks/hook';
@@ -15,14 +15,15 @@ import Predefineddata from '../../data/PredefinedData';
 import CandidateTimeLine from '../../component/candidate/CandidateTimeLine';
 const { Title, Text } = Typography;
 const CandidateDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams<string>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data, isLoading, refetch } = useGetCandidateByIdQuery(id, {
     skip: !id
   });
 
-  const [changeCandidateStage, { isLoading: changeCandidateStageLoading }] = useChangeCandidateStageMutation();
+  const [changeCandidateStage] = useChangeCandidateStageMutation();
+  const [rejectCandidate] = useRejectCandidateMutation();
 
   const [candidate, setCandidate] = useState<candidateFormData>({
     name: "",
@@ -65,34 +66,34 @@ const CandidateDetails = () => {
     'third',
     'offered',
     'hired',
-    'rejected'
   ] as const;
 
   const canMoveToStatus = (targetStatus: candidateStatus) => {
     const currentStatus = candidate.status;
 
-    // Always allow staying on the same status
     if (targetStatus === currentStatus) return true;
-
-    // Allow moving to rejected at any point
-    if (targetStatus === "rejected") return true;
-
-    // Allow "offered" from any stage
-    if (targetStatus === "offered") return true;
 
     const stageOrder = StatusFlow;
     const currentIndex = stageOrder.indexOf(currentStatus);
     const targetIndex = stageOrder.indexOf(targetStatus);
 
-    // Disallow skipping stages (e.g., from first to third directly)
-    if (targetIndex > currentIndex + 1) return false;
+    // Disallow skipping more than one stage ahead, unless it's "offered"
+    if (targetStatus !== "offered" && targetIndex > currentIndex + 1) return false;
 
-    // If moving to a next stage, check if the previous one is marked completed
+    //Special case for "offered"
+    if (targetStatus === "offered") {
+      const previousState = stageOrder.slice(0, targetIndex);
+      const hasAnyCompleted = previousState.some(
+        stage => candidate.progress?.[stage]?.completed === true
+      );
+      return hasAnyCompleted;
+    }
+
+    // Default case: check if previous stage is completed
     const prevIndex = targetIndex - 1;
     if (prevIndex >= 0) {
       const prevStage = stageOrder[prevIndex];
       const isCompleted = candidate?.progress?.[prevStage]?.completed;
-
       return isCompleted === true;
     }
 
@@ -137,6 +138,33 @@ const CandidateDetails = () => {
       refetch();
     }
   };
+
+  const rejectCandidateHandler = async () => {
+    try {
+      if (!id) return
+      const res = await rejectCandidate(id).unwrap();
+      if (res.success) {
+        api.success({
+          message: res?.message,
+          placement: "topRight",
+          duration: 3000,
+          pauseOnHover: true
+        });
+      }
+    } catch (error: any) {
+      console.log(error);
+      api.error({
+        message: `Error updating candidate status: ${error?.data?.message}`,
+        placement: "topRight",
+        duration: 3000,
+        pauseOnHover: true
+      })
+    } finally {
+      if (id) {
+        navigate(`/dashboard/candidates/${id}`);
+      }
+    }
+  }
 
   const currentStep = StatusFlow.indexOf(candidate.status);
 
@@ -226,7 +254,7 @@ const CandidateDetails = () => {
 
 
           <Col md={8} xs={16}>
-            <CandidateQuickAction />
+            <CandidateQuickAction rejectCandidateHandlers={rejectCandidateHandler} />
           </Col>
 
         </Row>

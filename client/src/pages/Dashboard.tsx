@@ -1,7 +1,6 @@
 import React from 'react';
 import { Users, Calendar, FileCheck, FileText } from 'lucide-react';
 import MetricsCard from '../component/dashboard/MetricsCard';
-import CandidateByStatus from '../component/dashboard/CandidateByStatus';
 import UpcomingInterviews from '../component/dashboard/UpComingInterviews';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,6 +11,8 @@ import dayjs from 'dayjs';
 import { Col, Row, Space, Typography } from 'antd';
 import RecentActivityLog from '../component/dashboard/RecentActivitiesLog';
 import ListOfCandidatesWithStatus from '../component/dashboard/ListOfCandidatesWithStatus';
+import CandidateByTechnology from '../component/dashboard/CandidateByTechnology';
+import ExperienceDistribution from '../component/dashboard/ExperienceDistribution';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -26,16 +27,16 @@ export const Dashboard: React.FC = () => {
   const { interviews } = useAppSelector((state) => state.interview);
 
   const shortListed = candidate.filter((item) => item.status === 'shortlisted');
-
+  const scheduledInterview = interviews.filter((item) => item.status === 'scheduled');
   const assessment = candidate.filter((item) => item.status === 'assessment');
   const offered = candidate.filter((item) => item.status === 'offered');
   const rejected = candidate.filter((item) => item.status === 'rejected');
   const hired = candidate.filter((item) => item.status === 'hired');
 
   const pipelineStages = [
-    { id: '1', name: 'New Applications', count: shortListed.length, color: '#3B82F6' },
+    { id: '1', name: 'Shortlisted', count: shortListed.length, color: '#3B82F6' },
     { id: '2', name: 'Assessment', count: assessment.length, color: '#8B5CF6' },
-    { id: '3', name: 'Interviewing', count: interviews.length, color: '#10B981' },
+    { id: '3', name: 'Interviewing', count: scheduledInterview?.length, color: '#10B981' },
     { id: '4', name: 'Offered', count: offered.length, color: '#F59E0B' },
     { id: '5', name: 'Hired', count: hired.length, color: '#EC4899' },
     { id: '6', name: 'Rejected', count: rejected.length, color: '#EF4444' },
@@ -112,7 +113,7 @@ export const Dashboard: React.FC = () => {
             <motion.div variants={itemVariants}>
               <MetricsCard
                 title="Scheduled Interviews"
-                value={interviews?.length}
+                value={scheduledInterview?.length}
                 icon={<Calendar size={20} className="text-green-700" />}
                 link="/dashboard/interviews"
                 loading={interviewLoading}
@@ -139,20 +140,21 @@ export const Dashboard: React.FC = () => {
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <ListOfCandidatesWithStatus />
         </Space>
-        <Col xs={24} lg={16}>
+        <Col xs={24} lg={12}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <CandidateByStatus stages={pipelineStages} loading={candidateLoading} />
+              {/* <CandidateByStatus stages={pipelineStages} loading={candidateLoading} /> */}
+              <CandidateByTechnology />
             </motion.div>
           </Space>
         </Col>
 
         {/* Right Side */}
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={12}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -166,16 +168,6 @@ export const Dashboard: React.FC = () => {
           </motion.div>
         </Col>
 
-        {/* Bottom Full Width */}
-        {/* <Col xs={24} lg={16}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <RecentActivity activities={recentActivities} />
-          </motion.div>
-        </Col> */}
 
         <Col xs={24} lg={12} md={12}>
           <motion.div
@@ -185,6 +177,9 @@ export const Dashboard: React.FC = () => {
           >
             <RecentActivityLog />
           </motion.div>
+        </Col>
+        <Col xs={24} lg={12} md={12}>
+          <ExperienceDistribution />
         </Col>
       </Row>
     </div>

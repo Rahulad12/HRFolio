@@ -73,8 +73,23 @@ export const candidateServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Candidate"],
         }),
+        rejectCandidate : builder.mutation<globalResponse, string>({
+            query: (id) => ({
+                url: `${CANDIDATE_URL}/reject/${id}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["Candidate"],
+        }),
 
     }),
 });
 
-export const { useCreateCandidateMutation, useGetCandidateQuery, useGetCandidateByIdQuery, useDeleteCandidateMutation, useUpdateCandidateMutation, useGetCandidateLogsByCandidateIdQuery, useChangeCandidateStageMutation } = candidateServiceApi;
+export const { useCreateCandidateMutation, 
+    useGetCandidateQuery, 
+    useGetCandidateByIdQuery, 
+    useDeleteCandidateMutation, 
+    useUpdateCandidateMutation, 
+    useGetCandidateLogsByCandidateIdQuery, 
+    useChangeCandidateStageMutation,
+    useRejectCandidateMutation
+} = candidateServiceApi;

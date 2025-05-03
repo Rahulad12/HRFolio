@@ -17,6 +17,7 @@ const statusGroups = [
 
 const ListOfCandidatesWithStatus = () => {
     const navigate = useNavigate();
+
     const { candidate } = useAppSelector((state) => state.candidate);
 
     const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
@@ -27,6 +28,7 @@ const ListOfCandidatesWithStatus = () => {
 
     const filterCandidates = (statusKey: string) => {
         return candidate?.filter((can) => {
+
             let isMatch = false;
             const isInterviewStage = ['first', 'second', 'third'].includes(can.status);
 
@@ -51,7 +53,10 @@ const ListOfCandidatesWithStatus = () => {
 
     const getProgressBadge = (can: any, statusKey: string) => {
         const currentStatus = statusKey === 'interviewing' ? can.status : statusKey;
-        const completed = can.progress[currentStatus].completed;
+        if (currentStatus === 'rejected') {
+            return <Badge status="error" text="Rejected" />;
+        }
+        const completed = can?.progress[currentStatus]?.completed;
 
         return (
             <Badge
@@ -69,11 +74,11 @@ const ListOfCandidatesWithStatus = () => {
                 {statusGroups.map((group) => {
                     const candidates = filterCandidates(group.key);
                     return (
-                        <Col xs={24} sm={12} md={8} lg={6} key={group.key}>
+                        <Col xs={24} sm={12} md={8} lg={4} key={group.key}>
                             <Card
                                 title={group.title}
                                 extra={<Badge count={candidates.length} style={{ backgroundColor: group.color }} />}
-                                style={{ minHeight: '400px' }}
+                                style={{ minHeight: '500px' }}
                             >
                                 <List
                                     dataSource={candidates}
@@ -109,7 +114,9 @@ const ListOfCandidatesWithStatus = () => {
                                     style={{ maxHeight: '320px', overflowY: 'auto' }}
                                 />
                             </Card>
+
                         </Col>
+
                     );
                 })}
             </Row>

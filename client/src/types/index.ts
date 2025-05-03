@@ -62,7 +62,7 @@ export type referenceResponse = {
     relation: string
 
 }
-export type candidateStatus = 'shortlisted' | 'first' | 'second' | 'third' | 'assessment' | 'offered' | 'hired' | 'rejected';
+export type candidateStatus = 'shortlisted' | 'first' | 'second' | 'third' | 'assessment' | 'offered' | 'hired';
 export type interviewStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'failed';
 export type candidateData = {
     name: string;

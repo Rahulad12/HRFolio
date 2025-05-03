@@ -1,12 +1,32 @@
 import Candidate from "../model/Candidate.js";
 import CandidateLog from "../model/CandidateLogs.js";
-import EmailTemplate from "../model/EmailTemplate.js";
 import Offer from "../model/Offer.js";
 import Reference from "../model/Reference.js";
 import ActivityLog from "../model/ActivityLogs.js";
 import dayjs from "dayjs";
 import { sendCandidateEmail } from "../utils/sendCandidateEmailHelper.js";
 import { updateCandidateStage, canMoveToStage } from "../utils/updateCandidateStage.js";
+/**
+ * Creates a new candidate and associated references.
+ * Returns a 400 status code if the candidate could not be created or if the
+ * applied date is in the future.
+ * Returns a 201 status code if the candidate is created successfully.
+ * @param {Object} req.body - The request body containing the candidate data.
+ * @param {string} req.body.name - The name of the candidate.
+ * @param {string} req.body.email - The email address of the candidate.
+ * @param {number} req.body.phone - The phone number of the candidate.
+ * @param {string} req.body.technology - The technology of the candidate.
+ * @param {string} req.body.level - The level of the candidate (junior, mid, senior).
+ * @param {number} req.body.experience - The experience of the candidate in years.
+ * @param {number} req.body.expectedsalary - The expected salary of the candidate.
+ * @param {string} req.body.applieddate - The date the candidate applied.
+ * @param {string} req.body.resume - The resume file of the candidate.
+ * @param {Object[]} req.body.references - The references of the candidate.
+ * @param {string} req.body.references.name - The name of the reference.
+ * @param {string} req.body.references.email - The email address of the reference.
+ * @param {string} req.body.references.phone - The phone number of the reference.
+ * @param {string} req.body.references.relationship - The relationship of the reference to the candidate.
+ */
 const createCandidate = async (req, res) => {
     const {
         name, email, phone,
@@ -100,13 +120,17 @@ const createCandidate = async (req, res) => {
     }
 };
 
+/**
+ * Gets a candidate by ID.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>}
+ * @throws {Error} If there is an error while fetching the candidate.
+ */
 const getCandidateById = async (req, res) => {
     const { id } = req.params;
     try {
-        const candidate = await Candidate.findById(id).select("  -__v").populate({
-            path: "references",
-            select: "-createdAt -updatedAt -__v -candidate"
-        });
+        const candidate = await Candidate.findById(id).select("  -__v");
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
@@ -121,11 +145,19 @@ const getCandidateById = async (req, res) => {
     }
 }
 
+/**
+ * Gets all candidates with optional filtering by search text and/or status.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {string} [req.query.searchText] - The search text to filter candidates by.
+ * @param {string} [req.query.status] - The status to filter candidates by.
+ * @returns {Promise<void>}
+ * @throws {Error} If there is an error while fetching the candidates.
+ */
 const getAllCandidates = async (req, res) => {
     const { searchText, status } = req.query;
 
     try {
-        // If no filter is passed, you can return an error or return all
         const query = {};
 
         if (searchText) {
@@ -163,6 +195,20 @@ const getAllCandidates = async (req, res) => {
         });
     }
 };
+
+/**
+ * Deletes a candidate by ID.
+ * 
+ * This function finds and deletes a candidate from the database using the provided ID.
+ * It also logs the deletion activity in both CandidateLog and ActivityLog.
+ *
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the candidate is not found, or a 200 status if the candidate is deleted successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 
 const deleteCandidate = async (req, res) => {
     try {
@@ -265,46 +311,6 @@ const changeCandidateStage = async (req, res) => {
 
         // Update candidate stage
         const updatedCandidate = await updateCandidateStage(candidateId, newStatus);
-
-        // Handle rejection email and logs in production only
-        if (newStatus === "rejected" && process.env.NODE_ENV === "production") {
-            const offer = await Offer.findOne({ candidate: candidate._id }).lean();
-            const emailStatus = await sendCandidateEmail("rejection", candidate, offer);
-
-            if (!emailStatus.success) {
-                return res.status(400).json({ success: false, message: emailStatus.message });
-            }
-
-            // Log email and rejection
-            await CandidateLog.create({
-                candidate: candidate._id,
-                action: 'created',
-                performedAt: Date.now(),
-                performedBy: req.user._id,
-                metaData: {
-                    emailStatus: emailStatus.message,
-                    emailType: "rejection",
-                },
-            });
-
-            await ActivityLog.create({
-                candidate: candidate._id,
-                userID: req.user._id,
-                action: 'created',
-                entityType: 'candidates',
-                relatedId: candidate._id,
-                metaData: {
-                    title: candidate.name,
-                    description: newStatus,
-                    emailType: "rejection",
-                },
-            });
-
-            // Clear candidate progress after rejection
-            candidate.progress = {};
-            await candidate.save(); // Ensure progress reset is saved
-        }
-
         // General update logs (for all status changes)
         await CandidateLog.create({
             candidate: candidate._id,
@@ -353,4 +359,63 @@ const getCandidateLogsByCandidateId = async (req, res) => {
     }
 }
 
-export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage };
+const rejectCandidate = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const candidate = await Candidate.findById(id);
+
+        if (!candidate) {
+            return res.status(404).json({ success: false, message: "Candidate not found" });
+        }
+
+        if (candidate.status === "rejected") {
+            return res.status(400).json({ success: false, message: "Candidate already rejected" });
+        }
+
+        const offer = await Offer.findOne({ candidate: id }).lean();
+
+        const emailStatus = await sendCandidateEmail("rejection", candidate, offer);
+
+        if (!emailStatus.success) {
+            return res.status(400).json({ success: false, message: "Cannot send email and reject candidate" });
+        }
+
+        await CandidateLog.create({
+            candidate: candidate._id,
+            action: 'updated',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+            metaData: {
+                emailStatus: emailStatus.message,
+                emailType: "rejection",
+            },
+        });
+
+        await ActivityLog.create({
+            candidate: candidate._id,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'candidates',
+            relatedId: candidate._id,
+            metaData: {
+                title: candidate.name,
+                description: candidate.status,
+                emailType: "rejection",
+            },
+        });
+
+        candidate.status = "rejected";
+        candidate.progress = {};
+
+        await candidate.save();
+        return res.status(200).json({ success: true, message: "Candidate rejected successfully" });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+
+    }
+}
+
+
+export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage, rejectCandidate };

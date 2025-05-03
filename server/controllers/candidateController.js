@@ -72,19 +72,19 @@ const createCandidate = async (req, res) => {
         const savedCandidate = await newCandidate.save();
 
         // Step 2: Create references and associate with candidate
-        if (references) {
-            const referenceDocs = await Promise.all(references.map(async (ref) => {
-                const newRef = await Reference.create({
-                    ...ref,
-                    candidate: savedCandidate._id,
-                });
-                return newRef._id;
-            }));
+        // if (references) {
+        //     const referenceDocs = await Promise.all(references.map(async (ref) => {
+        //         const newRef = await Reference.create({
+        //             ...ref,
+        //             candidate: savedCandidate._id,
+        //         });
+        //         return newRef._id;
+        //     }));
 
-            // Step 3: Update candidate to reference the new reference
-            savedCandidate.references = referenceDocs;
-            await savedCandidate.save();
-        }
+        //     // Step 3: Update candidate to reference the new reference
+        //     savedCandidate.references = referenceDocs;
+        //     await savedCandidate.save();
+        // }
 
         await CandidateLog.create({
             candidate: savedCandidate._id,

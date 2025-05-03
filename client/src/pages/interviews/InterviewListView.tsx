@@ -280,9 +280,25 @@ const InterviewListView = ({
                                     </div>
                                     <div className="flex items-center">
                                         <Users size={14} className="mr-1 text-gray-500" />
-                                        <Text type="secondary" className='capitalize'>{interview?.interviewer?.name}</Text>
+                                        <Text type="secondary" className="capitalize">
+                                            {interview?.interviewer?.name}
+                                        </Text>
                                     </div>
                                 </div>
+
+                                {interview?.meetingLink && (
+                                    <div className="mt-2">
+                                        <a
+                                            href={interview.meetingLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            Join Interview
+                                        </a>
+                                    </div>
+                                )}
+
                             </div>
                         </div>
                     </div>

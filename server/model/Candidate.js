@@ -33,7 +33,7 @@ const candidateSchema = new mongoose.Schema({
         match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"]
     },
     phone: {
-        type: Number,
+        type: String,
         required: true
     },
     technology: {
@@ -57,10 +57,18 @@ const candidateSchema = new mongoose.Schema({
         type: String
     },
     references: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "references"
+        name: {
+            type: String,
+        },
+        contact: {
+            type: String,
+        },
+        relation: {
+            type: String,
+        },
     }],
-    progress: progressSchema, // ← Dynamic progress structure
+    progress: progressSchema,
+
     status: {
         type: String,
         enum: [...STAGES, "rejected"],

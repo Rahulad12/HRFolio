@@ -12,7 +12,7 @@ import { Col, Row, Space, Typography } from 'antd';
 import RecentActivityLog from '../component/dashboard/RecentActivitiesLog';
 import ListOfCandidatesWithStatus from '../component/dashboard/ListOfCandidatesWithStatus';
 import CandidateByTechnology from '../component/dashboard/CandidateByTechnology';
-import ExperienceDistribution from '../component/dashboard/ExperienceDistribution';
+import CandidateLevelDistribution from '../component/dashboard/CandidateLevelDistribution';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -26,22 +26,9 @@ export const Dashboard: React.FC = () => {
   const { candidate } = useAppSelector((state) => state.candidate);
   const { interviews } = useAppSelector((state) => state.interview);
 
-  const shortListed = candidate.filter((item) => item.status === 'shortlisted');
   const scheduledInterview = interviews.filter((item) => item.status === 'scheduled');
   const assessment = candidate.filter((item) => item.status === 'assessment');
   const offered = candidate.filter((item) => item.status === 'offered');
-  const rejected = candidate.filter((item) => item.status === 'rejected');
-  const hired = candidate.filter((item) => item.status === 'hired');
-
-  const pipelineStages = [
-    { id: '1', name: 'Shortlisted', count: shortListed.length, color: '#3B82F6' },
-    { id: '2', name: 'Assessment', count: assessment.length, color: '#8B5CF6' },
-    { id: '3', name: 'Interviewing', count: scheduledInterview?.length, color: '#10B981' },
-    { id: '4', name: 'Offered', count: offered.length, color: '#F59E0B' },
-    { id: '5', name: 'Hired', count: hired.length, color: '#EC4899' },
-    { id: '6', name: 'Rejected', count: rejected.length, color: '#EF4444' },
-  ];
-
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -179,7 +166,7 @@ export const Dashboard: React.FC = () => {
           </motion.div>
         </Col>
         <Col xs={24} lg={12} md={12}>
-          <ExperienceDistribution />
+          <CandidateLevelDistribution />
         </Col>
       </Row>
     </div>

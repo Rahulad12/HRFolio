@@ -6,11 +6,10 @@ import dayjs from "dayjs";
 import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
 import { sendInterviewEmail } from "../utils/sendInterviewScheduleEmailHelper.js";
 import Interviewers from "../model/Interviewers.js";
-import { canCandidateProgress } from "../utils/canCandidateProgress.js";
 
 
 const createInterview = async (req, res) => {
-    const { candidate, interviewer, date, time, type, notes, status, InterviewRound } = req.body;
+    const { candidate, interviewer, date, time, type, notes, status, InterviewRound, meetingLink } = req.body;
 
     // 1. Validate required fields
     if (!candidate || !interviewer || !date || !time || !type || !status) {
@@ -43,11 +42,6 @@ const createInterview = async (req, res) => {
             });
         }
 
-        // // 4. Validate candidate progress pipeline only for draft/scheduled
-        // if (["draft", "scheduled"].includes(status)) {
-        //     const proceed = await canCandidateProgress(candidate, InterviewRound, req, res);
-        //     if (!proceed) return; // early exit if middleware sent response
-        // }
 
         // 5. Prevent duplicate interviews for the same round
         const existing = await Interview.findOne({ candidate, InterviewRound });
@@ -72,7 +66,8 @@ const createInterview = async (req, res) => {
             type,
             notes,
             status,
-            InterviewRound
+            InterviewRound,
+            meetingLink
         });
 
         if (!interview) {
@@ -88,7 +83,7 @@ const createInterview = async (req, res) => {
 
         // 8. Send email to candidate
         const interviewerInfo = await Interviewers.findById(interviewer).lean();
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV === 'production' && status === 'scheduled') {
             await sendInterviewEmail(candidateInfo, interview, interviewerInfo, InterviewRound);
         }
 

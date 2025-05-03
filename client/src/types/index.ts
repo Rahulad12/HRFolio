@@ -29,7 +29,7 @@ export type referenceData = {
 export type candidateFormData = {
     name: string;
     email: string;
-    phone: number;
+    phone: string;
     technology: string;
     level: string;
     experience: number;
@@ -62,12 +62,22 @@ export type referenceResponse = {
     relation: string
 
 }
-export type candidateStatus = 'shortlisted' | 'first' | 'second' | 'third' | 'assessment' | 'offered' | 'hired';
+export type candidateStatus =
+    | "shortlisted"
+    | "assessment"
+    | "first"
+    | "second"
+    | "third"
+    | "offered"
+    | "hired"
+    | "rejected";
+
+
 export type interviewStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'failed';
 export type candidateData = {
     name: string;
     email: string;
-    phone: number;
+    phone: string;
     technology: string;
     level: string;
     experience: number;
@@ -115,6 +125,7 @@ export type interviewData = {
     notes: string;
     status: interviewStatus;
     InterviewRound: 'first' | 'second' | 'third';
+    meetingLink: string;
     _id: string;
     __v: number;
     createdAt: string;
@@ -131,12 +142,6 @@ export type interviewResponseById = {
     message: string;
     data?: interviewData[];
 }
-
-// export type interviewerResponse = {
-//     success?: boolean;
-//     message?: string;
-//     data?: interviewer[]
-// }
 
 //assessmet types
 export type assessmentFormData = {

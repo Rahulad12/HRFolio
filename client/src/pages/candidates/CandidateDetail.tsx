@@ -28,7 +28,7 @@ const CandidateDetails = () => {
   const [candidate, setCandidate] = useState<candidateFormData>({
     name: "",
     email: "",
-    phone: 0,
+    phone: "",
     status: "shortlisted",
     applieddate: "",
     technology: "",
@@ -48,6 +48,8 @@ const CandidateDetails = () => {
       rejected: { completed: false, date: "" },
     }
   })
+
+
   const [api, contextHolder] = notification.useNotification();
   useEffect(() => {
     if (data?.data) {
@@ -58,7 +60,7 @@ const CandidateDetails = () => {
 
   }, [data]);
 
-  const StatusFlow = [
+  const StatusFlow: candidateStatus[] = [
     'shortlisted',
     'assessment',
     'first',
@@ -66,6 +68,7 @@ const CandidateDetails = () => {
     'third',
     'offered',
     'hired',
+    'rejected'
   ] as const;
 
   const canMoveToStatus = (targetStatus: candidateStatus) => {
@@ -111,12 +114,11 @@ const CandidateDetails = () => {
       return;
     }
 
-    setCandidate({ ...candidate, status: newStatus });
 
     try {
       const res = await changeCandidateStage({ id: id || '', data: { status: newStatus } }).unwrap();
-      console.log("res", res);
       if (res.success) {
+        setCandidate({ ...candidate, status: newStatus });
         api.success({
           message: res?.message,
           placement: "topRight",
@@ -263,14 +265,44 @@ const CandidateDetails = () => {
       {/* Progress Steps */}
       <Card className="rounded-2xl shadow-sm">
         <Typography.Title level={5}>Candidate Progress</Typography.Title>
-        <Steps current={currentStep} responsive size="default">
+        {/* <Steps current={currentStep} responsive size="default">
           {StatusFlow.map((step, index) => {
             const stepStatus = index < currentStep ? "finish" : index === currentStep ? "process" : "wait";
             return (
               <Steps.Step key={step} title={makeCapitilized(step)} status={stepStatus} disabled={!canMoveToStatus(step as candidateStatus)} />
             );
           })}
+        </Steps> */}
+        <Steps
+          current={currentStep}
+          responsive
+          size="default"
+          onChange={(current) => {
+            const newStatus = StatusFlow[current];
+            if (canMoveToStatus(newStatus)) {
+              updateStatus(newStatus);
+            } else {
+              api.error({
+                message: "You cannot skip steps! Complete the current stage first.",
+                placement: "topRight",
+                duration: 3000,
+              });
+            }
+          }}
+        >
+          {StatusFlow.map((step, index) => {
+            const stepStatus = index < currentStep ? "finish" : index === currentStep ? "process" : "wait";
+            return (
+              <Steps.Step
+                key={step}
+                title={makeCapitilized(step)}
+                status={stepStatus}
+                disabled={!canMoveToStatus(step as candidateStatus)}
+              />
+            );
+          })}
         </Steps>
+
 
       </Card>
 

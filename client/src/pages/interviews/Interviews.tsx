@@ -3,7 +3,7 @@ import { useInterview } from '../../action/StoreInterview'
 import InterviewListView from './InterviewListView';
 import CalenderView from './CalenderView';
 import { CalendarIcon, ListIcon, Plus, Search } from 'lucide-react';
-import { Card, Typography, Button, Spin, Tabs, Select, Input, Skeleton } from 'antd'
+import { Card, Typography, Button, Tabs, Select, Input, Skeleton } from 'antd'
 import { useNavigate } from 'react-router-dom';
 import TabPane from 'antd/es/tabs/TabPane';
 const { Title, Text } = Typography

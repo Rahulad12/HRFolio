@@ -320,7 +320,6 @@ const CandidateForm: React.FC = () => {
                         {...restField}
                         name={[name, "name"]}
                         label="Name"
-                        rules={[{ required: true, message: "Please enter name" }]}
                       >
                         <Input placeholder="Reference name" />
                       </Form.Item>

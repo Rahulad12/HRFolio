@@ -8,6 +8,19 @@ import dayjs from "dayjs";
 import AssessmentLog from "../model/AssessmentLog.js";
 import ActivityLog from "../model/ActivityLogs.js";
 
+/**
+ * @function createAssessment
+ * @description Creates a new assessment
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @param {string} title - title of the assessment
+ * @param {string} type - type of the assessment (behavioural or technical)
+ * @param {string} technology - technology of the assessment
+ * @param {string} level - level of the assessment (junior, mid, senior)
+ * @param {number} duration - duration of the assessment in minutes
+ * @param {string} assessmentLink - link of the assessment
+ * @returns {Object} - response object with success status and message
+ */
 const createAssessment = async (req, res) => {
     const { title, type, technology, level, duration, assessmentLink } = req.body
     try {
@@ -22,6 +35,24 @@ const createAssessment = async (req, res) => {
     }
 }
 
+
+/**
+ * Assigns an assessment to one or more candidates.
+ * Validates input fields and ensures no duplicate assignments exist for the same candidate and assessment date.
+ * Sends an email to each candidate if the environment is production and the status is 'assigned'.
+ * Records the assignment activity in the logs.
+ * 
+ * @param {Object} req - The request object containing assignment details.
+ * @param {Object} req.body - The request body.
+ * @param {string|string[]} req.body.candidate - Candidate ID(s) to assign the assessment to.
+ * @param {string} req.body.assessment - The ID of the assessment.
+ * @param {string} req.body.dueDate - The due date for the assessment (format 'YYYY-MM-DD').
+ * @param {string} req.body.emailTemplate - The ID of the email template to use.
+ * @param {string} req.body.status - The status of the assignment ('assigned', 'pending', or 'completed').
+ * @param {Object} res - The response object.
+ * 
+ * @returns {Object} - Returns a JSON response with success status and message.
+ */
 
 const assignAssessment = async (req, res) => {
     let { candidate, assessment, dueDate, emailTemplate, status } = req.body;
@@ -54,7 +85,7 @@ const assignAssessment = async (req, res) => {
         if (existingAssignment.length > 0) {
             return res.status(400).json({
                 success: false,
-                message: `Candidate with ID ${duplicateCandidate} is already assigned to the same assessment on ${dayjs(existingAssignment[0].dueDate).format('YYYY-MM-DD')}`,
+                message: `Candidate with ID ${duplicateCandidate} is already assigned to the same assessment on ${dayjs(existingAssignment[0]?.dueDate).format('YYYY-MM-DD')}`,
             });
         }
 
@@ -88,17 +119,17 @@ const assignAssessment = async (req, res) => {
                         const assessmentDate = new Date(createdAssignment.createdAt).toLocaleDateString();
 
                         const html = template.body
-                            .replace(/{{candidateName}}/g, candidateInfo.name)
-                            .replace(/{{technology}}/g, assessmentDetails.technology || '')
+                            .replace(/{{candidateName}}/g, candidateInfo?.name)
+                            .replace(/{{technology}}/g, assessmentDetails?.technology || '')
                             .replace(/{{assessmentDate}}/g, assessmentDate)
                             .replace(/{{assessmentTime}}/g, assessmentTime)
-                            .replace(/{{assessmentLink}}/g, assessmentDetails.assessmentLink || '')
-                            .replace(/{{duration}}/g, assessmentDetails.duration || '')
-                            .replace(/{{level}}/g, assessmentDetails.level || '')
+                            .replace(/{{assessmentLink}}/g, assessmentDetails?.assessmentLink || '')
+                            .replace(/{{duration}}/g, assessmentDetails?.duration || '')
+                            .replace(/{{level}}/g, assessmentDetails?.level || '')
                             .replace(/{{deueDate}}/g, dueDate)
-                            .replace(/{{type}}/g, assessmentDetails.type || '');
+                            .replace(/{{type}}/g, assessmentDetails?.type || '');
 
-                        const subject = template.subject.replace(/{{technology}}/g, assessmentDetails.technology || 'Assessment');
+                        const subject = template?.subject.replace(/{{technology}}/g, assessmentDetails?.technology || 'Assessment').replace(/{{candidateName}}/g, candidateInfo?.name);
 
                         await sendEmail({
                             to: candidateInfo.email,

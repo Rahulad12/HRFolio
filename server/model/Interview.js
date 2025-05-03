@@ -25,7 +25,7 @@ const interviewSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ["in-person", "phone", "video"],
+        enum: ["in-person", "video"],
         default: "in-person",
         required: true
     },
@@ -43,21 +43,13 @@ const interviewSchema = new mongoose.Schema({
     },
     rating: {
         type: Number
+    },
+    meetingLink: {
+        type: String
     }
 }, {
     timestamps: true
 });
-
-// interviewSchema.pre("save", async function (next) {
-//     try {
-//         if (this.status === "completed") {
-//             await updateCandidateProgress(this.candidate, this.InterviewRound);
-//         }
-//         next();
-//     } catch (err) {
-//         next(err);
-//     }
-// })
 
 const Interview = mongoose.model("interviews", interviewSchema);
 export default Interview;

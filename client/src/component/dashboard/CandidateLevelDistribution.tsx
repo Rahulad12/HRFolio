@@ -1,7 +1,7 @@
 import { Card } from 'antd';
 import { useAppSelector } from '../../Hooks/hook';
 import PieChart from '../Charts/PieChart';
-const ExperienceDistribution = () => {
+const CandidateLevelDistribution = () => {
     const candidates = useAppSelector(state => state.candidate.candidate);
 
     const statusCounts: Record<string, number> = {};
@@ -27,4 +27,4 @@ const ExperienceDistribution = () => {
     );
 };
 
-export default ExperienceDistribution 
+export default CandidateLevelDistribution 

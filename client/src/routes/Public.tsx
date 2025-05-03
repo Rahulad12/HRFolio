@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from '../pages/auth/Login'
 import { useAppSelector } from '../Hooks/hook'
+import NotFound from '../pages/NotFound'
 
 
 const Public = () => {
@@ -12,6 +13,7 @@ const Public = () => {
     return (
         <Routes>
             <Route path='/' element={<Login />} />
+            <Route path='*' element={<NotFound />} />
         </Routes>
     )
 }

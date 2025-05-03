@@ -290,12 +290,28 @@ const updateCandidate = async (req, res) => {
     }
 };
 
+/**
+ * Changes the stage of a candidate to a new status.
+ * 
+ * @param {Object} req - The request object containing the candidate ID in req.params and the new status in req.body.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 400 status if the new status is the same as the current status, or if the candidate cannot be moved to the new stage.
+ * Responds with a 404 status if the candidate is not found.
+ * Responds with a 200 status if the candidate is updated successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 const changeCandidateStage = async (req, res) => {
     try {
         const { id: candidateId } = req.params;
         const { status: newStatus } = req.body;
 
         const candidate = await Candidate.findById(candidateId);
+
+        if (candidate.status === newStatus) {
+            return res.status(400).json({ success: false, message: "Cannot move to same stage" });
+        }
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
@@ -311,6 +327,11 @@ const changeCandidateStage = async (req, res) => {
 
         // Update candidate stage
         const updatedCandidate = await updateCandidateStage(candidateId, newStatus);
+        const offer = await Offer.findOne({ candidate: candidateId });
+
+        if (newStatus === 'hired') {
+            await sendCandidateEmail('hired', updatedCandidate, offer);
+        }
         // General update logs (for all status changes)
         await CandidateLog.create({
             candidate: candidate._id,
@@ -343,6 +364,16 @@ const changeCandidateStage = async (req, res) => {
 };
 
 
+/**
+ * Gets all logs for a given candidate ID.
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the candidate logs are not found.
+ * Responds with a 200 status if the candidate logs are fetched successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 const getCandidateLogsByCandidateId = async (req, res) => {
     try {
         const candidateLogs = await CandidateLog.find({ candidate: req.params.id }).sort({ createdAt: -1 }).select(' -__v').populate({
@@ -359,6 +390,17 @@ const getCandidateLogsByCandidateId = async (req, res) => {
     }
 }
 
+/**
+ * Rejects a candidate with the given ID.
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the candidate is not found.
+ * Responds with a 400 status if the candidate is already rejected.
+ * Responds with a 200 status if the candidate is rejected successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 const rejectCandidate = async (req, res) => {
     const { id } = req.params;
     try {

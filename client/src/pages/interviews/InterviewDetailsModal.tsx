@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Modal, Descriptions, Tag, Timeline, Button, Form, Input, Rate, Divider, Typography, Popconfirm } from 'antd';
 import { Calendar, Clock, Users, Video, Phone, MapPin, FileText, } from 'lucide-react';
 import dayjs from 'dayjs';
@@ -26,15 +26,6 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
 
   const navigate = useNavigate();
   const [feedbackForm] = Form.useForm();
-
-  // const { data: interviewById } = useGetInterviewByIdQuery(interview?._id || '');
-  // console.log(interviewById);
-  // console.log(interviewData);
-  // useEffect(() => {
-  //   if (interviewById?.success && interviewById?.data) {
-  //     setInterviewData(interviewById?.data);
-  //   }
-  // }, [interviewById]);
 
   const getInterviewTypeIcon = (type: string | undefined) => {
     switch (type) {

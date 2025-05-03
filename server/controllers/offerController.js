@@ -5,17 +5,44 @@ import OfferLog from "../model/offerLogs.js";
 import sendEmail from "../utils/sendEmail.js";
 import ActivityLog from "../model/ActivityLogs.js";
 import dayjs from "dayjs";
+import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
 
 const createOffer = async (req, res) => {
     const { candidate, email, position, salary, startDate, responseDeadline, status } = req.body;
+    if (!candidate || !email || !position || !salary || !startDate || !responseDeadline || !status) {
+        return res.status(400).json({
+            message: 'All fields are required.',
+            success: false,
+        });
+    }
 
     try {
+        if (dayjs(startDate).isBefore(dayjs().startOf('day'))) {
+            return res.status(400).json({
+                message: 'Start date cannot be in the past.',
+                success: false,
+            });
+        }
+        if (dayjs(responseDeadline).isBefore(dayjs().startOf('day'))) {
+            return res.status(400).json({
+                message: 'Response deadline cannot be in the past.',
+                success: false,
+            });
+        }
+
+        if (dayjs(responseDeadline).isAfter(dayjs(startDate))) {
+            return res.status(400).json({
+                message: 'Response deadline cannot be After start date.',
+                success: false,
+            });
+        }
+
         const existingOffer = await Offer.findOne({ candidate });
 
         if (existingOffer && existingOffer.status === 'sent') {
             return res.status(400).json({
-                success: false,
                 message: 'Offer has already been sent to this candidate.',
+                success: false,
             });
         }
 
@@ -34,7 +61,7 @@ const createOffer = async (req, res) => {
         });
 
         const candidateInfo = await Candidate.findById(candidate);
-        if (newOffer.status === 'sent') {
+        if (newOffer.status === 'sent' && process.env.NODE_ENV === 'production') {
             const emailTemplate = await EmailTemplate.findById(email);
 
             if (candidateInfo && emailTemplate) {
@@ -141,7 +168,12 @@ const getOfferByCandidates = async (req, res) => {
 };
 
 const updateOffer = async (req, res) => {
+    const { candidate, status } = req.body
     try {
+
+        if (status === "accepted") {
+            await updateCandidateProgress(candidate, 'offered');
+        }
         const offer = await Offer.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!offer) {
             return res.status(404).json({ success: false, message: "Offer not found" });

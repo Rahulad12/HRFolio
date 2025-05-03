@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetCandidateByIdQuery, useUpdateCandidateMutation } from '../../services/candidateServiceApi';
-import { candidateFormData } from '../../types/index';
+import { useGetCandidateByIdQuery, useUpdateCandidateMutation, useChangeCandidateStageMutation } from '../../services/candidateServiceApi';
+import { candidateData, candidateFormData } from '../../types/index';
 import CandidateProfileLoading from '../../component/Loding/CandidateProfileLoading';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { useAppDispatch } from '../../Hooks/hook';
@@ -22,7 +22,7 @@ const CandidateDetails = () => {
     skip: !id
   });
 
-  const [updateCandidate] = useUpdateCandidateMutation();
+  const [changeCandidateStage, { isLoading: changeCandidateStageLoading }] = useChangeCandidateStageMutation();
 
   const [candidate, setCandidate] = useState<candidateFormData>({
     name: "",
@@ -36,6 +36,16 @@ const CandidateDetails = () => {
     expectedsalary: 0,
     references: [],
     resume: "",
+    progress: {
+      shortlisted: { completed: false, date: "" },
+      first: { completed: false, date: "" },
+      second: { completed: false, date: "" },
+      third: { completed: false, date: "" },
+      assessment: { completed: false, date: "" },
+      offered: { completed: false, date: "" },
+      hired: { completed: false, date: "" },
+      rejected: { completed: false, date: "" },
+    }
   })
   const [api, contextHolder] = notification.useNotification();
   useEffect(() => {
@@ -59,15 +69,36 @@ const CandidateDetails = () => {
   ] as const;
 
   const canMoveToStatus = (targetStatus: candidateStatus) => {
-    const stageOrder = StatusFlow;
-    const currentIndex = stageOrder.indexOf(candidate.status);
-    const targetIndex = stageOrder.indexOf(targetStatus);
+    const currentStatus = candidate.status;
 
+    // Always allow staying on the same status
+    if (targetStatus === currentStatus) return true;
+
+    // Allow moving to rejected at any point
     if (targetStatus === "rejected") return true;
 
-    // Allow only next immediate step or staying on current
-    return targetIndex <= currentIndex + 1;
+    // Allow "offered" from any stage
+    if (targetStatus === "offered") return true;
+
+    const stageOrder = StatusFlow;
+    const currentIndex = stageOrder.indexOf(currentStatus);
+    const targetIndex = stageOrder.indexOf(targetStatus);
+
+    // Disallow skipping stages (e.g., from first to third directly)
+    if (targetIndex > currentIndex + 1) return false;
+
+    // If moving to a next stage, check if the previous one is marked completed
+    const prevIndex = targetIndex - 1;
+    if (prevIndex >= 0) {
+      const prevStage = stageOrder[prevIndex];
+      const isCompleted = candidate?.progress?.[prevStage]?.completed;
+
+      return isCompleted === true;
+    }
+
+    return true;
   };
+
 
   const updateStatus = async (newStatus: candidateStatus) => {
     if (!canMoveToStatus(newStatus)) {
@@ -82,21 +113,25 @@ const CandidateDetails = () => {
     setCandidate({ ...candidate, status: newStatus });
 
     try {
-      const res = await updateCandidate({ id: id || '', data: { ...candidate, status: newStatus } }).unwrap();
+      const res = await changeCandidateStage({ id: id || '', data: { status: newStatus } }).unwrap();
+      console.log("res", res);
       if (res.success) {
         api.success({
-          message: res.message,
+          message: res?.message,
           placement: "topRight",
           duration: 3000,
+          pauseOnHover: true
         });
         dispatch(storeCandidate([res.data]));
       }
-    } catch (err: any) {
-      console.error(err);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || 'An unknown error occurred.';
+      console.error("errorMessage", errorMessage);
       api.error({
-        message: `Error updating candidate status: ${err?.data?.message}`,
+        message: `Error updating candidate status: ${errorMessage}`,
         placement: "topRight",
         duration: 3000,
+        pauseOnHover: true
       });
     } finally {
       refetch();
@@ -106,7 +141,6 @@ const CandidateDetails = () => {
   const currentStep = StatusFlow.indexOf(candidate.status);
 
   if (isLoading) return <CandidateProfileLoading />;
-
 
   const candidatesStatusOptions = StatusFlow
     .filter(step => Predefineddata?.Status.map((status) => status.value).includes(step))

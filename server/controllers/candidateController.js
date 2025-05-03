@@ -6,6 +6,7 @@ import Reference from "../model/Reference.js";
 import ActivityLog from "../model/ActivityLogs.js";
 import dayjs from "dayjs";
 import { sendCandidateEmail } from "../utils/sendCandidateEmailHelper.js";
+import { updateCandidateStage, canMoveToStage } from "../utils/updateCandidateStage.js";
 const createCandidate = async (req, res) => {
     const {
         name, email, phone,
@@ -42,6 +43,12 @@ const createCandidate = async (req, res) => {
             expectedsalary, applieddate, resume
         })
 
+        if (!newCandidate) {
+            return res.status(400).json({
+                success: false,
+                message: "Candidate could not be created"
+            });
+        }
         const savedCandidate = await newCandidate.save();
 
         // Step 2: Create references and associate with candidate
@@ -113,25 +120,7 @@ const getCandidateById = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 }
-// const getAllCandidates = async (req, res) => {
-//     try {
-//         const candidates = await Candidate.find().select("-createdAt -updatedAt -__v").populate({
-//             path: "references",
-//             select: "-createdAt -updatedAt -__v -candidate"
-//         })
-//         if (candidates.length === 0) {
-//             return res.status(404).json({ success: false, message: "No candidates found" });
-//         }
-//         res.status(200).json({
-//             success: true,
-//             message: "Candidates fetched successfully",
-//             data: candidates
-//         });
 
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: error.message });
-//     }
-// }
 const getAllCandidates = async (req, res) => {
     const { searchText, status } = req.query;
 
@@ -206,113 +195,6 @@ const deleteCandidate = async (req, res) => {
 }
 
 /**
- * Update a candidate by ID
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {string} req.params.id - ID of the candidate to be updated
- * @param {Object} req.body - Updated information for the candidate
- * @returns {Promise<Object>} - An object containing a success message and the updated candidate data
- * this function updates a candidate by Id and when status is hired then it will send the email to particular candidate based on email template
- */
-// const updateCandidate = async (req, res) => {
-//     try {
-//         const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
-
-//         if (!candidate) {
-//             return res.status(404).json({ success: false, message: "Candidate not found" });
-//         }
-
-
-//         if (candidate.status === "rejected") {
-//             candidate.progress.rejected = { completed: true, date: new Date() };
-//             await candidate.save();
-//         }
-
-//         if (candidate.status === "hired") {
-//             const candidateInfo = candidate.name;
-//             const candidateEmail = candidate.email;
-
-//             candidate.progress.hired = { completed: true, date: new Date() };
-//             await candidate.save();
-
-//             if (candidateInfo && candidateEmail) {
-//                 const emailTemplate = await EmailTemplate.findOne({ type: "hired" });
-//                 const candidateOffer = await Offer.findOne({ candidate: candidate._id });
-
-//                 if (!emailTemplate) {
-//                     return res.status(400).json({ success: false, message: "Hired email template not found" });
-//                 }
-//                 if (!candidateOffer) {
-//                     return res.status(400).json({ success: false, message: "Candidate offer not found" });
-//                 }
-
-//                 const emailSubject = emailTemplate.subject;
-//                 const emailBody = emailTemplate.body
-//                     .replace("{{candidateName}}", candidateInfo)
-//                     .replace("{{position}}", candidateOffer.position);
-
-//                 await sendEmail(candidateEmail, emailSubject, emailBody);
-//             }
-//         }
-
-//         await CandidateLog.create({
-//             candidate: candidate._id,
-//             action: 'updated',
-//             performedAt: Date.now(),
-//             performedBy: req.user._id,
-//         })
-
-//         await ActivityLog.create({
-//             candidate: candidate._id,
-//             userID: req.user._id,
-//             action: 'updated',
-//             entityType: 'candidates',
-//             relatedId: candidate._id,
-//             metaData: {
-//                 title: candidate.name,
-//             }
-//         })
-
-
-//         return res.status(200).json({ success: true, message: "Candidate updated successfully", data: candidate });
-
-//     } catch (err) {
-//         console.error(err);
-//         return res.status(500).json({ success: false, message: "Server Error", error: err.message });
-//     }
-// };
-
-const canMoveToStage = (progress, newStatus) => {
-    const PIPELINE_ORDER = [
-        "shortlisted",
-        "assessment",
-        "first",
-        "second",
-        "third",
-        "offered",
-        "hired"
-    ];
-
-    const targetIndex = PIPELINE_ORDER.indexOf(newStatus);
-
-    // If invalid status or if it's "shortlisted", allow freely
-    if (targetIndex === -1 || newStatus === "shortlisted") return true;
-
-    // Rejected is always allowed — handle this in your route logic separately
-
-    // Check that all previous stages are completed
-    for (let i = 0; i < targetIndex; i++) {
-        const stage = PIPELINE_ORDER[i];
-        if (stage === "shortlisted") continue; // skip check for "shortlisted"
-        if (!progress[stage]?.completed) {
-            return false;
-        }
-    }
-    return true;
-};
-
-
-/**
  * Updates a candidate with the given ID.
  * @param {Object} req - The request object.
  * @param {Object} res - The response object.
@@ -324,64 +206,13 @@ const canMoveToStage = (progress, newStatus) => {
  */
 const updateCandidate = async (req, res) => {
     try {
-        const candidate = await Candidate.findById(req.params.id);
+        const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
+        // Send email if candidate is hired or rejected
 
-        const newStatus = req.body.status;
-
-        // Check if moving to the new status is allowed based on the current progress
-        if (newStatus !== "rejected" && !canMoveToStage(candidate.progress, newStatus)) {
-            return res.status(400).json({
-                success: false,
-                message: `Cannot move to '${newStatus}' until previous stage is completed.`,
-            });
-        }
-
-        // Check if the status is different
-        if (candidate.status === newStatus) {
-            return res.status(400).json({
-                success: false,
-                message: "Candidate is already in the selected status.",
-            });
-        }
-
-        // If the status changes, allow progress but do not mark the current stage as 'completed' automatically
-        candidate.status = newStatus;
-
-        // Don't automatically set the current stage as completed
-        if (!candidate.progress) candidate.progress = {};
-
-        // Only set the next stage as completed if the previous stage is truly completed
-        if (newStatus !== "shortlisted") {
-            candidate.progress[newStatus] = {
-                completed: false,
-                date: null, // Keep date null until the stage is marked as completed manually later
-            };
-        }
-
-        /**
-         * 
-         * This is where we send the email if the candidate is hired or rejected this will call the helper function sendCandidateEmail
-         * which will works for both hired and rejected
-         */
-        if (["hired", "rejected"].includes(newStatus)) {
-
-            const type = newStatus === "hired" ? "hired" : "rejection";
-            const offer = await Offer.findOne({ candidate: candidate._id }).lean();
-            const emailStatus = await sendCandidateEmail(type, candidate, offer);
-
-            if (!emailStatus.success) {
-                return res.status(400).json({ success: false, message: emailStatus.message });
-            }
-            candidate.progress = {};
-        }
-
-        // Save candidate changes
-        await candidate.save();
-
-        // Create logs for the candidate update
+        // Log the update
         await CandidateLog.create({
             candidate: candidate._id,
             action: 'updated',
@@ -397,7 +228,7 @@ const updateCandidate = async (req, res) => {
             relatedId: candidate._id,
             metaData: {
                 title: candidate.name,
-                description: newStatus
+                description: candidate.status
             },
         });
 
@@ -413,50 +244,98 @@ const updateCandidate = async (req, res) => {
     }
 };
 
-
-const filterCandidate = async (req, res) => {
-    const { name, technology, level, status } = req.query;
-
+const changeCandidateStage = async (req, res) => {
     try {
-        // If no filter is passed, you can return an error or return all
-        const query = {};
+        const { id: candidateId } = req.params;
+        const { status: newStatus } = req.body;
 
-        if (name) {
-            query.name = { $regex: name, $options: "i" };
-        }
-        if (technology) {
-            query.technology = { $regex: technology, $options: "i" };
-        }
-        if (level) {
-            query.level = { $regex: level, $options: "i" };
-        }
-        if (status) {
-            query.status = { $regex: status, $options: "i" };
+        const candidate = await Candidate.findById(candidateId);
+        if (!candidate) {
+            return res.status(404).json({ success: false, message: "Candidate not found" });
         }
 
-        const candidates = await Candidate.find(query).select(
-            "-createdAt -updatedAt -__v -references"
-        );
-
-        if (!candidates.length) {
-            return res
-                .status(404)
-                .json({ success: false, message: "No candidates found" });
+        // Check if the candidate can be moved to the new stage
+        const canUpdate = canMoveToStage(candidate.status, newStatus, candidate.progress);
+        if (!canUpdate) {
+            return res.status(400).json({
+                success: false,
+                message: `Cannot move to '${newStatus}' from '${candidate.status}'`,
+            });
         }
+
+        // Update candidate stage
+        const updatedCandidate = await updateCandidateStage(candidateId, newStatus);
+
+        // Handle rejection email and logs in production only
+        if (newStatus === "rejected" && process.env.NODE_ENV === "production") {
+            const offer = await Offer.findOne({ candidate: candidate._id }).lean();
+            const emailStatus = await sendCandidateEmail("rejection", candidate, offer);
+
+            if (!emailStatus.success) {
+                return res.status(400).json({ success: false, message: emailStatus.message });
+            }
+
+            // Log email and rejection
+            await CandidateLog.create({
+                candidate: candidate._id,
+                action: 'created',
+                performedAt: Date.now(),
+                performedBy: req.user._id,
+                metaData: {
+                    emailStatus: emailStatus.message,
+                    emailType: "rejection",
+                },
+            });
+
+            await ActivityLog.create({
+                candidate: candidate._id,
+                userID: req.user._id,
+                action: 'created',
+                entityType: 'candidates',
+                relatedId: candidate._id,
+                metaData: {
+                    title: candidate.name,
+                    description: newStatus,
+                    emailType: "rejection",
+                },
+            });
+
+            // Clear candidate progress after rejection
+            candidate.progress = {};
+            await candidate.save(); // Ensure progress reset is saved
+        }
+
+        // General update logs (for all status changes)
+        await CandidateLog.create({
+            candidate: candidate._id,
+            action: 'updated',
+            performedAt: Date.now(),
+            performedBy: req.user._id,
+        });
+
+        await ActivityLog.create({
+            candidate: candidate._id,
+            userID: req.user._id,
+            action: 'updated',
+            entityType: 'candidates',
+            relatedId: candidate._id,
+            metaData: {
+                title: candidate.name,
+                description: newStatus,
+            },
+        });
 
         return res.status(200).json({
             success: true,
-            message: "Candidates fetched successfully",
-            data: candidates,
+            message: `Candidate updated successfully to ${newStatus}`,
+            data: updatedCandidate,
         });
-
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message || "Internal Server Error",
-        });
+    } catch (err) {
+        console.error("Error in changeCandidateStage:", err);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 
 const getCandidateLogsByCandidateId = async (req, res) => {
     try {
@@ -474,4 +353,4 @@ const getCandidateLogsByCandidateId = async (req, res) => {
     }
 }
 
-export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, filterCandidate, updateCandidate, getCandidateLogsByCandidateId };
+export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage };

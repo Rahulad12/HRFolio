@@ -6,56 +6,64 @@ import dayjs from "dayjs";
 import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
 import { sendInterviewEmail } from "../utils/sendInterviewScheduleEmailHelper.js";
 import Interviewers from "../model/Interviewers.js";
+import { canCandidateProgress } from "../utils/canCandidateProgress.js";
+
 
 const createInterview = async (req, res) => {
     const { candidate, interviewer, date, time, type, notes, status, InterviewRound } = req.body;
 
+    // 1. Validate required fields
     if (!candidate || !interviewer || !date || !time || !type || !status) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
     try {
-        // 1. Prevent past interviews
-        if (dayjs(`${date} ${time}`).isBefore(dayjs())) {
+        // 2. Prevent scheduling interviews in the past
+        const scheduledDateTime = dayjs(`${date} ${time}`);
+        if (scheduledDateTime.isBefore(dayjs().startOf('day'))) {
             return res.status(400).json({ success: false, message: "Cannot schedule interview in the past" });
         }
 
-        // 2. Fetch candidate's interview history
+        // 3. Check interview round order dependency
         const interviews = await Interview.find({ candidate });
 
-        const stageCompleted = (stage) =>
-            interviews.some(int => int.InterviewRound === stage && int.status === "completed");
+        const hasCompleted = (round) =>
+            interviews.some(int => int.InterviewRound === round && int.status === "completed");
 
-        // 3. Enforce round progression rules
-        if (InterviewRound === "second" && !stageCompleted("first")) {
+        const roundDependencies = {
+            second: "first",
+            third: "second"
+        };
+
+        const requiredPrevRound = roundDependencies[InterviewRound];
+        if (requiredPrevRound && !hasCompleted(requiredPrevRound)) {
             return res.status(400).json({
                 success: false,
-                message: "First round interview must be completed before scheduling second round."
+                message: `${requiredPrevRound} round must be completed before scheduling ${InterviewRound} round.`
             });
         }
 
-        if (InterviewRound === "third" && !stageCompleted("second")) {
-            return res.status(400).json({
-                success: false,
-                message: "Second round interview must be completed before scheduling third round."
-            });
+        // // 4. Validate candidate progress pipeline only for draft/scheduled
+        // if (["draft", "scheduled"].includes(status)) {
+        //     const proceed = await canCandidateProgress(candidate, InterviewRound, req, res);
+        //     if (!proceed) return; // early exit if middleware sent response
+        // }
+
+        // 5. Prevent duplicate interviews for the same round
+        const existing = await Interview.findOne({ candidate, InterviewRound });
+
+        if (existing) {
+            if (existing.status === "draft") {
+                await Interview.findByIdAndDelete(existing._id); // replace draft
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: `${InterviewRound} interview is already scheduled.`
+                });
+            }
         }
 
-        // 4. Check for existing scheduled/draft interviews in the same round
-        const existingInterview = await Interview.findOne({ candidate, InterviewRound }).lean();
-
-        if (existingInterview) {
-            return res.status(400).json({
-                success: false,
-                message: `Check your schedule. ${InterviewRound} interview is already scheduled.`
-            });
-        }
-
-        if (existingInterview && existingInterview.status === "draft") {
-            await Interview.findByIdAndDelete(existingInterview._id);
-        }
-
-        // 5. Create interview
+        // 6. Create interview
         const interview = await Interview.create({
             candidate,
             interviewer,
@@ -71,24 +79,20 @@ const createInterview = async (req, res) => {
             return res.status(500).json({ success: false, message: "Interview not created" });
         }
 
-        // 6. Update candidate status
+        // 7. Update candidate status
         const candidateInfo = await Candidate.findById(candidate);
         if (candidateInfo) {
             candidateInfo.status = InterviewRound;
             await candidateInfo.save();
         }
 
-        //send Email to the Candidate
-        const interviewerInfo = await Interviewers.findOne({
-            _id: interviewer
-        }).lean();
-        console.log(interviewerInfo);
-        console.log(candidateInfo);
-        console.log(interview);
-        console.log(InterviewRound);
-        await sendInterviewEmail(candidateInfo, interview, interviewerInfo, InterviewRound);
+        // 8. Send email to candidate
+        const interviewerInfo = await Interviewers.findById(interviewer).lean();
+        if (process.env.NODE_ENV === 'production') {
+            await sendInterviewEmail(candidateInfo, interview, interviewerInfo, InterviewRound);
+        }
 
-        // 7. Log interview creation
+        // 9. Log interview creation
         await InterviewLog.create({
             interviewId: interview._id,
             candidate,
@@ -97,7 +101,7 @@ const createInterview = async (req, res) => {
             details: { date, time, type, notes, status, interviewRound: InterviewRound },
         });
 
-        // 8. Log activity
+        // 10. Log activity
         await ActivityLog.create({
             candidate,
             userID: req.user.id,
@@ -123,7 +127,7 @@ const createInterview = async (req, res) => {
     }
 };
 
-export default createInterview;
+
 
 const getAllInterviews = async (req, res) => {
     const { date, status } = req.query;
@@ -207,52 +211,76 @@ const getAllInterviewsByCandidate = async (req, res) => {
 }
 
 const updateInterview = async (req, res) => {
+    const { status } = req.body;
+
     try {
-        const updatedInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedInterview) {
+        const interview = await Interview.findById(req.params.id);
+
+        if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
-        //check if status is completed and update candidate progress to completed
-        const status = updatedInterview?.status;
-        if (status === 'completed') {
-            await updateCandidateProgress(updatedInterview?.candidate, updatedInterview?.InterviewRound);
+
+        if (!dayjs(interview.date).isSame(dayjs(), 'day') && status === 'completed') {
+            return res.status(400).json({
+                success: false,
+                message: "Interview can only be marked completed on the scheduled interview date.",
+            });
         }
 
-        // Log interview update
+        const updatedInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+        if (!updatedInterview) {
+            return res.status(404).json({ success: false, message: "Interview not found after update" });
+        }
+
+        const updatedStatus = updatedInterview.status;
+
+        if (updatedStatus === 'completed') {
+            await updateCandidateProgress(updatedInterview.candidate, updatedInterview.InterviewRound);
+        }
+
         await InterviewLog.create({
-            interviewId: updatedInterview?._id,
-            candidate: updatedInterview?.candidate,
-            interviewer: updatedInterview?.interviewer,
+            interviewId: updatedInterview._id,
+            candidate: updatedInterview.candidate,
+            interviewer: updatedInterview.interviewer,
             action: 'updated',
             details: {
-                date: updatedInterview?.date, time: updatedInterview?.time, type: updatedInterview?.type, notes: updatedInterview?.notes, status: updatedInterview?.status,
-                feedback: updatedInterview?.feedback, rating: updatedInterview?.rating, interviewRound: updatedInterview?.InterviewRound
+                date: updatedInterview.date,
+                time: updatedInterview.time,
+                type: updatedInterview.type,
+                notes: updatedInterview.notes,
+                status: updatedStatus,
+                feedback: updatedInterview.feedback,
+                rating: updatedInterview.rating,
+                interviewRound: updatedInterview.InterviewRound,
             },
         });
 
-        const existingCandidate = await Candidate.findById(updatedInterview?.candidate);
+        const existingCandidate = await Candidate.findById(updatedInterview.candidate);
         await ActivityLog.create({
-            candidate: updatedInterview?.candidate,
+            candidate: updatedInterview.candidate,
             userID: req.user.id,
             action: 'updated',
             entityType: 'interviews',
-            relatedId: updatedInterview?._id,
+            relatedId: updatedInterview._id,
             metaData: {
                 title: existingCandidate?.name,
                 description: existingCandidate?.status,
-                interviewRound: updatedInterview?.InterviewRound
+                interviewRound: updatedInterview.InterviewRound,
             },
-        })
+        });
+
         return res.status(200).json({
             success: true,
             message: "Interview updated successfully",
-            data: updatedInterview
+            data: updatedInterview,
         });
 
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
-}
+};
+
 
 const deleteInterview = async (req, res) => {
     try {

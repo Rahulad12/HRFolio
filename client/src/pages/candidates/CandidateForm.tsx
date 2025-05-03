@@ -92,6 +92,7 @@ const CandidateForm: React.FC = () => {
           navigate('/dashboard/candidates');
           return;
         }
+        console.log(res);
       } else {
         const res = await createCandidate(filterFormData).unwrap();
         if (res.success) {

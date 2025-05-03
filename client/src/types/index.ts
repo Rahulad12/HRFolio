@@ -38,6 +38,16 @@ export type candidateFormData = {
     applieddate: string | null;
     resume: string | null;
     status: candidateStatus
+    progress: {
+        shortlisted: { completed: boolean, date: string };
+        first: { completed: boolean, date: string };
+        second: { completed: boolean, date: string };
+        third: { completed: boolean, date: string };
+        assessment: { completed: boolean, date: string };
+        offered: { completed: boolean, date: string };
+        hired: { completed: boolean, date: string };
+        rejected: { completed: boolean, date: string };
+    }
 }
 
 export type candidateFilter = {
@@ -97,8 +107,8 @@ export type interviewer = {
 export type interviewData = {
     candidate: candidateData;
     interviewer: interviewer;
-    date: Dayjs;
-    time: Dayjs;
+    date: Dayjs | null;
+    time: Dayjs | null;
     type: 'phone' | 'video' | 'in-person';
     feedback: string;
     rating: number;
@@ -114,12 +124,12 @@ export type interviewData = {
 export type interviewResponse = {
     success: boolean;
     message: string;
-    data: interviewData[];
+    data?: interviewData[];
 }
 export type interviewResponseById = {
     success: boolean;
     message: string;
-    data: interviewData[];
+    data?: interviewData[];
 }
 
 // export type interviewerResponse = {

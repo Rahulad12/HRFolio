@@ -1,7 +1,5 @@
 import dayjs from "dayjs";
 import EmailTemplate from "../model/EmailTemplate.js";
-import Interview from "../model/Interview.js";
-import Interviewers from "../model/Interviewers.js";
 import sendEmail from "../utils/sendEmail.js";
 
 /**

@@ -98,7 +98,7 @@ export const assessmentServiceApi = api.injectEndpoints({
                 url: `${ASSESSMENT_URL}/logs/candidate/${id}`,
                 method: "GET",
             }),
-            providesTags: ['Assessment', 'Assignment']
+            providesTags: ['Assessment', 'Assignment' , 'Interview' , 'Candidate']
         })
     }),
 });

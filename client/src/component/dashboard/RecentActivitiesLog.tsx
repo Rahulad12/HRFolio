@@ -43,9 +43,10 @@ const RecentActivityLog: React.FC = () => {
         }
     };
 
-    const sortedLog = [...(activityLog?.data || [])].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    const sortedLog = [...(activityLog?.data || [])].filter((item) => dayjs(item?.createdAt).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')).
+        sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
 
     const paginatedLog = sortedLog.slice(
         (currentPage - 1) * pageSize,

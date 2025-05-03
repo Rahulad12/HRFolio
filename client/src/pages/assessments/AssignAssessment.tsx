@@ -189,7 +189,17 @@ const AssignAssessment = () => {
                                     <Form.Item
                                         name="dueDate"
                                         label="Due Date"
-                                        rules={[{ required: true, message: 'Please select a due date' }]}
+                                        rules={[{ required: true, message: 'Please select a due date' },
+
+                                        {
+                                            validator: (_, value) => {
+                                                if (value && dayjs(value).isBefore(dayjs().startOf('day'))) {
+                                                    return Promise.reject(new Error('Due date cannot be in the past'));
+                                                }
+                                                return Promise.resolve();
+                                            }
+                                        }
+                                        ]}
                                     >
                                         <DatePicker style={{ width: '100%' }} />
                                     </Form.Item>

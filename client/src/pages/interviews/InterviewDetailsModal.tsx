@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Descriptions, Tag, Timeline, Button, Form, Input, Rate, Divider, Typography, Popconfirm } from 'antd';
 import { Calendar, Clock, Users, Video, Phone, MapPin, FileText, } from 'lucide-react';
 import dayjs from 'dayjs';
@@ -8,7 +8,6 @@ import { makeCapitilized } from '../../utils/TextAlter';
 
 const { TextArea } = Input;
 const { Title } = Typography;
-
 interface InterviewDetailsModalProps {
   interview: interviewData | null;
   visible: boolean;
@@ -27,12 +26,13 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
 
   const navigate = useNavigate();
   const [feedbackForm] = Form.useForm();
-  // const [interviewData, setInterviewData] = React.useState<interviewData | null>(null);
+
   // const { data: interviewById } = useGetInterviewByIdQuery(interview?._id || '');
- 
+  // console.log(interviewById);
+  // console.log(interviewData);
   // useEffect(() => {
   //   if (interviewById?.success && interviewById?.data) {
-  //     setInterviewData(interviewById.data);
+  //     setInterviewData(interviewById?.data);
   //   }
   // }, [interviewById]);
 

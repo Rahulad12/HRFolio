@@ -14,17 +14,15 @@ const { Option } = Select;
 const { TextArea } = Input;
 const { Title } = Typography;
 
-
 const InterviewSchedule: React.FC = () => {
   const navigate = useNavigate();
   // const dispatch = useAppDispatch();
   const [form] = Form.useForm();
+
   const [createInterview, { isLoading: createInterviewLoading }] = useCreateInterviewMutation();
   const { interviewers } = useInterviewer();
   const { data: candidates } = useCandidate();
   const { interview: interviews } = useInterview(null, null);
-  console.log(interviews);
-
 
   const handleDraftInterview = async () => {
     const payload = form.getFieldsValue();
@@ -32,11 +30,11 @@ const InterviewSchedule: React.FC = () => {
     try {
       const response = await createInterview({
         ...payload,
-        date: dayjs(payload.date).format('YYYY-MM-DD'),
-        time: dayjs(payload.time).format('h:mm A'),
+        date: dayjs(payload.date),
+        time: payload.time,
         status: 'draft' as interviewStatus
       }).unwrap();
-
+      console.log(response);
       if (response?.success && response?.data) {
         message.success('Interview saved as draft');
         navigate('/dashboard/interviews');
@@ -94,11 +92,12 @@ const InterviewSchedule: React.FC = () => {
               rules={[{ required: true, message: 'Candidate is required' }]}
             >
               <Select placeholder="Select Candidate" showSearch>
-                {candidates?.data?.filter((c) => c?.progress?.assessment?.completed === true)?.map((c) => (
-                  <Option key={c._id} value={c._id}>
-                    {makeCapitilized(c.name)} - {makeCapitilized(c.technology)} ({makeCapitilized(c.level)})
-                  </Option>
-                ))}
+                {candidates?.data?.filter((c) => c?.status !== 'rejected' && c?.status !== 'hired')
+                  ?.map((c) => (
+                    <Option key={c._id} value={c._id}>
+                      {makeCapitilized(c.name)} - {makeCapitilized(c.technology)} ({makeCapitilized(c.level)})
+                    </Option>
+                  ))}
               </Select>
             </Form.Item>
             <Form.Item
@@ -109,9 +108,7 @@ const InterviewSchedule: React.FC = () => {
                 {
                   validator: (_, value) => {
                     const candidateId = form.getFieldValue('candidate');
-                    console.log(candidateId);
-                    const interview = interviews?.data?.find((i) => i.candidate._id === candidateId);
-                    console.log(interview);
+                    const interview = interviews?.data?.find((i) => i?.candidate?._id === candidateId);
 
                     if (!candidateId || !value) return Promise.resolve();
 
@@ -133,6 +130,7 @@ const InterviewSchedule: React.FC = () => {
                 ]}
                 allowClear
               />
+
             </Form.Item>
 
             <Form.Item
@@ -154,7 +152,7 @@ const InterviewSchedule: React.FC = () => {
               name="date"
               rules={[{ required: true, message: 'Date is required' }, {
                 validator: (_, value) => {
-                  if (dayjs(value).isBefore(dayjs())) {
+                  if (dayjs(value).isBefore(dayjs().startOf('day'))) {
                     return Promise.reject(new Error('Please select a future date'));
                   }
                   return Promise.resolve();
@@ -165,21 +163,34 @@ const InterviewSchedule: React.FC = () => {
                 className="w-full"
               />
             </Form.Item>
+
             <Form.Item
               label="Time Slot"
               name="time"
-              rules={[{ required: true, message: 'Time slot is required' }, {
+              rules={[{
+                required: true, message: 'Time slot is required'
+              }, {
                 validator: (_, value) => {
-                  if (dayjs(value).isBefore(dayjs())) {
+                  const date = form.getFieldValue('date');
+                  if (!date || !value) return Promise.resolve();
+
+                  const dateTime = dayjs(date)
+                    .hour(value.hour())
+                    .minute(value.minute());
+
+                  if (dateTime.isBefore(dayjs())) {
                     return Promise.reject(new Error('Please select a future time'));
                   }
                   return Promise.resolve();
-                },
+                }
               }]}
             >
-              <TimePicker format={'h:mm A'} />
+              <TimePicker
+                format="h:mm A"
+                showNow={false}
+                use12Hours
+              />
             </Form.Item>
-
 
             <Form.Item
               label="Interview Type"

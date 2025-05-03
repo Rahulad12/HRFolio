@@ -3,7 +3,7 @@ import Candidate from '../model/Candidate.js';
 export const updateCandidateProgress = async (candidateId, targetStage) => {
     const candidate = await Candidate.findById(candidateId);
     if (!candidate) throw new Error('Candidate not found');
-    
+
     const PIPELINE_ORDER = [
         'shortlisted',
         'assessment',
@@ -19,14 +19,17 @@ export const updateCandidateProgress = async (candidateId, targetStage) => {
         throw new Error('Invalid pipeline stage');
     }
 
-    for (let i = 0; i < targetIndex; i++) {
-        const prevStage = PIPELINE_ORDER[i];
-        if (prevStage === 'shortlisted') continue;
+    if (!['offered', 'hired'].includes(targetStage)) {
+        for (let i = 0; i < targetIndex; i++) {
+            const prevStage = PIPELINE_ORDER[i];
+            if (prevStage === 'shortlisted') continue;
 
-        if (!candidate.progress[prevStage]?.completed) {
-            throw new Error(`Cannot move to '${targetStage}' until '${prevStage}' is completed`);
+            if (!candidate.progress[prevStage]?.completed) {
+                throw new Error(`Cannot move to '${targetStage}' until '${prevStage}' is completed`);
+            }
         }
     }
+
 
     //  Only mark progress as completed if it's not yet marked
     if (!candidate.progress[targetStage]?.completed) {

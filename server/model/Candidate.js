@@ -1,5 +1,26 @@
 import mongoose from "mongoose";
 
+// Define the candidate pipeline stages
+const STAGES = [
+    "shortlisted",
+    "assessment",
+    "first",
+    "second",
+    "third",
+    "offered",
+    "hired"
+];
+
+// Dynamically generate the progress schema for each stage
+const progressSchema = {};
+STAGES.forEach(stage => {
+    progressSchema[stage] = {
+        completed: { type: Boolean, default: stage === "shortlisted" },
+        date: Date
+    };
+});
+
+
 const candidateSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -8,7 +29,8 @@ const candidateSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"]
     },
     phone: {
         type: Number,
@@ -38,39 +60,10 @@ const candidateSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "references"
     }],
-    progress: {
-        shortlisted: {
-            completed: { type: Boolean, default: false },
-            date: Date
-        },
-        assessment: {
-            completed: { type: Boolean, default: false },
-            date: Date
-        },
-        first: {
-            completed: { type: Boolean, default: false },
-            date: Date
-        },
-        second: {
-            completed: { type: Boolean, default: false },
-            date: Date
-        },
-        third: {
-            completed: { type: Boolean, default: false },
-            date: Date
-        },
-        offered: {
-            completed: { type: Boolean, default: false },
-            date: Date
-        },
-        hired: {
-            completed: { type: Boolean, default: false },
-            date: Date
-        }
-    },
+    progress: progressSchema, // ← Dynamic progress structure
     status: {
         type: String,
-        enum: ["shortlisted", "assessment", "first", "second", "third", "offered", "hired", "rejected"],
+        enum: [...STAGES, "rejected"],
         default: "shortlisted"
     },
     applieddate: {

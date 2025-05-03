@@ -41,7 +41,7 @@ const EmailTemplateForm: React.FC = () => {
       message.error(error?.data?.message || 'An error occurred');
     }
   };
-
+  console.log(emailTemplates?.data)
   const typeOptions = [
     { value: 'offer', label: 'Offer Letter' },
     { value: 'interview', label: 'Interview' },
@@ -103,15 +103,68 @@ const EmailTemplateForm: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card title="Template Details">
-            <Form layout="vertical" form={form} onFinish={handleSubmit}>
-              <Form.Item label="Template Name" name="name" rules={[{ required: true }]}> <Input placeholder="e.g. Interview Invitation" /> </Form.Item>
-              <Form.Item label="Template Type" name="type" rules={[{ required: true }]}> <Select options={typeOptions} placeholder="Select type" /> </Form.Item>
-              <Form.Item label="Email Subject" name="subject" rules={[{ required: true }]}> <Input placeholder="e.g. Your Interview at {{companyName}}" /> </Form.Item>
-              <Form.Item label="Email Body" name="body" rules={[{ required: true }]}> <TextArea rows={10} placeholder="Use {{variable}} to insert dynamic content." /> </Form.Item>
+            <Form onFinish={handleSubmit} layout='vertical' form={form}>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Form.Item
+                      label="Template Name"
+                      name="name"
+                      rules={[{ required: true, message: 'Please enter a template name' }]}
+                    >
+                      <Input placeholder='e.g. Standard Offer Letter' />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <Form.Item
+                      label="Template Type"
+                      name="type"
+                      rules={[{ required: true, message: 'Please select a template type' }]}
+                    >
+                      <Select
+                        options={typeOptions}
+                      />
 
-              <div className="flex justify-end gap-3 mt-4">
-                <Button icon={<X size={16} />} onClick={() => navigate('/dashboard/email-templates')} disabled={getLoading || createLoading}>Cancel</Button>
-                <Button type="primary" htmlType="submit" icon={<Save size={16} />} loading={createLoading || updateLoading}>
+                    </Form.Item>
+
+                  </div>
+                </div>
+                <div>
+                  <Form.Item
+                    label="Email Subject"
+                    name="subject"
+                    rules={[{ required: true, message: 'Please enter an email subject' }]}
+                  >
+                    <Input placeholder='e.g. Your Offer from {{companyName}}' />
+                  </Form.Item>
+                </div>
+                <div>
+                  <Form.Item
+                    label="Email Body"
+                    name="body"
+                    rules={[{ required: true, message: 'Please enter an email body' }]}
+                  >
+                    <TextArea
+                      rows={12}
+                      placeholder="Add your email content here. Use {{variableName}} for dynamic content."
+                    />
+                  </Form.Item>
+
+                </div>
+              </div>
+              <div className="mt-8 flex justify-end space-x-3">
+                <Button
+                  type="default"
+                  icon={<X size={16} />}
+                  onClick={() => navigate('/dashboard/email-templates')}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  icon={<Save size={16} />}
+                >
                   {isEditing ? 'Update Template' : 'Save Template'}
                 </Button>
               </div>

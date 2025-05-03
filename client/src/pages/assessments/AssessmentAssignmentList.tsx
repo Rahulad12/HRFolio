@@ -246,18 +246,18 @@ const AssessmentAssignmentList: React.FC = () => {
         width={600}
         afterClose={() => {
           setSelectedAssignment(null);
-          form.resetFields(); // and also here just in case
+          form.resetFields();
         }}
         footer={null}
       >
         <div className="space-y-4">
           <div>
-            <h3 className="text-sm font-medium text-gray-700">Candidate:</h3>
-            <p className="text-sm text-gray-900 capitalize">{selectedAssignment?.candidate?.name}</p>
+            <h3 className="text-sm font-medium ">Candidate:</h3>
+            <p className="text-sm capitalize text-gray-400">{selectedAssignment?.candidate?.name}</p>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-700">Assessment:</h3>
-            <p className="text-sm text-gray-900 capitalize">{selectedAssignment?.assessment?.title}</p>
+            <h3 className="text-sm font-medium">Assessment:</h3>
+            <p className="text-sm capitalize text-gray-400">{selectedAssignment?.assessment?.title}</p>
           </div>
 
           <Form

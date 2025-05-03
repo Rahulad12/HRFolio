@@ -3,7 +3,7 @@ import { useInterview } from '../../action/StoreInterview'
 import InterviewListView from './InterviewListView';
 import CalenderView from './CalenderView';
 import { CalendarIcon, ListIcon, Plus, Search } from 'lucide-react';
-import { Card, Typography, Button, Spin, Tabs, Select, Input } from 'antd'
+import { Card, Typography, Button, Spin, Tabs, Select, Input, Skeleton } from 'antd'
 import { useNavigate } from 'react-router-dom';
 import TabPane from 'antd/es/tabs/TabPane';
 const { Title, Text } = Typography
@@ -25,12 +25,8 @@ const Interviews = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStatus, setFilteredStatus] = useState<string>('');
 
-    // const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
     const { isLoading: interviewLoading } = useInterview(null, null);
 
-    // const handleDateChange = (value: Dayjs | null) => {
-    //     setSelectedDate(value);
-    // };
 
     const handleSearch = (value: string) => {
         setSearchTerm(value);
@@ -51,7 +47,7 @@ const Interviews = () => {
     if (interviewLoading) {
         return (
             <div className="flex items-center justify-center h-64">
-                <Spin size="large" />
+                <Skeleton active paragraph={{ rows: 4 }} />
             </div>
         );
     }

@@ -74,7 +74,7 @@ export const interviewServiceApi = api.injectEndpoints({
                 method: "PUT",
                 body: data
             }),
-            invalidatesTags: ["Interview"],
+            invalidatesTags: ["Interview", "Candidate"],
         }),
 
         updateInterviewer: builder.mutation<interviewerResponse, { id: string, data: interviewerData }>({
@@ -86,7 +86,7 @@ export const interviewServiceApi = api.injectEndpoints({
                 method: "PUT",
                 body: data
             }),
-            invalidatesTags: ["Interviewer"],
+            invalidatesTags: ["Interviewer", "Interview"],
         }),
         deleteInterviewer: builder.mutation<interviewerResponse, string>({
             query: (id) => ({
@@ -115,7 +115,7 @@ export const interviewServiceApi = api.injectEndpoints({
                 url: `${INTERVIEW_URL}/log/candidate/${id}`,
                 method: "GET",
             }),
-            providesTags: ["InterviewLog", "Interview"],
+            providesTags: ["InterviewLog", "Interview", "Candidate", "Assessment", "OfferLetter"],
         })
     })
 })

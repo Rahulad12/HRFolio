@@ -44,9 +44,7 @@ const CandidateTimeLine = () => {
     const { data: candidateLogs, isLoading } = useGetActivityLogByCandidateIdQuery(candidate?.[0]?._id, {
         skip: !candidate?.[0]?._id,
     });
-    console.log(candidateLogs);
     const logs = candidateLogs?.data || [];
-    console.log(logs);
 
     return (
         <Card

@@ -30,7 +30,7 @@ export const googleCallback = (req, res, next) => {
         );
 
         logger.info("Redirecting to frontend with token");
-        res.redirect(`${process.env.FRONTEND_URL}/?token=${token}&email=${user.email}&name=${user.name}&picture=${user.picture}&loggedIn=${user.isLoggedIn}&Id=${user._id}`);
+        res.redirect(`${process.env.FRONTEND_URL}/login/?token=${token}&email=${user.email}&name=${user.name}&picture=${user.picture}&loggedIn=${user.isLoggedIn}&Id=${user._id}`);
     })(req, res, next);
 };
 

@@ -11,7 +11,7 @@ export const offerServiceApi = api.injectEndpoints({
                 method: "POST",
                 body: data
             }),
-            invalidatesTags: ["OfferLetter"]
+            invalidatesTags: ["OfferLetter", "Candidate"]
         }),
         getOfferLetter: builder.query<offerLetterResponse, void>({
             query: () => ({
@@ -40,7 +40,7 @@ export const offerServiceApi = api.injectEndpoints({
                 method: "PUT",
                 body: data
             }),
-            invalidatesTags: ["OfferLetter",'Candidate']
+            invalidatesTags: ["OfferLetter", 'Candidate']
         }),
         deleteOfferLetter: builder.mutation<offerLetterResponseById, string>({
             query: (id) => ({

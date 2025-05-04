@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { updateCandidateProgress } from '../utils/updateCandidateProgress.js';
 const offerSchema = new mongoose.Schema({
     candidate: {
         type: mongoose.Schema.Types.ObjectId,

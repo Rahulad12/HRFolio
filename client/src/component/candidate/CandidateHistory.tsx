@@ -69,13 +69,16 @@ const getInterviewRoundTagColor = (round: string) => {
 const CandidateHistory = () => {
     const [activeTab, setActiveTab] = useState('assessments');
     const { candidate } = useAppSelector((state) => state.candidate);
-    const { data: interviewsLog, isLoading: interviewLogLoading } = useGetInterviewLogByCanidateIdQuery(candidate?.[0]?._id, {
+    console.log(candidate);
+    const { data: interviewsLog, isLoading: interviewLogLoading, isError: interviewLogError } = useGetInterviewLogByCanidateIdQuery(candidate?.[0]?._id, {
         skip: !candidate?.[0]?._id,
     });
-    const { data: assessmentLog, isLoading: assessmentLogLoading } = useGetAssessmentLogByCandidateIdQuery(candidate?.[0]?._id, {
+    const { data: assessmentLog, isLoading: assessmentLogLoading, isError: assessmentLogError } = useGetAssessmentLogByCandidateIdQuery(candidate?.[0]?._id, {
         skip: !candidate?.[0]?._id,
     })
-    const { data: offerLog, isLoading: offerLogLoading } = useGetOfferLogsByCandidateIdQuery(candidate?.[0]?._id, {
+    console.log(assessmentLog);
+
+    const { data: offerLog, isLoading: offerLogLoading, isError: offerLogError } = useGetOfferLogsByCandidateIdQuery(candidate?.[0]?._id, {
         skip: !candidate?.[0]?._id
     })
 
@@ -89,87 +92,12 @@ const CandidateHistory = () => {
                 <TabPane tab="Offer" key="offers" />
             </Tabs>
 
-            {activeTab === 'interviews' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    {interviewLogLoading ? (
-                        <Skeleton active className="mx-auto" />
-                    ) : interviewsLog?.data?.length === 0 ? (
-                        <Empty description="No interviews found." className="col-span-2" />
-                    ) : (
-                        interviewsLog?.data.map((log: interviewLogData) => (
-                            <Card
-                                key={log._id}
-                                title={
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-semibold flex gap-1">
-                                            {dayjs(log.performedAt).format('MMM DD, YYYY')}
-                                            <span className='text-gray-400'>({log?.action})</span>
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            {getStatusIcon(log?.details?.status)}
-                                            <span className={`capitalize text-sm font-medium ${getColor(log?.details?.status)}`}>
-                                                {dayjs(log?.createdAt).format('h:mm A')}
-                                            </span>
-                                        </div>
-                                    </div>
-                                }
-                                className="shadow-sm border"
-                                loading={interviewLogLoading}
-                            >
-                                <p className="mb-1">
-                                    <strong>Status:</strong>{' '}
-                                    <span className={`capitalize ${getColor(log?.details?.status)}`}>
-                                        {log?.details?.status}
-                                    </span>
-                                </p>
-                                <p className="mb-1">
-                                    <strong>Type:</strong> {log?.details?.type}
-                                </p>
-                                {
-                                    log?.details?.interviewRound && (
-                                        <p className="mb-1">
-                                            <strong>Round: </strong>
-
-                                            <Tag color={getInterviewRoundTagColor(log?.details?.interviewRound)}>
-                                                {log?.details?.interviewRound}
-                                            </Tag>
-                                        </p>
-                                    )
-                                }
-                                {log?.details?.feedback && (
-                                    <p className="mb-1">
-                                        <strong>Feedback:</strong>
-                                        <span className='italic'> "{log?.details?.feedback}"</span>
-
-                                    </p>
-                                )}
-                                {log?.details?.rating && (
-                                    <p className="flex items-center mb-1">
-                                        <strong className="mr-2">Rating:</strong>
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star
-                                                key={star}
-                                                size={16}
-                                                className={`mr-1 ${star <= log?.details?.rating
-                                                    ? 'text-yellow-500'
-                                                    : 'text-gray-300'
-                                                    }`}
-                                            />
-                                        ))}
-                                    </p>
-                                )}
-                            </Card>
-                        ))
-                    )}
-                </div>
-            )}
-
             {
                 activeTab === 'assessments' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         {assessmentLogLoading ? (
                             <Skeleton active className="mx-auto" />
-                        ) : assessmentLog?.data.length === 0 ? (
+                        ) : assessmentLogError ? (
                             <Empty description="No assessments found." className="col-span-2" />
                         ) : (
                             assessmentLog?.data.map((log: AssessmentLogData) => (
@@ -242,12 +170,86 @@ const CandidateHistory = () => {
                     </div>
                 )
             }
+            {activeTab === 'interviews' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {interviewLogLoading ? (
+                        <Skeleton active className="mx-auto" />
+                    ) : interviewLogError ? (
+                        <Empty description="No interviews found." className="col-span-2" />
+                    ) : (
+                        interviewsLog?.data.map((log: interviewLogData) => (
+                            <Card
+                                key={log._id}
+                                title={
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-semibold flex gap-1">
+                                            {dayjs(log.performedAt).format('MMM DD, YYYY')}
+                                            <span className='text-gray-400'>({log?.action})</span>
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            {getStatusIcon(log?.details?.status)}
+                                            <span className={`capitalize text-sm font-medium ${getColor(log?.details?.status)}`}>
+                                                {dayjs(log?.createdAt).format('h:mm A')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                                className="shadow-sm border"
+                                loading={interviewLogLoading}
+                            >
+                                <p className="mb-1">
+                                    <strong>Status:</strong>{' '}
+                                    <span className={`capitalize ${getColor(log?.details?.status)}`}>
+                                        {log?.details?.status}
+                                    </span>
+                                </p>
+                                <p className="mb-1">
+                                    <strong>Type:</strong> {log?.details?.type}
+                                </p>
+                                {
+                                    log?.details?.interviewRound && (
+                                        <p className="mb-1">
+                                            <strong>Round: </strong>
+
+                                            <Tag color={getInterviewRoundTagColor(log?.details?.interviewRound)}>
+                                                {log?.details?.interviewRound}
+                                            </Tag>
+                                        </p>
+                                    )
+                                }
+                                {log?.details?.feedback && (
+                                    <p className="mb-1">
+                                        <strong>Feedback:</strong>
+                                        <span className='italic'> "{log?.details?.feedback}"</span>
+
+                                    </p>
+                                )}
+                                {log?.details?.rating && (
+                                    <p className="flex items-center mb-1">
+                                        <strong className="mr-2">Rating:</strong>
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <Star
+                                                key={star}
+                                                size={16}
+                                                className={`mr-1 ${star <= log?.details?.rating
+                                                    ? 'text-yellow-500'
+                                                    : 'text-gray-300'
+                                                    }`}
+                                            />
+                                        ))}
+                                    </p>
+                                )}
+                            </Card>
+                        ))
+                    )}
+                </div>
+            )}
             {
                 activeTab === 'offers' && (
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
                         {offerLogLoading ? (
                             <Skeleton active className="mx-auto" />
-                        ) : offerLog?.data.length === 0 ? (
+                        ) : offerLogError ? (
                             <Empty description="No offers found." className="col-span-2" />
                         ) : (
                             offerLog?.data.map((log: offerLog) => (

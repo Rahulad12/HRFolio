@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import EmailTemplate from "../model/EmailTemplate.js";
 import sendEmail from "../utils/sendEmail.js";
 import { makeCapitilized } from "./makeCapitilize.js";
+import { updateCandidateCurrentStage } from "./updateCandidateProgress.js";
 
 /**
  * Replace template placeholders with dynamic values.
@@ -45,6 +46,7 @@ export const sendCandidateEmail = async (type, candidate, offer) => {
             });
         } else if (type === "hired") {
             body = fillTemplate(body, { startDate: offer?.startDate });
+            await updateCandidateCurrentStage(candidate?._id, "hired", "updated");
         }
 
         await sendEmail({ to: candidate?.email, subject, html: body });

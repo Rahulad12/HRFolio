@@ -3,7 +3,7 @@ import Candidate from "../model/Candidate.js";
 import Interview from "../model/Interview.js";
 import InterviewLog from "../model/interviewLog.js";
 import dayjs from "dayjs";
-import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
+import { updateCandidateCurrentStage } from "../utils/updateCandidateProgress.js";
 import { sendCandidateInterviewEmail } from "../utils/sendCandidateInterviewEmail.js";
 import { sendInterviewerNotificationEmail } from "../utils/sendInterviewerNotificationEmail.js";
 import Interviewers from "../model/Interviewers.js";
@@ -227,7 +227,7 @@ const updateInterview = async (req, res) => {
         if (dayjs(interview.date).format('YYYY-MM-DD') !== dayjs(date).format('YYYY-MM-DD') || dayjs(interview.time).format('HH:mm:ss') !== dayjs(time).format('HH:mm:ss')) {
             isRescheduled = true;
         }
-        // --- Update interview ---
+        //  Update interview 
         const updatedInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
         if (!updatedInterview) {
@@ -236,9 +236,9 @@ const updateInterview = async (req, res) => {
 
         const updatedStatus = updatedInterview.status;
 
-        // --- If marked completed, update candidate progress ---
+        //  If marked completed, update candidate progress 
         if (updatedStatus === 'completed') {
-            await updateCandidateProgress(updatedInterview.candidate, updatedInterview.InterviewRound);
+            await updateCandidateCurrentStage(updatedInterview.candidate, updatedInterview.InterviewRound, 'updated');
         }
 
         const candidateInfo = await Candidate.findById(updatedInterview.candidate);
@@ -293,13 +293,13 @@ const updateInterview = async (req, res) => {
     }
 };
 
-
 const deleteInterview = async (req, res) => {
     try {
         const deleteInterview = await Interview.findByIdAndDelete(req.params.id);
         if (!deleteInterview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
+
         await InterviewLog.create({
             interviewId: deleteInterview._id,
             candidate: deleteInterview.candidate,
@@ -324,17 +324,26 @@ const deleteInterview = async (req, res) => {
                 interviewRound: deleteInterview.InterviewRound
             },
         })
+
+        const result = await updateCandidateCurrentStage(deleteInterview.candidate, deleteInterview.InterviewRound, 'deleted');
+        if (result?.success) {
+            return res.status(200).json({
+                success: true,
+                message: result?.message,
+            });
+        }
+
         return res.status(200).json({
             success: true,
-            message: "Interview deleted successfully",
+            message: "Interview deleted successfully and candidate progress updated",
             data: deleteInterview
         });
+
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
 const getInterviewLog = async (req, res) => {
-    console.log("get interview log");
     try {
         const interviewLog = await InterviewLog.find({}).populate
             ({

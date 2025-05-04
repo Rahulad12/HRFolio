@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 // Define the candidate pipeline stages
 const STAGES = [
     "shortlisted",
@@ -81,6 +80,8 @@ const candidateSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+
 
 const Candidate = mongoose.model("candidates", candidateSchema);
 export default Candidate;

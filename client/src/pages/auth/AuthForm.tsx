@@ -1,6 +1,5 @@
 import { Button } from "antd";
 import { FcGoogle } from "react-icons/fc";
-
 interface Props {
     submitHandler: () => void;
     loading: boolean;
@@ -8,15 +7,14 @@ interface Props {
 
 const AuthForm = ({ submitHandler, loading }: Props) => {
     return (
-        <div className="flex flex-col items-center justify-center px-4">
+        <div className="flex flex-col items-center justify-center px-">
             <div className="text-center mb-12">
-                <p className="text-white text-xl md:text-2xl font-medium mb-2">👋 Welcome</p>
-                <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight mb-2">
+                <h1 className=" text-4xl md:text-5xl font-bold leading-tight mb-2">
                     Explore What We Provide
                 </h1>
-                <p className="text-white text-lg md:text-xl font-medium">Login to get started</p>
+                <p className=" text-lg md:text-xl font-medium">Login to get started</p>
             </div>
-            <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-xl overflow-hidden shadow-xl">
+            <div className="flex flex-col md:flex-row w-full max-w-4xl  rounded-xl overflow-hidden shadow-xl">
                 {/* Left Section */}
                 <div className="w-full md:w-1/2 bg-gradient-to-br from-orange-600 via-blue-950 to-blue-950 text-white flex items-center justify-center p-10  md:flex">
                     <h2 className="text-3xl font-bold text-center leading-tight">

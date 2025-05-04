@@ -10,7 +10,7 @@ import { storeCandidate } from '../../action/StoreCandidate';
 import CandidateHistory from '../../component/candidate/CandidateHistory';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Edit, ExternalLink } from 'lucide-react';
 import CandidateTimeLine from '../../component/candidate/CandidateTimeLine';
 const { Title, Text } = Typography;
 
@@ -195,19 +195,30 @@ const CandidateDetails = () => {
     <div className="space-y-6 flex flex-col gap-3">
       {contextHolder}
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap">
         <div className="flex items-center gap-2">
           <Button type="text" icon={<ArrowLeft size={18} />} onClick={() => navigate('/dashboard/candidates')} />
           <Title level={3} className="!mb-0">Candidate Details</Title>
         </div>
-        <Select
-          placeholder="Update Status"
-          className="w-40"
-          onChange={updateStatus}
-          options={candidatesStatusOptions}
-          value={candidate?.status}
-          showSearch
-        />
+
+        <div className='flex items-center gap-2 flex-wrap'>
+          <Button
+            type="primary"
+            onClick={() => navigate(`/dashboard/candidates/edit/${id}`)}
+            icon={<Edit size={16} />}
+          >
+            Edit
+          </Button>
+          <Select
+            placeholder="Update Status"
+            className="w-40"
+            onChange={updateStatus}
+            options={candidatesStatusOptions}
+            value={candidate?.status}
+            showSearch
+          />
+        </div>
+
       </div>
 
       {/* Profile Summary */}
@@ -265,7 +276,7 @@ const CandidateDetails = () => {
 
 
           <Col md={8} xs={16}>
-            <CandidateQuickAction rejectCandidateHandlers={rejectCandidateHandler} />
+            <CandidateQuickAction rejectCandidateHandlers={rejectCandidateHandler} disableRejectionButton={data?.data?.status === 'hired'} />
           </Col>
 
         </Row>
@@ -274,14 +285,6 @@ const CandidateDetails = () => {
       {/* Progress Steps */}
       <Card className="rounded-2xl shadow-sm">
         <Typography.Title level={5}>Candidate Progress</Typography.Title>
-        {/* <Steps current={currentStep} responsive size="default">
-          {StatusFlow.map((step, index) => {
-            const stepStatus = index < currentStep ? "finish" : index === currentStep ? "process" : "wait";
-            return (
-              <Steps.Step key={step} title={makeCapitilized(step)} status={stepStatus} disabled={!canMoveToStatus(step as candidateStatus)} />
-            );
-          })}
-        </Steps> */}
         <Steps
           current={currentStep}
           responsive
@@ -311,12 +314,9 @@ const CandidateDetails = () => {
             );
           })}
         </Steps>
-
-
       </Card>
 
       {/* Full Profile Section */}
-
       <Row gutter={[16, 16]}>
         <Col md={16} xs={24} lg={16}>
 

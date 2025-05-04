@@ -239,15 +239,7 @@ const CandidateForm: React.FC = () => {
               <Form.Item
                 name="applieddate"
                 label="Applied Date"
-                rules={[{ required: true, message: "Please select applied date" }, {
-                  validator: (_, value) => {
-                    if (!value) return Promise.resolve();
-                    if (value.isAfter(dayjs().startOf('day'))) {
-                      return Promise.reject(new Error('Applied date must be in the past'));
-                    }
-                    return Promise.resolve();
-                  }
-                }]}
+                rules={[{ required: true, message: "Please select applied date" }]}
 
               >
                 <DatePicker

@@ -329,7 +329,7 @@ const changeCandidateStage = async (req, res) => {
         const updatedCandidate = await updateCandidateStage(candidateId, newStatus);
         const offer = await Offer.findOne({ candidate: candidateId });
 
-        if (newStatus === 'hired') {
+        if (newStatus === 'hired' && process.env.NODE_ENV === 'production') {
             await sendCandidateEmail('hired', updatedCandidate, offer);
         }
         // General update logs (for all status changes)
@@ -424,7 +424,7 @@ const rejectCandidate = async (req, res) => {
 
         await CandidateLog.create({
             candidate: candidate._id,
-            action: 'updated',
+            action: 'rejected',
             performedAt: Date.now(),
             performedBy: req.user._id,
             metaData: {
@@ -436,12 +436,12 @@ const rejectCandidate = async (req, res) => {
         await ActivityLog.create({
             candidate: candidate._id,
             userID: req.user._id,
-            action: 'updated',
+            action: 'rejected',
             entityType: 'candidates',
             relatedId: candidate._id,
             metaData: {
                 title: candidate.name,
-                description: candidate.status,
+                description: "rejected",
                 emailType: "rejection",
             },
         });

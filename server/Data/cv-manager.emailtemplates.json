@@ -1,0 +1,114 @@
+[{
+  "_id": {
+    "$oid": "6814a1a1d130df8b19f5b558"
+  },
+  "name": "react js assignment",
+  "type": "assessment",
+  "subject": "Technical Assessment of {{technology}",
+  "body": "Dear <b>{{candidateName}}</b>,<br><br>\n\nThank you for your interest in the <b>{{position}}</b> role at our company. As part of our recruitment process, we would like you to complete an assessment to evaluate your skills and suitability for the role.<br><br>\n\n📝 <b>Assessment Details:</b><br>\n📅 <b>Date:</b> <u>{{assessmentDate}}</u><br>\n⏰ <b>Time:</b> <u>{{assessmentTime}}</u><br>\n⏳ <b>Duration:</b> <i>{{duration}}</i><br>\n🧪 <b>Technology/Focus:</b> <i>{{technology}}</i><br>\n🔗 <b>Assessment Link:</b> <a href=\"{{assessmentLink}}\">{{assessmentLink}}</a><br><br>\n\nPlease ensure you complete the assessment by the scheduled time. If you have any questions or need assistance, feel free to contact us.<br><br>\n\nBest of luck!<br><br>\n\nSincerely,<br>\n<i>Gokuldham Society</i>\n",
+  "variables": [
+    "candidateName",
+    "position",
+    "assessmentDate",
+    "assessmentTime",
+    "duration",
+    "technology",
+    "assessmentLink"
+  ],
+  "createdAt": {
+    "$date": "2025-05-02T10:42:41.886Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-03T17:52:10.271Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6815caa270e969939a8411f9"
+  },
+  "name": "offer letter template",
+  "type": "offer",
+  "subject": "Your Offer from Gokuldham Society In {{position}}",
+  "body": "Dear <b>{{candidateName}},</b><br><br>\n\nWe are pleased to extend you an offer for the position of {{position}} at our company. Your starting date will be {{startDate}}, and your annual salary will be {{salary}}.<b><b>\n\nPlease confirm your acceptance of this offer by replying to this email before {{responseDeadline}}.<br>\n\nWe look forward to having you on our team!<br>\n\nSincerely, <br>\n<i>Gokuldham Society</i> <br>\n\n",
+  "variables": [
+    "candidateName",
+    "position",
+    "startDate",
+    "salary",
+    "responseDeadline"
+  ],
+  "createdAt": {
+    "$date": "2025-05-03T07:49:54.103Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-03T17:52:20.895Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68164352a43ca528ceccabaa"
+  },
+  "name": "rejection template",
+  "type": "rejection",
+  "subject": "Application Status – {{technology}} At GokulDham Society",
+  "body": "Dear <b>{{candidateName}}</b>,<br><br>\n\nThank you for your interest in the {{technology}} position at our company and for the time you invested in the application process.<br><br>\n\nAfter reviewing your profile and carefully considering your qualifications, we regret to inform you that we have decided to move forward with another candidate for this role.<br><br>\n\nPlease know that this decision was not a reflection of your skills or potential. We received many strong applications and had to make some very difficult choices.<br><br>\n\nWe appreciate your effort and encourage you to apply for future openings that align with your experience and goals.<br><br>\n\nWishing you the very best in your career ahead.<br>\n\nSincerely,<br>\n<i>Gokhuldham Society</i>",
+  "variables": [
+    "candidateName",
+    "technology"
+  ],
+  "createdAt": {
+    "$date": "2025-05-03T16:24:50.507Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-03T17:52:33.178Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "681656f530475bb794565b09"
+  },
+  "name": "general interview templates",
+  "type": "interview",
+  "subject": "Interview Invitation for the {{technology}} ",
+  "body": "Dear <b>{{candidateName}</b><br>},\n\nThank you for applying for the position of b>{{technology}}</b> at our company. We are pleased to invite you to an interview to further discuss your background and qualifications.<br><br>\n\n📅 Date: {{interviewDate}}<br>  \n⏰ Time: {{interviewTime}}<br>\n📍 Type: {{interviewType}} <br>\n🧑 Interviewer: {{interviewerName}} ({{interviewerEmail}})<br>\n🔗 Link: {{interviewLink}}\n\nPlease confirm your availability by replying to this email. If you have any questions, feel free to reach out.<br>\n\nWe look forward to speaking with you.<br>\n\nBest regards<Br>,  \n<i>Gokuldham Society</i>\n",
+  "variables": [
+    "technology",
+    "interviewDate",
+    "interviewTime",
+    "interviewType",
+    "interviewerName",
+    "interviewerEmail",
+    "interviewLink"
+  ],
+  "createdAt": {
+    "$date": "2025-05-03T17:48:37.671Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-03T17:52:52.449Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6816578530475bb794565b0e"
+  },
+  "name": "hired confirmation template",
+  "type": "hired",
+  "subject": "You're Hired! Welcome to the {{position}} Team",
+  "body": "Dear <b>{{candidateName}}</b>,\n\nWe are thrilled to inform you that you have been officially selected for the position of <b>{{position}}</b>. Congratulations and welcome to the team!<br>\n\nWe will be sharing your onboarding schedule and additional documents soon. Your start date is scheduled for {{startDate}}.<br>\n\nShould you have any questions before then, feel free to reach out.<br>\n\nOnce again, welcome and we look forward to your journey with us.<br>\n\nBest regards, <br>\n<i>Gokuldham Society</i>\n",
+  "variables": [
+    "candidateName",
+    "position",
+    "startDate"
+  ],
+  "createdAt": {
+    "$date": "2025-05-03T17:51:01.239Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-03T17:53:09.519Z"
+  },
+  "__v": 0
+}]

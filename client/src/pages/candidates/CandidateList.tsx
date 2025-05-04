@@ -1,5 +1,5 @@
-import { Button, Space, Tag, Tooltip, Popconfirm, Skeleton, notification, Card, Typography } from 'antd';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Button, Space, Tag, Tooltip, Popconfirm, notification, Card, Typography, Input, Select } from 'antd';
+import { Plus, Trash2, Pencil, Search } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../Hooks/hook';
 import { useDeleteCandidateMutation, useGetCandidateQuery } from '../../services/candidateServiceApi';
 import { setCandidate } from '../../slices/candidateSlices';
@@ -9,10 +9,10 @@ import { makeCapitilized } from '../../utils/TextAlter';
 import { motion } from 'framer-motion';
 import type { TableColumnsType } from 'antd';
 import CustomTable from '../../component/common/Table';
-import TableSearch from '../../component/common/TableSearch';
 import PrimaryButton from '../../component/ui/button/Primary';
 import Predefineddata from '../../data/PredefinedData';
 import { useMemo, useState } from 'react';
+import ExportButton from '../../component/common/Export';
 
 const statusColors: Record<string, string> = {
   shortlisted: 'blue',
@@ -31,6 +31,8 @@ const CandidateTable = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
   // const filter = useAppSelector((state) => state.search);
   const [deleteCandidate] = useDeleteCandidateMutation();
 
@@ -48,7 +50,18 @@ const CandidateTable = () => {
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }, [data]);
-  
+
+  const filteredCandidates = useMemo(() => {
+    const filteredText = searchText.toLowerCase();
+    return sortedCandidates?.filter((candidate) =>
+      (candidate.name.toLowerCase().includes(filteredText) ||
+        candidate.technology.toLowerCase().includes(filteredText) ||
+        candidate.level.toLowerCase().includes(filteredText)) &&
+      (selectedStatus ? candidate.status.toLowerCase() === selectedStatus.toLowerCase() : true)
+    );
+  }, [sortedCandidates, searchText, selectedStatus]);
+
+
   const [api, contextHolder] = notification.useNotification();
 
   const handleDelete = async (id: string) => {
@@ -191,21 +204,15 @@ const CandidateTable = () => {
     },
   ];
 
-  if (candidateLoading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
-        <Skeleton
-          active
-          paragraph={{ rows: 8 }}
-        />
-      </motion.div>
-    );
-  }
+  // if (candidateLoading) {
+  //   return (
+  //     <Skeleton
+  //       active
+  //       paragraph={{ rows: 8 }}
+  //     />
 
-  //sorted Candidate based on createdAt
+  //   );
+  // }
 
 
   //main content return
@@ -231,15 +238,35 @@ const CandidateTable = () => {
 
       <Card>
         <div className="flex justify-between items-center mb-4">
-          <TableSearch
-            items={Predefineddata?.Status || []}
-            placeholder="Search by name, level, technology"
-          />
+          <div className="flex flex-wrap gap-4  items-center p-2  w-full ">
+            <div className="flex items-center gap-2 w-full md:w-1/2 ">
+              <Input
+                placeholder="Search by name, level, technology"
+                allowClear
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
+                prefix={<Search size={16} className="text-gray-500" />}
+              />
+            </div>
+
+            <Select
+              allowClear
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              placeholder="Filter by status"
+              options={Predefineddata?.Status || []}
+              className="w-50"
+              showSearch
+            />
+
+            <ExportButton data={data?.data} fileName="Candidates" />
+
+          </div >
         </div>
 
         <CustomTable
           loading={candidateLoading}
-          data={sortedCandidates || []}
+          data={filteredCandidates || []}
           columns={columns}
           pageSize={10}
           key={sortedCandidates?.map(c => c._id).join(',')}

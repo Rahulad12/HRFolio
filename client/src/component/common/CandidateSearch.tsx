@@ -1,13 +1,11 @@
 import { Input, Select } from "antd";
 import { useState } from "react";
-import dayjs from "dayjs";
-import { storeSearch } from "../../action/StoreSearch";
 import { useAppDispatch } from "../../Hooks/hook";
 import { Search } from "lucide-react";
 import ExportButton from "./Export";
 import { useCandidate } from "../../action/StoreCandidate";
+import { setCandidateSearch } from "../../slices/setSearchSlices";
 
-const { Option } = Select;
 
 interface StatusOption {
     label: string;
@@ -20,7 +18,7 @@ interface TableSearchProps {
 
 }
 
-const TableSearch = ({
+const CandidateTableSearch = ({
     items = [],
     placeholder = "Search",
 
@@ -32,23 +30,22 @@ const TableSearch = ({
     const [selectedStatus, setSelectedStatus] = useState("");
     const { data: candidates } = useCandidate();
 
-    // const handleSearch = () => {
-    //     dispatch(storeSearch(searchText, selectedStatus, dayjs(), ""));
-    // };
-
     const handleStatusChange = (value: string) => {
         setSelectedStatus(value);
-        dispatch(storeSearch(searchText, value, dayjs(), ""));
+        dispatch(setCandidateSearch({ text: searchText, status: value }));
         if (value === "") {
-            dispatch(storeSearch(searchText, "", dayjs(), ""));
+            dispatch(setCandidateSearch({ text: searchText, status: "" }));
         }
     };
 
     const handleInputChange = (value: string) => {
         setSearchText(value);
-        dispatch(storeSearch(searchText, selectedStatus, dayjs(), ""));
+        dispatch(setCandidateSearch({
+            text: value,
+            status: selectedStatus
+        }));
         if (value === "") {
-            dispatch(storeSearch("", selectedStatus, dayjs(), ""));
+            dispatch(setCandidateSearch({ text: "", status: selectedStatus }));
         }
     };
 
@@ -69,15 +66,10 @@ const TableSearch = ({
                 value={selectedStatus}
                 onChange={handleStatusChange}
                 placeholder="Filter by status"
+                options={items}
                 className="w-50"
                 showSearch
-            >
-                {items.map((option) => (
-                    <Option key={option.value} value={option.value} className="text-sm">
-                        {option.label}
-                    </Option>
-                ))}
-            </Select>
+            />
 
             <ExportButton data={candidates?.data} fileName="Candidates" />
 
@@ -85,4 +77,4 @@ const TableSearch = ({
     );
 };
 
-export default TableSearch;
+export default CandidateTableSearch;

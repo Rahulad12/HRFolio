@@ -193,7 +193,7 @@ const updateOffer = async (req, res) => {
                 responseDeadline: offer?.responseDeadline
             }
         })
-
+        
         const candidateInfo = await Candidate.findById(offer?.candidate);
         await ActivityLog.create({
             candidate: offer?.candidate,

@@ -11,9 +11,18 @@ import CandidateHistory from '../../component/candidate/CandidateHistory';
 import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
-import Predefineddata from '../../data/PredefinedData';
 import CandidateTimeLine from '../../component/candidate/CandidateTimeLine';
 const { Title, Text } = Typography;
+
+const CandidateStatusStage = [
+  { key: 1, label: "Shortlisted", value: "shortlisted" },
+  { key: 2, label: "First Interview", value: "first" },
+  { key: 3, label: "Second Interview", value: "second" },
+  { key: 4, label: "Third Interview", value: "third" },
+  { key: 5, label: "Assessment", value: "assessment" },
+  { key: 6, label: "Offered", value: "offered" },
+  { key: 7, label: "Hired", value: "hired" },
+]
 const CandidateDetails = () => {
   const { id } = useParams<string>();
   const navigate = useNavigate();
@@ -173,7 +182,7 @@ const CandidateDetails = () => {
   if (isLoading) return <CandidateProfileLoading />;
 
   const candidatesStatusOptions = StatusFlow
-    .filter(step => Predefineddata?.Status.map((status) => status.value).includes(step))
+    .filter(step => CandidateStatusStage?.map((status) => status.value).includes(step))
     .map((step, index) => ({
       key: index,
       label: makeCapitilized(step),

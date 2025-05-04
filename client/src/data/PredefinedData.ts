@@ -25,6 +25,7 @@ const Predefineddata = {
         { key: 17, label: "Assessment", value: "assessment" },
         { key: 18, label: "Offered", value: "offered" },
         { key: 16, label: "Hired", value: "hired" },
+        { key: 17, label: "Rejected", value: "rejected" }
     ]
 };
 

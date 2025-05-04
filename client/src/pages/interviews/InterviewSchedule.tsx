@@ -23,7 +23,7 @@ const InterviewSchedule: React.FC = () => {
   const [createInterview, { isLoading: createInterviewLoading }] = useCreateInterviewMutation();
   const { interviewers } = useInterviewer();
   const { data: candidates } = useCandidate();
-  const { interview: interviews } = useInterview(null, null);
+  const { interview: interviews } = useInterview();
 
   const handleDraftInterview = async () => {
     const payload = form.getFieldsValue();

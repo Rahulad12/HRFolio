@@ -58,6 +58,9 @@ const ListOfCandidatesWithStatus = () => {
         if (currentStatus === 'rejected') {
             return <Badge status="error" text="Rejected" />;
         }
+        if (currentStatus === 'hired') {
+            return <Badge status="success" text="Hired" />;
+        }
         const completed = can?.progress[currentStatus]?.completed;
 
         return (
@@ -107,6 +110,7 @@ const ListOfCandidatesWithStatus = () => {
                                                         {group.key === 'interviewing' && (
                                                             <span className="capitalize"> - {item.status} Interview</span>
                                                         )}
+
                                                         <div>{getProgressBadge(item, group.key)}</div>
                                                     </>
                                                 }

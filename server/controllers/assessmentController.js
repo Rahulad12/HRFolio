@@ -7,6 +7,7 @@ import Candidate from "../model/Candidate.js";
 import dayjs from "dayjs";
 import AssessmentLog from "../model/AssessmentLog.js";
 import ActivityLog from "../model/ActivityLogs.js";
+import { sendCandidateAssignmentEmail } from "../utils/sendCandidateAssignmentEmail.js";
 
 /**
  * @function createAssessment
@@ -98,6 +99,7 @@ const assignAssessment = async (req, res) => {
         if (!template) {
             return res.status(404).json({ success: false, message: 'Email template not found' });
         }
+
         const assignments = [];
         for (const candidateId of candidate) {
             try {
@@ -111,31 +113,10 @@ const assignAssessment = async (req, res) => {
 
                 if (status === 'assigned' && process.env.NODE_ENV === 'production') {
                     const candidateInfo = await Candidate.findById(candidateId);
-                    if (candidateInfo) {
-                        const assessmentTime = new Date(createdAssignment.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                        });
-                        const assessmentDate = new Date(createdAssignment.createdAt).toLocaleDateString();
+                    if (!candidateInfo) return res.status(404).json({ success: false, message: 'Candidate not found' });
 
-                        const html = template.body
-                            .replace(/{{candidateName}}/g, candidateInfo?.name)
-                            .replace(/{{technology}}/g, assessmentDetails?.technology || '')
-                            .replace(/{{assessmentDate}}/g, assessmentDate)
-                            .replace(/{{assessmentTime}}/g, assessmentTime)
-                            .replace(/{{assessmentLink}}/g, assessmentDetails?.assessmentLink || '')
-                            .replace(/{{duration}}/g, assessmentDetails?.duration || '')
-                            .replace(/{{level}}/g, assessmentDetails?.level || '')
-                            .replace(/{{deueDate}}/g, dueDate)
-                            .replace(/{{type}}/g, assessmentDetails?.type || '');
-
-                        const subject = template?.subject.replace(/{{technology}}/g, assessmentDetails?.technology || 'Assessment').replace(/{{candidateName}}/g, candidateInfo?.name);
-
-                        await sendEmail({
-                            to: candidateInfo.email,
-                            subject,
-                            html,
-                        });
+                    if (candidateInfo?.email) {
+                        await sendCandidateAssignmentEmail(candidateInfo, assessmentDetails, template);
                     }
                 }
 
@@ -187,6 +168,13 @@ const assignAssessment = async (req, res) => {
     }
 };
 
+/**
+ * @function getAssessment
+ * @description Retrieves all assessments
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @returns {Object} - response object with success status and message
+ */
 const getAssessment = async (req, res) => {
     try {
         const assessment = await Assessment.find({}).select(" -__v");
@@ -199,6 +187,13 @@ const getAssessment = async (req, res) => {
     }
 }
 
+/**
+ * @function getAssignment
+ * @description Retrieves all assignments
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @returns {Object} - response object with success status and message
+ */
 const getAssignment = async (req, res) => {
     try {
         const assignment = await AssessmentAssignment.find({}).select(" -__v").populate({
@@ -217,6 +212,14 @@ const getAssignment = async (req, res) => {
     }
 }
 
+/**
+ * @function deleteAssessment
+ * @description Deletes an assessment by ID
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @param {string} req.params.id - The ID of the assessment to delete
+ * @returns {Promise<Object>} - response object with success status and message
+ */
 const deleteAssessment = async (req, res) => {
     try {
         const assessment = await Assessment.findByIdAndDelete(req.params.id);
@@ -229,6 +232,14 @@ const deleteAssessment = async (req, res) => {
     }
 };
 
+/**
+ * @function deleteAssignment
+ * @description Deletes an assignment by ID
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @param {string} req.params.id - The ID of the assignment to delete
+ * @returns {Promise<Object>} - response object with success status and message
+ */
 const deleteAssignment = async (req, res) => {
     try {
         const assignment = await AssessmentAssignment.findByIdAndDelete(req.params.id).populate({
@@ -283,6 +294,14 @@ const updateAssessment = async (req, res) => {
     }
 }
 
+/**
+ * @function updateAssignmnet
+ * @description Updates an assignment by ID
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @param {string} req.params.id - The ID of the assignment to update
+ * @returns {Promise<Object>} - response object with success status and message
+ */
 const updateAssignmnet = async (req, res) => {
     try {
         const assignment = await AssessmentAssignment.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -324,6 +343,13 @@ const updateAssignmnet = async (req, res) => {
     }
 }
 
+/**
+ * Retrieves an assessment by ID.
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @param {string} req.params.id - The ID of the assessment to fetch
+ * @returns {Promise<Object>} - response object with success status and message
+ */
 const getAssessmentById = async (req, res) => {
     try {
         const assessment = await Assessment.findById(req.params.id).select(" -__v");
@@ -336,6 +362,16 @@ const getAssessmentById = async (req, res) => {
     }
 }
 
+/**
+ * Retrieves all assignments for a given candidate ID.
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the assignment is not found.
+ * Responds with a 200 status if the assignment is fetched successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 const getAssignmentByCandidateId = async (req, res) => {
     try {
         const assignment = await AssessmentAssignment.find({ candidate: req.params.id }).select(" -__v").populate({
@@ -353,6 +389,18 @@ const getAssignmentByCandidateId = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+
+/**
+ * @function getAssignmentById
+ * @description Retrieves an assignment by its ID.
+ * @param {Object} req - The request object containing the assignment ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the assignment is not found.
+ * Responds with a 200 status if the assignment is fetched successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 
 const getAssignmentById = async (req, res) => {
     try {
@@ -372,6 +420,19 @@ const getAssignmentById = async (req, res) => {
     }
 }
 
+/**
+ * Creates a new score for a candidate.
+ * Validates input fields and ensures no duplicate scores exist for the same candidate and assessment.
+ * Sends a success response if the score is created successfully.
+ * If the score is created, it also updates the assignment status to 'evaluated' and records the activity in the logs.
+ * In case of an error, it responds with a 500 status and an error message.
+ * @param {Object} req.body - The request body containing the score data.
+ * @param {string} req.body.candidate - The ID of the candidate.
+ * @param {string} req.body.assessment - The ID of the assessment.
+ * @param {number} req.body.score - The score given to the candidate.
+ * @param {string} req.body.note - The feedback given to the candidate.
+ * @returns {Object} - Returns a JSON response with success status and message.
+ */
 const createScore = async (req, res) => {
     const { candidate, assessment, score, note } = req.body;
 
@@ -442,6 +503,17 @@ const createScore = async (req, res) => {
     }
 };
 
+/**
+ * @function getScoreById
+ * @description Retrieves a score by candidate ID.
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if the score is not found.
+ * Responds with a 200 status if the score is fetched successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 const getScoreById = async (req, res) => {
     try {
         const score = await Score.find({ candidate: req.params.id }).select(" -__v").populate({
@@ -460,6 +532,13 @@ const getScoreById = async (req, res) => {
     }
 }
 
+/**
+ * @function getScore
+ * @description Retrieves all scores
+ * @param {Object} req - request object
+ * @param {Object} res - response object
+ * @returns {Object} - response object with success status and message
+ */
 const getScore = async (req, res) => {
     try {
         const score = await Score.find({}).select(" -__v").populate({
@@ -477,6 +556,18 @@ const getScore = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+
+/**
+ * Retrieves assessment logs for a specific candidate by their ID.
+ * 
+ * @param {Object} req - The request object containing the candidate ID in req.params.
+ * @param {Object} res - The response object used to send back the appropriate HTTP response.
+ * @returns {Promise<void>}
+ * 
+ * Responds with a 404 status if no assessment logs are found for the candidate.
+ * Responds with a 200 status if assessment logs are fetched successfully.
+ * In case of an error, it responds with a 500 status and an error message.
+ */
 
 const getAssessmentLogByCandidateId = async (req, res) => {
     try {

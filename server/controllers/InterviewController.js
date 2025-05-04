@@ -4,7 +4,8 @@ import Interview from "../model/Interview.js";
 import InterviewLog from "../model/interviewLog.js";
 import dayjs from "dayjs";
 import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
-import { sendInterviewEmail } from "../utils/sendInterviewScheduleEmailHelper.js";
+import { sendCandidateInterviewEmail } from "../utils/sendCandidateInterviewEmail.js";
+import { sendInterviewerNotificationEmail } from "../utils/sendInterviewerNotificationEmail.js";
 import Interviewers from "../model/Interviewers.js";
 
 
@@ -76,6 +77,9 @@ const createInterview = async (req, res) => {
 
         // 7. Update candidate status
         const candidateInfo = await Candidate.findById(candidate);
+        if (!candidateInfo) {
+            return res.status(404).json({ success: false, message: "Candidate not found" });
+        }
         if (candidateInfo) {
             candidateInfo.status = InterviewRound;
             await candidateInfo.save();
@@ -83,8 +87,15 @@ const createInterview = async (req, res) => {
 
         // 8. Send email to candidate
         const interviewerInfo = await Interviewers.findById(interviewer).lean();
-        if (process.env.NODE_ENV === 'production' && status === 'scheduled') {
-            await sendInterviewEmail(candidateInfo, interview, interviewerInfo, InterviewRound);
+        if (!interviewerInfo) {
+            return res.status(404).json({ success: false, message: "Interviewer not found" });
+        }
+
+        if (status === 'scheduled' && candidateInfo && interviewerInfo && process.env.NODE_ENV === 'production') {
+            await Promise.allSettled([
+                sendCandidateInterviewEmail(candidateInfo, interview, interviewerInfo, InterviewRound),
+                sendInterviewerNotificationEmail(candidateInfo, interview, interviewerInfo)
+            ]);
         }
 
         // 9. Log interview creation
@@ -112,7 +123,7 @@ const createInterview = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            message: "Interview created successfully",
+            message: "Interview created successfully and email sent to candidate and interviewer",
             data: interview
         });
 
@@ -125,19 +136,8 @@ const createInterview = async (req, res) => {
 
 
 const getAllInterviews = async (req, res) => {
-    const { date, status } = req.query;
     try {
-        const query = {};
-        if (date) {
-            query.date = date;
-        }
-        if (status) {
-            query.status = status;
-        }
-
-        const interviews = await Interview.find({
-            ...query
-        }).populate({
+        const interviews = await Interview.find({}).populate({
             path: 'candidate',
             select: '-createdAt -updatedAt -__v'
         }).populate({
@@ -206,8 +206,7 @@ const getAllInterviewsByCandidate = async (req, res) => {
 }
 
 const updateInterview = async (req, res) => {
-    const { status } = req.body;
-
+    const { status, date, time } = req.body;
     try {
         const interview = await Interview.findById(req.params.id);
 
@@ -215,13 +214,20 @@ const updateInterview = async (req, res) => {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
 
-        if (!dayjs(interview.date).isSame(dayjs(), 'day') && status === 'completed') {
+
+        // Restrict "completed" status 
+        if (dayjs(interview.date).isBefore(dayjs().startOf('day')) && status === 'completed') {
             return res.status(400).json({
                 success: false,
-                message: "Interview can only be marked completed on the scheduled interview date.",
+                message: "Interview can only be marked completed on or after the scheduled time on the same day.",
             });
         }
-
+        // Detect reschedule
+        let isRescheduled = false;
+        if (dayjs(interview.date).format('YYYY-MM-DD') !== dayjs(date).format('YYYY-MM-DD') || dayjs(interview.time).format('HH:mm:ss') !== dayjs(time).format('HH:mm:ss')) {
+            isRescheduled = true;
+        }
+        // --- Update interview ---
         const updatedInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
         if (!updatedInterview) {
@@ -230,15 +236,26 @@ const updateInterview = async (req, res) => {
 
         const updatedStatus = updatedInterview.status;
 
+        // --- If marked completed, update candidate progress ---
         if (updatedStatus === 'completed') {
             await updateCandidateProgress(updatedInterview.candidate, updatedInterview.InterviewRound);
         }
 
+        const candidateInfo = await Candidate.findById(updatedInterview.candidate);
+        const interviewerInfo = await Interviewers.findById(updatedInterview.interviewer).lean();
+
+        if (isRescheduled && process.env.NODE_ENV === 'production') {
+            await sendCandidateInterviewEmail(candidateInfo, updatedInterview, interviewerInfo, updatedInterview.InterviewRound);
+            await sendInterviewerNotificationEmail(candidateInfo, updatedInterview, interviewerInfo);
+        }
+
+
+        //  Log interview update
         await InterviewLog.create({
             interviewId: updatedInterview._id,
             candidate: updatedInterview.candidate,
             interviewer: updatedInterview.interviewer,
-            action: 'updated',
+            action: isRescheduled ? 'rescheduled' : 'updated',
             details: {
                 date: updatedInterview.date,
                 time: updatedInterview.time,
@@ -255,7 +272,7 @@ const updateInterview = async (req, res) => {
         await ActivityLog.create({
             candidate: updatedInterview.candidate,
             userID: req.user.id,
-            action: 'updated',
+            action: isRescheduled ? 'rescheduled' : 'updated',
             entityType: 'interviews',
             relatedId: updatedInterview._id,
             metaData: {
@@ -267,7 +284,7 @@ const updateInterview = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Interview updated successfully",
+            message: isRescheduled ? "Interview rescheduled successfully" : "Interview updated successfully",
             data: updatedInterview,
         });
 

@@ -5,7 +5,7 @@ import OfferLog from "../model/offerLogs.js";
 import sendEmail from "../utils/sendEmail.js";
 import ActivityLog from "../model/ActivityLogs.js";
 import dayjs from "dayjs";
-import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
+import { updateCandidateCurrentStage } from "../utils/updateCandidateProgress.js";
 
 const createOffer = async (req, res) => {
     const { candidate, email, position, salary, startDate, responseDeadline, status } = req.body;
@@ -46,10 +46,17 @@ const createOffer = async (req, res) => {
             });
         }
 
+        /**
+         * this function delete the drafted offer from hte existing offer of particular candidate
+         * when new offer is sent
+         */
         if (existingOffer && existingOffer.status === 'draft') {
             await Offer.findByIdAndDelete(existingOffer._id);
         }
 
+        /**
+         * Create new offer
+         */
         const newOffer = await Offer.create({
             candidate,
             email,
@@ -60,7 +67,26 @@ const createOffer = async (req, res) => {
             status,
         });
 
+        if (!newOffer) {
+            return res.status(400).json({
+                message: 'Failed to create offer.',
+                success: false,
+            });
+        }
+
+
+        /**
+         * Update candidate current stage to offerd when offer is sent
+         */
         const candidateInfo = await Candidate.findById(candidate);
+        if (newOffer.status === 'sent') {
+            candidateInfo.status = 'offered';
+            await candidateInfo.save();
+        }
+
+        /**
+         * Send offer email to the candidate
+         */
         if (newOffer.status === 'sent' && process.env.NODE_ENV === 'production') {
             const emailTemplate = await EmailTemplate.findById(email);
 
@@ -168,11 +194,16 @@ const getOfferByCandidates = async (req, res) => {
 };
 
 const updateOffer = async (req, res) => {
-    const { candidate, status } = req.body
+    const { candidate, status } = req.body;
+
+    if (!candidate || !status) {
+        return res.status(400).json({ success: false, message: "Candidate and status are required" });
+    }
+
     try {
 
         if (status === "accepted") {
-            await updateCandidateProgress(candidate, 'offered');
+            await updateCandidateCurrentStage(candidate, 'offered', 'updated');
         }
         const offer = await Offer.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!offer) {
@@ -193,7 +224,7 @@ const updateOffer = async (req, res) => {
                 responseDeadline: offer?.responseDeadline
             }
         })
-        
+
         const candidateInfo = await Candidate.findById(offer?.candidate);
         await ActivityLog.create({
             candidate: offer?.candidate,
@@ -250,6 +281,10 @@ const delteOffer = async (req, res) => {
             }
         })
 
+        const result = await updateCandidateCurrentStage(offer?.candidate, 'offer', 'deleted');
+        if (!result?.success) {
+            return res.status(500).json({ success: false, message: result?.message });
+        }
         return res.status(200).json({ success: true, message: "Offer deleted successfully", data: offer });
     } catch (error) {
         console.log(error);
@@ -265,7 +300,7 @@ const getOfferLogsByCandidate = async (req, res) => {
             path: 'offer',
             select: '-__v'
         });
-        if (!offerLogs) {
+        if (offerLogs.length === 0) {
             return res.status(404).json({ success: false, message: "Offer logs not found" });
         }
         return res.status(200).json({ success: true, message: "Offer logs fetched successfully", data: offerLogs });

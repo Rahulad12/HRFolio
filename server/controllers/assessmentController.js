@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import AssessmentLog from "../model/AssessmentLog.js";
 import ActivityLog from "../model/ActivityLogs.js";
 import { sendCandidateAssignmentEmail } from "../utils/sendCandidateAssignmentEmail.js";
+import { updateCandidateCurrentStage } from "../utils/updateCandidateProgress.js";
 
 /**
  * @function createAssessment
@@ -101,6 +102,7 @@ const assignAssessment = async (req, res) => {
         }
 
         const assignments = [];
+        
         for (const candidateId of candidate) {
             try {
                 const createdAssignment = await AssessmentAssignment.create({
@@ -239,7 +241,10 @@ const deleteAssessment = async (req, res) => {
  * @param {Object} res - response object
  * @param {string} req.params.id - The ID of the assignment to delete
  * @returns {Promise<Object>} - response object with success status and message
+ * 
+ * this function will delete respective candidate score as well as the assignment and candidate id
  */
+
 const deleteAssignment = async (req, res) => {
     try {
         const assignment = await AssessmentAssignment.findByIdAndDelete(req.params.id).populate({
@@ -249,9 +254,16 @@ const deleteAssignment = async (req, res) => {
             path: "assessment",
             select: " -__v"
         });
+
         if (!assignment) {
             return res.status(404).json({ success: false, message: "Assignment not found" });
         }
+
+        if (assignment) {
+            await Score.deleteMany({ candidate: assignment.candidate, assessment: assignment.assessment });
+        }
+
+
         await AssessmentLog.create({
             assessment: assignment.assessment,
             candidate: assignment.candidate,
@@ -276,6 +288,15 @@ const deleteAssignment = async (req, res) => {
                 description: existingCandidate?.status
             },
         })
+
+        const result = await updateCandidateCurrentStage(assignment.candidate, 'assessment', 'deleted');
+        if (!result?.success) {
+            return res.status(500).json({ success: false, message: result?.message });
+        }
+        if (result?.success) {
+            return res.status(200).json({ success: true, message: result?.message });
+        }
+
         return res.status(200).json({ success: true, message: "Assignment deleted successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Search, Filter, Download, Eye, Send, MoreVertical, } from 'lucide-react';
+import { FileText, Search,  Eye, Send, MoreVertical, } from 'lucide-react';
 import { offerLetter } from '../../types';
 import PrimaryButton from '../../component/ui/button/Primary';
 import { Button, Card, Input, message, Select, Typography, Tag, Dropdown, Popconfirm } from 'antd';
@@ -310,20 +310,6 @@ const OfferList: React.FC = () => {
               onChange={setStatusFilter}
               className="w-40"
             />
-            <Button
-              type="default"
-              icon={<Filter size={16} />}
-              aria-label="More filters"
-            >
-              Filters
-            </Button>
-            <Button
-              type="default"
-              icon={<Download size={16} />}
-              aria-label="Export"
-            >
-              Export
-            </Button>
           </div>
         </div>
 

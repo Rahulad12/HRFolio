@@ -7,11 +7,11 @@ import { useAssignedAssessment } from '../../action/StoreAssessment';
 import { useAppSelector } from '../../Hooks/hook';
 import { makeCapitilized } from '../../utils/TextAlter';
 import CustomTable from '../../component/common/Table';
-import { Button, Input, Card, Select, Modal, Form, InputNumber, message, Typography, Tag, Dropdown, Skeleton } from 'antd';
+import { Button, Input, Card, Select, Modal, Form, InputNumber, message, Typography, Tag, Dropdown, Popconfirm } from 'antd';
 import dayjs from 'dayjs';
 import { useCreateAssignmentScoreMutation, useDeleteAssignmentMutation } from '../../services/assessmentServiceApi';
 import PrimaryButton from '../../component/ui/button/Primary';
-import ExportButton from '../../component/common/Export';
+
 const { TextArea } = Input;
 const AssessmentAssignmentList: React.FC = () => {
   const [form] = Form.useForm();
@@ -167,8 +167,16 @@ const AssessmentAssignmentList: React.FC = () => {
               items: [
                 {
                   key: '1',
-                  label: 'Delete',
-                  onClick: () => handleDeleteAssignment(record?._id),
+                  label: <>
+                    <Popconfirm
+                      title="Are you sure you want to delete this assignment?"
+                      okText="Yes"
+                      cancelText="No"
+                      onConfirm={() => handleDeleteAssignment(record?._id)}
+                    >
+                      Delete
+                    </Popconfirm>
+                  </>,
                   danger: true,
                   disabled: record.status === 'completed'
                 },
@@ -190,14 +198,6 @@ const AssessmentAssignmentList: React.FC = () => {
       )
     }
   ];
-
-  if (deleteLoading) return (
-    <div className="flex items-center justify-center h-screen">
-      <Skeleton children />
-    </div>
-  )
-
-
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -228,11 +228,10 @@ const AssessmentAssignmentList: React.FC = () => {
               onChange={(value) => setStatusFilter(value)}
               className="w-40"
             />
-            <ExportButton data={filteredAssignments} fileName="Assessignments" />
           </div>
         </div>
 
-        <CustomTable data={filteredAssignments} columns={columns} loading={assessmentLoading} pageSize={10} />
+        <CustomTable data={filteredAssignments} columns={columns} loading={assessmentLoading || scoreLoading || deleteLoading} pageSize={10} />
       </Card>
 
       <Modal

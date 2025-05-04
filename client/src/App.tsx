@@ -10,10 +10,8 @@ const App = () => {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('themeMode');
-    if (savedTheme) {
-      dispatch(setThemeMode(savedTheme as 'light' | 'dark'));
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      dispatch(setThemeMode('dark'));
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      dispatch(setThemeMode(savedTheme));
     }
   }, [dispatch]);
 

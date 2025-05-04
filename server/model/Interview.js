@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import Candidate from "./Candidate.js";
-import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
 const interviewSchema = new mongoose.Schema({
     candidate: {
         type: mongoose.Schema.Types.ObjectId,

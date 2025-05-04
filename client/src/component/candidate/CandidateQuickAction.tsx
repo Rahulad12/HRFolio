@@ -3,9 +3,11 @@ import { Calendar, FileCheck, FileText, Mail,Ban } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 interface Props {
     rejectCandidateHandlers?: () => void
+    disableRejectionButton?: boolean
 }
 const CandidateQuickAction: React.FC<Props> = ({
-    rejectCandidateHandlers
+    rejectCandidateHandlers,
+    disableRejectionButton
 }) => {
     const navigate = useNavigate();
     const { id } = useParams<string>();
@@ -25,7 +27,7 @@ const CandidateQuickAction: React.FC<Props> = ({
                 <Button block icon={<FileText size={16} />} className="flex items-center justify-center" onClick={() => navigate('/dashboard/offers/new')}>
                     Create Offer Letter
                 </Button>
-                <Button danger block icon={<Ban size={16} />} className="flex items-center justify-center" onClick={rejectCandidateHandlers}>
+                <Button danger block icon={<Ban size={16} />} className="flex items-center justify-center" onClick={rejectCandidateHandlers} disabled={disableRejectionButton}> 
                     Reject Candidate
                 </Button>
             </div>

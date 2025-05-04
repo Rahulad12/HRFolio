@@ -64,7 +64,7 @@ export const candidateServiceApi = api.injectEndpoints({
                 url: `${CANDIDATE_URL}/${id}`,
                 method: "DELETE",
             }),
-            invalidatesTags: ["Candidate"],
+            invalidatesTags: ["Candidate", "Assessment","Assignment", "OfferLetter", "Interview","InterviewLog", "ActivityLog", "Score", ,"EmailTemplate"],
         }),
         getCandidateLogsByCandidateId: builder.query<candidateLogResponse, string>({
             query: (id) => ({

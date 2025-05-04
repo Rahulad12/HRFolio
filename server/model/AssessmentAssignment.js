@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { updateCandidateProgress } from "../utils/updateCandidateProgress.js";
+import { updateCandidateCurrentStage } from "../utils/updateCandidateProgress.js";
 import Candidate from "./Candidate.js";
 const assessmentAssignmentSchema = new mongoose.Schema({
     candidate: {
@@ -41,7 +41,7 @@ assessmentAssignmentSchema.pre('save', async function (next) {
             await candidateInfo.save();
         }
         if (this.status === "completed") {
-            await updateCandidateProgress(this.candidate, 'assessment');
+            await updateCandidateCurrentStage(this.candidate, 'assessment', 'updated');
         }
         next();
     } catch (err) {

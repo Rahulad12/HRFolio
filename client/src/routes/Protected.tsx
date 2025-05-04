@@ -15,16 +15,16 @@ import OfferForm from '../pages/offers/OfferForm';
 import EmailTemplateList from '../pages/emails/EmailTemplateList';
 import EmailTemplateForm from '../pages/emails/EmailTemplateForm';
 import NotFound from '../pages/NotFound';
-import AssignAssessment from '../pages/assessments/AssignAssessment';
+import AssignAssessment from '../pages/assessments/AssignAssessmentForm';
 import Interviews from '../pages/interviews/Interviews';
 import GeneralEmailForm from '../pages/emails/GeneralEmailForm';
 const Protected = () => {
     const isAuth = useAppSelector(state => state.auth.user.token);
-    if (!isAuth) return <Navigate to="/" replace />
+    if (!isAuth) return <Navigate to="/login" replace />
     return (
         <Routes>
             {/* Dashboard */}
-            <Route path="/" element={<Dashboard />} />
+            <Route index element={<Dashboard />} />
             {/* Candidates */}
             <Route path="candidates">
                 <Route index element={<CandidateList />} />

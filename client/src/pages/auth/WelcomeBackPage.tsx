@@ -39,11 +39,7 @@ const WelcomeBackPage = ({ submitHandler, loading }: Props) => {
             <div className='flex flex-col items-center justify-center'>
                 {/* Intro Header */}
                 <div className="text-center mb-12">
-                    <p className="text-white text-xl md:text-2xl font-medium mb-2">👋 Welcome Back</p>
-                    <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight mb-2">
-                        Explore What We Provide
-                    </h1>
-                    <p className="text-white text-lg md:text-xl font-medium">Login to get started</p>
+                    <p className=" text-white text-4xl font-medium mb-2">👋 Welcome Back</p>
                 </div>
 
                 {/* User Card */}

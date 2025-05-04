@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Users, UserPlus, FileText, UserRound, LayoutDashboard, CalendarClock } from 'lucide-react';
 import Logo from '../common/Logo';
 import { Menu, Layout } from 'antd';
@@ -9,6 +9,7 @@ const { Sider } = Layout;
 
 export const Sidebar = () => {
   const location = useLocation();
+  const naviagte = useNavigate();
   const diapatch = useAppDispatch();
   const { collapse } = useAppSelector(state => state.sideBar);
   const currentPath = location.pathname;
@@ -51,19 +52,15 @@ export const Sidebar = () => {
       label: <Link to="/dashboard/interviewers">Interviewers</Link>
     },
     {
-      key: 'offers',
+      key: '/dashboard/offers',
       icon: <FileText size={20} />,
-      label: 'Offers',
-      children: [
-        {
-          key: '/dashboard/email-templates',
-          label: <Link to="/dashboard/email-templates">Manage Templates</Link>,
-        },
-        {
-          key: '/dashboard/offers',
-          label: <Link to="/dashboard/offers">Offer</Link>,
-        },
-      ],
+      label: <Link to="/dashboard/offers">Offer</Link>,
+
+    },
+    {
+      key: '/dashboard/email-templates',
+      icon: <FileText size={20} />,
+      label: <Link to="/dashboard/email-templates">Email Templates</Link>,
     },
   ];
 
@@ -81,10 +78,10 @@ export const Sidebar = () => {
           <Logo />
         )}
         {collapse &&
-          <>
+          <div onClick={() => naviagte('/dashboard')} className='cursor-pointer'>
             <span className='text-white font-medium text-3xl'>H</span>
             <span className='text-orange-600 text-5xl font-bold'>R</span>
-          </>
+          </div>
         }
       </div>
       <Menu

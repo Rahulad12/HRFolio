@@ -27,7 +27,7 @@ export const Layout: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden ">
         <HeaderComponent openMobileMenu={openMobileMenu} />
-        <Content style={{
+        <Content className="scrollable-content" style={{
           padding: 24,
           minHeight: 280,
           background: isDarkMode ? token.colorBgContainer : '#fff',

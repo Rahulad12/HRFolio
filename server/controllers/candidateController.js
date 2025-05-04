@@ -6,6 +6,7 @@ import ActivityLog from "../model/ActivityLogs.js";
 import dayjs from "dayjs";
 import { sendCandidateEmail } from "../utils/sendCandidateEmailHelper.js";
 import { updateCandidateStage, canMoveToStage } from "../utils/updateCandidateStage.js";
+import deleteAllRelatedDocs from "../utils/DeleteAllRelatedDocs.js";
 /**
  * Creates a new candidate and associated references.
  * Returns a 400 status code if the candidate could not be created or if the
@@ -216,6 +217,7 @@ const deleteCandidate = async (req, res) => {
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
+
         await CandidateLog.create({
             candidate: candidate._id,
             action: 'deleted',
@@ -234,7 +236,15 @@ const deleteCandidate = async (req, res) => {
                 description: candidate.status
             }
         })
-        return res.status(200).json({ success: true, message: "Candidate deleted successfully" });
+        
+        const result = await deleteAllRelatedDocs(candidate._id);
+        if (!result?.success) {
+            return res.status(500).json({ success: false, message: result?.message });
+        }
+
+        return res.status(200).json({ success: true, message: "Candidate deleted successfully and related docs deleted" });
+
+
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }

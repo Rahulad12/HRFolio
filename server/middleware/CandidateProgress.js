@@ -14,13 +14,13 @@ export const canCandidateProgress = (currentStage) => {
                 return res.status(400).json({ success: false, message: "Invalid stage" });
             }
             if (currentIndex > 0) {
-                const previousStages = pipelineStages.slice(0, currentIndex);
+                const previousStages = pipelineStages.slice(1, currentIndex);
                 if (currentStage === "offered") {
                     const anyCompleted = previousStages.some((stage) => candidate.progress?.[stage]?.completed);
                     if (!anyCompleted) {
                         return res.status(400).json({
                             success: false,
-                            message: `Cannot proceed to '${currentStage}' because previous stages are not completed`
+                            message: `Cannot proceed to '${currentStage}' because any of the previous stages are not completed`
                         });
                     }
                 }

@@ -203,18 +203,6 @@ const CandidateTable = () => {
       ),
     },
   ];
-
-  // if (candidateLoading) {
-  //   return (
-  //     <Skeleton
-  //       active
-  //       paragraph={{ rows: 8 }}
-  //     />
-
-  //   );
-  // }
-
-
   //main content return
   return (
     <>
@@ -237,32 +225,30 @@ const CandidateTable = () => {
       </div>
 
       <Card>
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex flex-wrap gap-4  items-center p-2  w-full ">
-            <div className="flex items-center gap-2 w-full md:w-1/2 ">
-              <Input
-                placeholder="Search by name, level, technology"
-                allowClear
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                prefix={<Search size={16} className="text-gray-500" />}
-              />
-            </div>
-
-            <Select
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <div className="relative flex-1">
+            <Input
+              placeholder="Search by name, level, technology"
               allowClear
-              value={selectedStatus}
-              onChange={setSelectedStatus}
-              placeholder="Filter by status"
-              options={Predefineddata?.Status || []}
-              className="w-50"
-              showSearch
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
+              prefix={<Search size={16} className="text-gray-500" />}
             />
+          </div>
 
-            <ExportButton data={data?.data} fileName="Candidates" />
+          <Select
+            allowClear
+            value={selectedStatus}
+            onChange={setSelectedStatus}
+            placeholder="Filter by status"
+            options={Predefineddata?.Status || []}
+            className="w-40"
+            showSearch
+          />
 
-          </div >
-        </div>
+          <ExportButton data={data?.data} fileName="Candidates" />
+
+        </div >
 
         <CustomTable
           loading={candidateLoading}

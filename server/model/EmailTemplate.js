@@ -14,6 +14,9 @@ const allowedVariables = [
     'interviewRound',
     'assessmentDate',
     'assessmentTime',
+    'assessmentLink',
+    'assessmentType',
+    'assessmentLevel',
     'rejectionReason',
     'rejectionDate',
     'rejectionTime',
@@ -24,7 +27,6 @@ const allowedVariables = [
     'benefits',
     'stockOptions',
     'responseDeadline',
-    'assessmentLink'
 ];
 
 const emailTemplateSchema = new mongoose.Schema({

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Avatar, Typography, Spin, Empty, Space, Pagination } from 'antd';
+import { Card, Avatar, Typography, Empty, Space, Pagination, Skeleton } from 'antd';
 import {
     UserPlus,
     CalendarClock,
@@ -70,7 +70,7 @@ const RecentActivityLog: React.FC = () => {
         >
             {logsLoading ? (
                 <div className="flex justify-center items-center h-32">
-                    <Spin size="large" />
+                    <Skeleton active />
                 </div>
             ) : sortedLog.length === 0 ? (
                 <Empty description="No recent activities" />

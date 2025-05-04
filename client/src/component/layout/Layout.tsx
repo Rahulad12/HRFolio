@@ -33,7 +33,7 @@ export const Layout: React.FC = () => {
           background: isDarkMode ? token.colorBgContainer : '#fff',
           borderRadius: token.borderRadius,
           overflowY: 'auto',
-          scrollbarColor: isDarkMode ? '#0D1117' : '#f1f1f1',
+          scrollbarColor: isDarkMode ? '#D3D3D3 #0D1117' : '#0D1117 #D3D3D3', //if darkmode scroll bar should be dark in background
           scrollbarWidth: 'thin',
         }}>
           <Outlet />

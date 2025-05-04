@@ -38,8 +38,8 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
   const filterInterview = interviews.filter((interview) => {
     const interviewDate = dayjs(interview.date);
     const today = dayjs().startOf('day');
-    const startOfWeek = today.startOf('week').add(1, 'day'); 
-    const endOfWeek = today.endOf('week').add(1, 'day');     
+    const startOfWeek = today.startOf('week');
+    const endOfWeek = today.endOf('week');
 
     const isScheduled = interview.status === 'scheduled';
 
@@ -65,6 +65,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
     <Card
       title="Upcoming Interviews"
       className={className}
+      loading={loading}
       extra={
         <div className="flex gap-2 items-center">
           <Radio.Group
@@ -74,7 +75,6 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
             options={[
               { label: 'Today', value: 'today' },
               { label: 'This Week', value: 'week' },
-              { label: 'All Upcoming', value: 'all' }
             ]}
             optionType="button"
             buttonStyle="solid"
@@ -82,7 +82,6 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
           <Button type="link" onClick={onViewAllClick}>View All</Button>
         </div>
       }
-      loading={loading}
     >
       <div className="space-y-4 flex gap-2 flex-col">
         {paginatedInterviews.length > 0 ? (

@@ -1,7 +1,6 @@
 import { api } from "./api";
 import { interviewData, interviewResponse, interviewResponseById, interviewerData, interviewerResponse, interviewerResponseId, interviewLogResponse, interviewLogResponseById } from "../types";
 import { INTERVIEW_URL, INTERVIEWER_URL } from "../constant";
-import type { Dayjs } from "dayjs";
 
 export const interviewServiceApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -11,20 +10,13 @@ export const interviewServiceApi = api.injectEndpoints({
                 method: "POST",
                 body: data
             }),
-            invalidatesTags: ["Interview"],
+            invalidatesTags: ["Interview", "Candidate"],
         }),
 
-        getInterview: builder.query<interviewResponse, { date: Dayjs | null | string, status: string | null }>({
-            query: ({
-                date,
-                status
-            }) => ({
+        getInterview: builder.query<interviewResponse, void>({
+            query: () => ({
                 url: `${INTERVIEW_URL}`,
                 method: "GET",
-                params: {
-                    date,
-                    status
-                }
             }),
             providesTags: ["Interview", "Candidate"],
         }),
@@ -100,7 +92,7 @@ export const interviewServiceApi = api.injectEndpoints({
                 url: `${INTERVIEW_URL}/${id}`,
                 method: "DELETE",
             }),
-            invalidatesTags: ["Interview"],
+            invalidatesTags: ["Interview", "Candidate"],
         }),
         getinterviewLog: builder.query<interviewLogResponse, void>({
             query: () => ({

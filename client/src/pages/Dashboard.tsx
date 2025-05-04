@@ -17,14 +17,14 @@ import CandidateLevelDistribution from '../component/dashboard/CandidateLevelDis
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
-  const { isLoading: interviewLoading } = useInterview(null, null);
-
+  const { isLoading: interviewLoading } = useInterview();
   const { isLoading: candidateLoading } = useCandidate(); // Fetch candidates and that will store in redux also 
 
   const { user } = useAppSelector((state) => state.auth);
 
   const { candidate } = useAppSelector((state) => state.candidate);
-  const { interviews } = useAppSelector((state) => state.interview);
+  const { interviews } = useAppSelector((state) => state.interview)
+console.log("interviews", interviews);
 
   const scheduledInterview = interviews.filter((item) => item.status === 'scheduled');
   const assessment = candidate.filter((item) => item.status === 'assessment');

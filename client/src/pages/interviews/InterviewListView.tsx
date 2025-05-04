@@ -134,7 +134,13 @@ const InterviewListView = ({
         }
     }
 
-    //feedback for particular interview
+
+    /**
+     * Handles submitting feedback for an interview.
+     * @param {string} id The ID of the interview to update.
+     * @param {string} feedback The feedback to submit.
+     * @param {number} rating The rating to submit.
+     */
     const handleFeedbackSubmit = async (id: string, feedback: string, rating: number) => {
         const interviewData = interviews?.find((i) => i._id === id);
         if (!interviewData) {
@@ -175,11 +181,17 @@ const InterviewListView = ({
             })
         }
     }
+    /**
+     * Delete an interview by id
+     * This function will delete the interview by the given id and remove it from the store
+     * @param id: string
+     */
     const handleInterviewDelete = async (id: string) => {
         try {
             const res = await deleteInterview(id);
             if (res?.data?.success) {
                 message.success(res?.data?.message);
+                dispatch(storeInterview(interviews.filter((interview) => interview._id !== id)));
             }
 
         } catch (error: any) {
@@ -188,6 +200,11 @@ const InterviewListView = ({
             message.error("Error deleting interview");
         }
     }
+    /**
+     * Send a drafted interview
+     * This function will take an interview data and send it to the server to be scheduled
+     * @param interview: interviewData
+     */
     const handleSendDraftedInterview = async (interview: interviewData) => {
         try {
             const res = await createInterview({
@@ -203,6 +220,45 @@ const InterviewListView = ({
             message.error("Error sending interview");
         }
     }
+
+    const handleRescheduleSubmit = async (interviewid: string, newDate: Dayjs, newTime: Dayjs) => {
+        /**
+         * reschedule interview
+         * this function will take interviewId , date and time that should be rescheduled and update the interview
+         * all the data will come from interview detailsmodal
+         * @Params interviewId: string
+         * @Params newDate: Dayjs
+         * @Params newTime: Dayjs
+         */
+        try {
+            const interviewData = interviews?.find((i) => i._id === interviewid);
+            if (!interviewData) {
+                api.error({
+                    message: "Interview data not found.",
+                    placement: "topRight",
+                    duration: 3000
+                });
+                return;
+            }
+            const res = await updateInterview({
+                id: interviewid,
+                data: {
+                    ...interviewData,
+                    date: newDate,
+                    time: newTime
+                }
+
+            }).unwrap();
+            if (res?.success) {
+                message.success(res?.message);
+            }
+        } catch (error: any) {
+            console.log(error);
+            message.error("Error rescheduling interview", error.data?.message);
+        }
+    }
+
+
     const filteredInterviews = useMemo(() => {
         return interviews.filter((interview) => {
 
@@ -220,6 +276,7 @@ const InterviewListView = ({
             return matchesSearch && matchesStatus && matchesDate;
         });
     }, [interviews, searchTerm, interviewStatus, selectedDate]);
+
 
 
     return (
@@ -334,6 +391,7 @@ const InterviewListView = ({
 
                 onStatusUpdate={handleStatusUpdate}
                 onFeedbackSubmit={handleFeedbackSubmit}
+                onReschedule={handleRescheduleSubmit}
             />
         </div>
     )

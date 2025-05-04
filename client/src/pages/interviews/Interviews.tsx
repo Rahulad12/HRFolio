@@ -25,7 +25,7 @@ const Interviews = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStatus, setFilteredStatus] = useState<string>('');
 
-    const { isLoading: interviewLoading } = useInterview(null, null);
+    const { isLoading: interviewLoading } = useInterview();
 
 
     const handleSearch = (value: string) => {

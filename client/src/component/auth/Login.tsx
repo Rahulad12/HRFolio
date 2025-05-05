@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import AuthForm from './AuthForm';
 import { useAppDispatch } from '../../Hooks/hook';
 import { setCredentials } from '../../slices/authSlices';
 import { useLocation, useNavigate } from 'react-router-dom';
 import WelcomeBackPage from './WelcomeBackPage';
+import { Divider } from 'antd';
+import GoogleLoginButton from './AuthForm';
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -46,28 +47,35 @@ const Login: React.FC = () => {
   const shouldShowWelcomeBack = localStorage.getItem('googleLogin') === 'true';
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Burn-colored background image */}
-      <div className="absolute inset-0 w-full h-full">
-        <div className="absolute inset-0 bg-gray-900 opacity-40 z-0" />
-        <img
-          src="/images/bgimage.jpg"
-          alt="Background"
-          className="w-full h-full object-cover blur-lg bg-center bg-no-repeat bg-cover bg-blend-color-burn"
-        />
+    <div className="w-full space-y-6">
+      <div className="space-y-4">
+        {
+          shouldShowWelcomeBack ?
+            (
+              <WelcomeBackPage submitHandler={submitHandler} loading={isLoading} />
+            ) :
+            < GoogleLoginButton onClick={submitHandler} loading={isLoading} />
+        }
+
       </div>
 
-      {/* Foreground content */}
-      <div className="relative z-10 p-4 w-full max-w-md">
-        {shouldShowWelcomeBack ? (
-          <WelcomeBackPage submitHandler={submitHandler} loading={isLoading} />
-        ) : (
-          <AuthForm submitHandler={submitHandler} loading={isLoading} />
-        )}
+      <Divider className="text-neutral-400">
+        <span className="text-xs uppercase tracking-wider">Secure Sign-In</span>
+      </Divider>
+
+      <div className="text-center text-sm text-neutral-500 space-y-4">
+        <p>
+          By signing in, you agree to HRfolio's
+          <a href="#" className="text-blue-500 hover:text-primary-600 mx-1">Terms of Service</a>
+          and
+          <a href="#" className="text-primary-500 hover:text-primary-600 mx-1">Privacy Policy</a>.
+        </p>
+
+        <p>
+          Need assistance? <a href="#" className="text-primary-500 hover:text-primary-600">Contact Support</a>
+        </p>
       </div>
     </div>
   );
-
 };
-
 export default Login;

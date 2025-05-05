@@ -37,14 +37,9 @@ const WelcomeBackPage = ({ submitHandler, loading }: Props) => {
     return (
         <div>
             <div className='flex flex-col items-center justify-center'>
-                {/* Intro Header */}
-                <div className="text-center mb-12">
-                    <p className=" text-white text-4xl font-medium mb-2">👋 Welcome Back</p>
-                </div>
-
                 {/* User Card */}
                 <Skeleton loading={loadingDelete} active avatar round paragraph={{ rows: 3 }} className="w-80 md:w-96 rounded-2xl">
-                    <div className="bg-white rounded-2xl shadow-xl w-80 md:w-96 flex flex-col items-center p-6 gap-4">
+                    <div className="w-80 md:w-96 flex flex-col items-center p-6 gap-4">
                         <div className='p-8'>
                             <span className="text-blue-950 text-6xl font-bold">H</span>
                             <span className="text-orange-600 text-8xl font-extrabold">R</span>

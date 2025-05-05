@@ -39,14 +39,14 @@ export type candidateFormData = {
     resume: string | null;
     status: candidateStatus
     progress: {
-        shortlisted: { completed: boolean, date: string };
-        first: { completed: boolean, date: string };
-        second: { completed: boolean, date: string };
-        third: { completed: boolean, date: string };
-        assessment: { completed: boolean, date: string };
-        offered: { completed: boolean, date: string };
-        hired: { completed: boolean, date: string };
-        rejected: { completed: boolean, date: string };
+        shortlisted: { completed: boolean, date: Dayjs };
+        first: { completed: boolean, date: Dayjs };
+        second: { completed: boolean, date: Dayjs };
+        third: { completed: boolean, date: Dayjs };
+        assessment: { completed: boolean, date: Dayjs };
+        offered: { completed: boolean, date: Dayjs };
+        hired: { completed: boolean, date: Dayjs };
+        rejected: { completed: boolean, date: Dayjs };
     }
 }
 
@@ -90,14 +90,14 @@ export type candidateData = {
     resume: string;
     updatedAt: string
     progress: {
-        shortlisted: { completed: boolean, date: string };
-        first: { completed: boolean, date: string };
-        second: { completed: boolean, date: string };
-        third: { completed: boolean, date: string };
-        assessment: { completed: boolean, date: string };
-        offered: { completed: boolean, date: string };
-        hired: { completed: boolean, date: string };
-        rejected: { completed: boolean, date: string };
+        shortlisted: { completed: boolean, date: Dayjs };
+        first: { completed: boolean, date: Dayjs };
+        second: { completed: boolean, date: Dayjs };
+        third: { completed: boolean, date: Dayjs };
+        assessment: { completed: boolean, date: Dayjs };
+        offered: { completed: boolean, date: Dayjs };
+        hired: { completed: boolean, date: Dayjs };
+        rejected: { completed: boolean, date: Dayjs };
     }
 }
 export type candidateResponse = {

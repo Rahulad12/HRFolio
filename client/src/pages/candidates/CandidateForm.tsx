@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {  useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, MinusCircle, PlusCircle, X } from 'lucide-react';
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Form, Input, InputNumber, message, Row, Select, Typography, Upload, Card } from 'antd';
@@ -15,8 +15,6 @@ import { useUploadResumeMutation } from '../../services/uploadFileService';
 const { Title } = Typography;
 
 const CandidateForm: React.FC = () => {
-  const location = useLocation();
-  console.log(location.state);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -27,7 +25,6 @@ const CandidateForm: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [resumeUrl, setResumeUrl] = useState('');
 
-  console.log(resumeUrl);
   useEffect(() => {
     if (id && candidate?.data) {
       setIsEditing(true);
@@ -54,7 +51,6 @@ const CandidateForm: React.FC = () => {
 
     try {
       const response = await uploadResume(formData).unwrap();
-      console.log(response);
       if (response?.success) {
         setResumeUrl(response.url);
         onSuccess(response, file);
@@ -93,7 +89,6 @@ const CandidateForm: React.FC = () => {
           navigate('/dashboard/candidates');
           return;
         }
-        console.log(res);
       } else {
         const res = await createCandidate(filterFormData).unwrap();
         if (res.success) {
@@ -102,6 +97,7 @@ const CandidateForm: React.FC = () => {
         }
       }
     } catch (err: any) {
+      console.error(err);
       const resErr: string = err?.data?.message || 'Something went wrong';
       message.error(resErr);
     }
@@ -178,7 +174,7 @@ const CandidateForm: React.FC = () => {
                 label="Technology"
                 rules={[{ required: true, message: "Please select technology" }]}
               >
-                <Select size="large" placeholder="Select technology" className="w-full">
+                <Select size="large" placeholder="Select technology" className="w-full" showSearch allowClear>
                   {Predefineddata.Technology?.map((tech) => (
                     <Select.Option key={tech.key} value={tech.value}>
                       {makeCapitilized(tech.label)}
@@ -193,7 +189,7 @@ const CandidateForm: React.FC = () => {
                 label="Level"
                 rules={[{ required: true, message: "Please select level" }]}
               >
-                <Select size="large" placeholder="Select level" className="w-full">
+                <Select size="large" placeholder="Select level" className="w-full" showSearch allowClear>
                   {Predefineddata.Level?.map((lvl) => (
                     <Select.Option key={lvl.key} value={lvl.value}>
                       {makeCapitilized(lvl.label)}

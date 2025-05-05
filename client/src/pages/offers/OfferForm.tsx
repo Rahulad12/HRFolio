@@ -86,7 +86,6 @@ const OfferForm = () => {
   const handleOfferSend = async (values: offerLetterPostData) => {
     setIsSubmitting(true);
     const payload = buildPayload(values, 'sent');
-
     try {
       const res = isEditing
         ? await updateOfferLetter({ id: id || '', data: payload }).unwrap()
@@ -123,6 +122,14 @@ const OfferForm = () => {
     }
   };
 
+  const candidateOptions = candidatesData?.data?.filter((c) => c.progress.assessment.completed && c.status !== 'rejected' && c.status !== 'hired').map((c) => (
+    {
+      value: c._id,
+      label: `${makeCapitilized(c.name)} - ${makeCapitilized(c.technology)} (${makeCapitilized(c.level)})`,
+      key: c._id.toString()
+    }
+  ))
+
   return (
     <div>
       <div className="mb-6 flex items-center">
@@ -151,10 +158,11 @@ const OfferForm = () => {
               <Col xs={24} md={12}>
                 <Form.Item label="Candidate" name="candidate" rules={[{ required: true, message: 'Candidate is required' }]}>
                   <Select
-                    options={candidatesData?.data?.map(c => ({ value: c._id, label: makeCapitilized(c.name) }))}
+                    options={candidateOptions}
                     placeholder="Select a candidate"
                     showSearch
                     allowClear
+                    filterOption={(inputValue, option) => (option?.label ?? '').toLowerCase().includes(inputValue.toLowerCase())}
                   />
                 </Form.Item>
               </Col>
@@ -162,10 +170,11 @@ const OfferForm = () => {
               <Col xs={24} md={12}>
                 <Form.Item label="Email Template" name="email" rules={[{ required: true, message: 'Email template is required' }]}>
                   <Select
-                    options={emailTemplatesData?.data?.map(t => ({ value: t._id, label: t.name }))}
+                    options={emailTemplatesData?.data?.filter(t => t.type === 'offer').map(t => ({ value: t._id, label: t.name }))}
                     placeholder="Select email template"
                     showSearch
                     allowClear
+                    filterOption={(inputValue, option) => (option?.label ?? '').toLowerCase().includes(inputValue.toLowerCase())}
                   />
                 </Form.Item>
               </Col>
@@ -232,6 +241,7 @@ const OfferForm = () => {
                 type="primary"
                 icon={<Send size={16} />}
                 loading={isSubmitting || offerSending || offerUpdating}
+                disabled={isSubmitting || offerSending || offerUpdating}
               >
                 Send Offer
               </Button>

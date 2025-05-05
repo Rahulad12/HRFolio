@@ -13,6 +13,7 @@ import RecentActivityLog from '../component/dashboard/RecentActivitiesLog';
 import ListOfCandidatesWithStatus from '../component/dashboard/ListOfCandidatesWithStatus';
 import CandidateByTechnology from '../component/dashboard/CandidateByTechnology';
 import CandidateLevelDistribution from '../component/dashboard/CandidateLevelDistribution';
+import HiredandRejectedCorelation from '../component/dashboard/HiredandRejectedCorelation';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ export const Dashboard: React.FC = () => {
 
   const { candidate } = useAppSelector((state) => state.candidate);
   const { interviews } = useAppSelector((state) => state.interview)
-console.log("interviews", interviews);
+  console.log("interviews", interviews);
 
   const scheduledInterview = interviews.filter((item) => item.status === 'scheduled');
   const assessment = candidate.filter((item) => item.status === 'assessment');
@@ -166,7 +167,12 @@ console.log("interviews", interviews);
           </motion.div>
         </Col>
         <Col xs={24} lg={12} md={12}>
-          <CandidateLevelDistribution />
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+
+            <CandidateLevelDistribution />
+            <HiredandRejectedCorelation />
+
+          </Space>
         </Col>
       </Row>
     </div>

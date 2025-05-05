@@ -15,10 +15,10 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
     {
         quote: "HRFolio has transformed our hiring process. We've reduced our time-to-hire by 45% and improved the quality of our candidates.",
-        author: "Sarah Johnson",
+        author: "Narendra Modi",
         position: "Head of Talent Acquisition",
         company: "TechNova Inc.",
-        avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+        avatar: "/images/narendra.jpeg",
         rating: 5
     },
     {
@@ -26,7 +26,7 @@ const testimonials: Testimonial[] = [
         author: "Michael Chen",
         position: "HR Director",
         company: "Global Solutions Ltd.",
-        avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+        avatar: "/images/gyne.jpg",
         rating: 5
     },
     {
@@ -34,7 +34,7 @@ const testimonials: Testimonial[] = [
         author: "Emma Rodriguez",
         position: "Recruitment Manager",
         company: "Innovate Partners",
-        avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+        avatar: "/images/kp.jpg",
         rating: 4
     },
 ];

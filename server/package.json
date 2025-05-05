@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon index.js",
     "start": "node index.js",
-    "data:seed": "node data/Seeder.js seed"
+    "data:seed": "node data/Seeder.js seed",
+    "data:destroy": "node data/Seeder.js destroy"
   },
   "author": "",
   "license": "MIT",

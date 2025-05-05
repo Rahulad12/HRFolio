@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Search, Pencil, Trash2, Copy } from 'lucide-react';
+import {  Search, Pencil, Trash2, Copy, Inbox } from 'lucide-react';
 import { emailTemplateData } from '../../types';
 import { motion } from 'framer-motion';
 import { Button, Card, Select, Input, Tag, message, Popconfirm, Tooltip, Typography } from 'antd';
@@ -175,7 +175,7 @@ const EmailTemplateList: React.FC = () => {
         </div>
         <PrimaryButton
           text="Create Template"
-          icon={<FileText size={16} />}
+          icon={<Inbox size={16} />}
           onClick={() => navigate('/dashboard/email-templates/new')}
           loading={false}
         />

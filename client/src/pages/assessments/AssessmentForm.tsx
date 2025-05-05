@@ -105,7 +105,7 @@ const AssessmentForm: React.FC = () => {
                 label="Type"
                 rules={[{ required: true, message: "Type is Required" }]}
               >
-                <Select size='large' placeholder='Select Type' allowClear>
+                <Select size='large' placeholder='Select Type' allowClear showSearch>
                   {
                     Predefineddata.Type?.map((type) => (
                       <Select.Option value={type.value} key={type.key}>{type.label} </Select.Option>
@@ -122,7 +122,7 @@ const AssessmentForm: React.FC = () => {
                 label="Technology"
                 rules={[{ required: true, message: "Technology is Required" }]}
               >
-                <Select size='large' placeholder='Select Technology' allowClear>
+                <Select size='large' placeholder='Select Technology' allowClear showSearch>
                   {
                     Predefineddata.Technology?.map((tech) => (
                       <Select.Option value={tech.value} key={tech.key}>{tech.label}</Select.Option>

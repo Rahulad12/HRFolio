@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import Login from '../pages/auth/Login'
+import LoginPage from '../pages/auth/LoginPage'
 import { useAppSelector } from '../Hooks/hook'
 import NotFound from '../pages/NotFound'
 import LandingPage from '../pages/landingPage/LandingPage'
@@ -11,7 +11,7 @@ const Public = () => {
     if (isAuth) return <Navigate to="/dashboard" replace />
     return (
         <Routes>
-            <Route path='/login' element={<Login />} />
+            <Route path='/login' element={<LoginPage />} />
             <Route element={<LandingPageLayout />}>
                 <Route index element={<LandingPage />} />
             </Route>

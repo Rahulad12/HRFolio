@@ -34,7 +34,7 @@ const createCandidate = async (req, res) => {
         technology, level, experience,
         expectedsalary, references, applieddate, resume
     } = req.body;
-
+    
     if (!name || !email || !phone || !technology || !level || !experience || !expectedsalary || !applieddate || !resume) {
         return res.status(400).json({
             success: false,
@@ -61,7 +61,7 @@ const createCandidate = async (req, res) => {
         const newCandidate = new Candidate({
             name, email, phone,
             technology, level, experience,
-            expectedsalary, applieddate, resume
+            expectedsalary, applieddate, resume,references
         })
 
         if (!newCandidate) {
@@ -236,7 +236,7 @@ const deleteCandidate = async (req, res) => {
                 description: candidate.status
             }
         })
-        
+
         const result = await deleteAllRelatedDocs(candidate._id);
         if (!result?.success) {
             return res.status(500).json({ success: false, message: result?.message });
@@ -412,6 +412,7 @@ const getCandidateLogsByCandidateId = async (req, res) => {
  * In case of an error, it responds with a 500 status and an error message.
  */
 const rejectCandidate = async (req, res) => {
+    console.log(req.params);
     const { id } = req.params;
     try {
         const candidate = await Candidate.findById(id);

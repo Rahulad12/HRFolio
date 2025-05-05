@@ -31,7 +31,7 @@ const benefits = [
 
 const Benefits: React.FC = () => {
     return (
-        <section style={{ padding: '5rem 0', backgroundColor: '#ffffff' }}>
+        <section style={{ padding: '5rem 0', backgroundColor: '#ffffff' }} id='benefits'>
             <div className="container mx-auto px-4">
                 <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
                     <Title level={2}>Why Choose <span className='inline-block bg-gradient-to-r from-blue-900 via-orange-600 to-blue-800 bg-clip-text text-transparent relative'>HRFolio</span></Title>

@@ -1,4 +1,3 @@
-import InterviewerData from "./InterviewData.js";
 import connectDB from "../config/db.js";
 import Interviewers from "../model/Interviewers.js";
 import Candiate from "../model/Candidate.js";
@@ -7,7 +6,6 @@ import { candidates } from "../Data/CandidateData.js";
 // Destroy data
 const destroyData = async () => {
     try {
-        await Interviewers.deleteMany({});
         await Candiate.deleteMany({});
         console.log("Data destroyed");
         process.exit();

@@ -26,5 +26,8 @@ CV Manager is a modern web application built to help organizations manage candid
 # copyright
 © 2025 Rahul Adhikari
 
-# GitHub 
-https://github.com/rahulad12
+# Developer Profile 
+<a href="https://www.adhikarirahul.com.np/">My Portfolio</a>
+
+# Donate
+Esewa/Khalti: 9847785623

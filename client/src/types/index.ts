@@ -115,8 +115,8 @@ export type interviewer = {
     updatedAt: string
 }
 export type interviewData = {
-    candidate: candidateData;
-    interviewer: interviewer;
+    candidate: candidateData | string;
+    interviewer: interviewer | string;
     date: Dayjs | null;
     time: Dayjs | null;
     type: 'phone' | 'video' | 'in-person';

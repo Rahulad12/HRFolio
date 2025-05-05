@@ -111,7 +111,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
                           ? 'success'
                           : interview.candidate?.level === 'senior'
                             ? 'blue'
-                            : interview.candidate.level === 'junior'
+                            : interview.candidate?.level === 'junior'
                               ? 'warning'
                               : 'info'
                       }

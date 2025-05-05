@@ -64,6 +64,14 @@ const InterviewSchedule: React.FC = () => {
     }
   };
 
+  const candidateOptions = candidates?.data?.filter((c) => c.progress.assessment.completed && c.status !== 'rejected' && c.status !== 'hired').map((c) => (
+    {
+      value: c._id,
+      label: `${makeCapitilized(c.name)} - ${makeCapitilized(c.technology)} (${makeCapitilized(c.level)})`,
+      key: c._id.toString()
+    }
+  ))
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <div className="mb-6 flex items-center">
@@ -95,14 +103,12 @@ const InterviewSchedule: React.FC = () => {
                 placeholder="Select Candidate"
                 showSearch
                 aria-label="Candidate selection"
-              >
-                {candidates?.data?.filter((c) => c?.status !== 'rejected' && c?.status !== 'hired')
-                  ?.map((c) => (
-                    <Option key={c._id} value={c._id}>
-                      {makeCapitilized(c.name)} - {makeCapitilized(c.technology)} ({makeCapitilized(c.level)})
-                    </Option>
-                  ))}
-              </Select>
+                options={candidateOptions}
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+
+              />
             </Form.Item>
 
             <Form.Item
@@ -127,6 +133,7 @@ const InterviewSchedule: React.FC = () => {
                 placeholder="Select Interview Round"
                 allowClear
                 aria-label="Interview round selection"
+                showSearch
               >
                 <Option value="first">First Interview</Option>
                 <Option value="second">Second Interview</Option>
@@ -139,12 +146,13 @@ const InterviewSchedule: React.FC = () => {
               name="interviewer"
               rules={[{ required: true, message: 'Interviewer is required' }]}
             >
-              <Select placeholder="Select Interviewer" aria-label="Interviewer selection">
-                {interviewers?.data?.map((i) => (
-                  <Option key={i._id} value={i._id}>
-                    {i.name}
-                  </Option>
-                ))}
+              <Select placeholder="Select Interviewer" aria-label="Interviewer selection"
+              options={interviewers?.data?.map((i) => ({ value: i._id, label: i.name }))}
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              showSearch
+              >
               </Select>
             </Form.Item>
 
@@ -199,6 +207,7 @@ const InterviewSchedule: React.FC = () => {
                 placeholder="Select Interview Type"
                 allowClear
                 aria-label="Interview type selection"
+                showSearch
               >
                 <Option value="in-person">In-Person Interview</Option>
                 <Option value="video">Video Interview</Option>

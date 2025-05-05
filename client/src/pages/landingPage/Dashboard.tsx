@@ -11,38 +11,38 @@ interface DashboardImage {
 const dashboardImages: Record<string, DashboardImage[]> = {
     candidates: [
         {
-            url: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            url: "/landingpage/candidatelist1.png",
             title: "Candidate Pipeline View",
             description: "Track candidates through each stage of your recruitment process with customizable pipelines."
         },
         {
-            url: "https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            url: "/landingpage/candidatepipeline.png",
             title: "Candidate Profile",
             description: "Comprehensive profiles with all relevant information in a single view."
         }
     ],
     analytics: [
         {
-            url: "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            url: "/landingpage/dashboard.png",
             title: "Recruitment Analytics",
             description: "Visualize your recruitment performance with customizable dashboards and metrics."
         },
         {
-            url: "https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            url:"/landingpage/dashboard2.png",
             title: "Performance Metrics",
             description: "Track key metrics like time-to-hire, cost-per-hire, and source effectiveness."
         }
     ],
     interviews: [
         {
-            url: "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            url: "/landingpage/interviewlist.png",
             title: "Interview Scheduler",
             description: "Streamline the scheduling process with automated calendar integration."
         },
         {
-            url: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            url: "/landingpage/feedback.png",
             title: "Interview Feedback",
-            description: "Collect and compare feedback from interviewers with customizable scorecards."
+            description: "Receive instant feedback on interviews in real-time."
         }
     ]
 };
@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
     };
 
     return (
-        <section className="py-16 md:py-24" id="dashboard">
+        <section className="py-16 md:py-24" id="screenshots">
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <Title level={1} className="mb-4">

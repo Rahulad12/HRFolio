@@ -12,6 +12,7 @@ import { candidateStatus } from '../../types/index';
 import CandidateQuickAction from '../../component/candidate/CandidateQuickAction';
 import { ArrowLeft, Edit, ExternalLink } from 'lucide-react';
 import CandidateTimeLine from '../../component/candidate/CandidateTimeLine';
+import dayjs from "dayjs";
 const { Title, Text } = Typography;
 
 const CandidateStatusStage = [
@@ -47,14 +48,14 @@ const CandidateDetails = () => {
     references: [],
     resume: "",
     progress: {
-      shortlisted: { completed: false, date: "" },
-      first: { completed: false, date: "" },
-      second: { completed: false, date: "" },
-      third: { completed: false, date: "" },
-      assessment: { completed: false, date: "" },
-      offered: { completed: false, date: "" },
-      hired: { completed: false, date: "" },
-      rejected: { completed: false, date: "" },
+      shortlisted: { completed: false, date: dayjs() },
+      first: { completed: false, date: dayjs() },
+      second: { completed: false, date: dayjs() },
+      third: { completed: false, date: dayjs() },
+      assessment: { completed: false, date: dayjs() },
+      offered: { completed: false, date: dayjs() },
+      hired: { completed: false, date: dayjs() },
+      rejected: { completed: false, date: dayjs() },
     }
   })
 
@@ -94,7 +95,7 @@ const CandidateDetails = () => {
 
     //Special case for "offered"
     if (targetStatus === "offered") {
-      const previousState = stageOrder.slice(0, targetIndex);
+      const previousState = stageOrder.slice(1, targetIndex);
       const hasAnyCompleted = previousState.some(
         stage => candidate.progress?.[stage]?.completed === true
       );

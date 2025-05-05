@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useAppDispatch } from '../../Hooks/hook';
 import { setCredentials } from '../../slices/authSlices';
 import { useLocation, useNavigate } from 'react-router-dom';
 import WelcomeBackPage from './WelcomeBackPage';
-import { Divider } from 'antd';
+import { Divider, Typography } from 'antd';
 import GoogleLoginButton from './AuthForm';
 
-const Login: React.FC = () => {
+const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -63,17 +63,24 @@ const Login: React.FC = () => {
         <span className="text-xs uppercase tracking-wider">Secure Sign-In</span>
       </Divider>
 
-      <div className="text-center text-sm text-neutral-500 space-y-4">
-        <p>
+      <div className="text-center text-sm text-neutral-400 space-y-4">
+        <Typography.Text>
           By signing in, you agree to HRfolio's
-          <a href="#" className="text-blue-500 hover:text-primary-600 mx-1">Terms of Service</a>
+          <a href="#" className="mx-1">
+            <Typography.Text strong  >Terms of Service</Typography.Text>
+          </a>
           and
-          <a href="#" className="text-primary-500 hover:text-primary-600 mx-1">Privacy Policy</a>.
-        </p>
+          <a href="#" className="text-primary-500 hover:text-primary-600 mx-1">
+            <Typography.Text strong>Privacy Policy</Typography.Text> </a>.
+        </Typography.Text>
 
-        <p>
-          Need assistance? <a href="#" className="text-primary-500 hover:text-primary-600">Contact Support</a>
-        </p>
+        <Typography.Text>
+          Need assistance? <a href="#" className="text-primary-500 hover:text-primary-600">
+
+            <Typography.Text strong>
+              Contact Support
+            </Typography.Text></a>
+        </Typography.Text>
       </div>
     </div>
   );

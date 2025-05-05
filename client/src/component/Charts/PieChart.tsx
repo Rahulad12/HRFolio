@@ -15,26 +15,25 @@ interface PieChartProps {
     data: number[];
     backgroundColor?: string[];
     title?: string;
+    size?: number; // optional prop to control size
 }
-const PieChart: React.FC<PieChartProps> = ({ labels, data, backgroundColor, title }) => {
 
+const PieChart: React.FC<PieChartProps> = ({ labels, data, backgroundColor, title, size = 300 }) => {
     const chartData = {
         labels,
         datasets: [
             {
                 label: title || 'Dataset',
                 data,
-                backgroundColor: backgroundColor || [
-                    '#363062',
-                    '#F99417',
-                    '#93B1A6',
-                ],
+                backgroundColor: backgroundColor || ['#363062', '#F99417', '#93B1A6'],
                 borderWidth: 1,
             },
         ],
     };
+
     const option = {
         responsive: true,
+        maintainAspectRatio: false, // required to control size via container
         plugins: {
             legend: {
                 position: 'top' as const,
@@ -46,7 +45,12 @@ const PieChart: React.FC<PieChartProps> = ({ labels, data, backgroundColor, titl
         },
     };
 
-    return <Pie data={chartData} options={option} />;
+    return (
+        <div style={{ width: size, height: size }}
+        >
+            <Pie data={chartData} options={option} />
+        </div>
+    );
 };
 
 export default PieChart;

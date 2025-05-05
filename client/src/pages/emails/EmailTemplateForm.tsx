@@ -128,7 +128,7 @@ const EmailTemplateForm: React.FC = () => {
                     name="type"
                     rules={[{ required: true, message: 'Please select a template type' }]}
                   >
-                    <Select options={typeOptions} />
+                    <Select options={typeOptions} showSearch allowClear placeholder="Select a template type" />
                   </Form.Item>
                 </div>
 

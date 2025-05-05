@@ -1,6 +1,8 @@
 import { Typography } from 'antd';
 import React, { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { Check } from 'lucide-react';
 interface AuthLayoutProps {
     children: ReactNode;
     title: string;
@@ -35,27 +37,21 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                     <div className="pt-6">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="bg-white/10 p-3 rounded-full">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <Check size={24} strokeWidth={2} />
                             </div>
                             <span className="text-lg">Centralized candidate management</span>
                         </div>
 
                         <div className="flex items-center gap-4 mb-4">
                             <div className="bg-white/10 p-3 rounded-full">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <Check size={24} strokeWidth={2} />
                             </div>
                             <span className="text-lg">Streamlined onboarding workflows</span>
                         </div>
 
                         <div className="flex items-center gap-4">
                             <div className="bg-white/10 p-3 rounded-full">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <Check size={24} strokeWidth={2} />
                             </div>
                             <span className="text-lg">Advanced analytics and reporting</span>
                         </div>
@@ -71,18 +67,23 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             <div className="w-full md:w-1/2 p-6 md:p-10 flex items-center justify-center">
                 <div className="w-full max-w-md animate-fade-in">
                     <div className="md:hidden mb-10">
-                        {/* <Logo size="large" /> */}
+
+                        <div className="flex items-center justify-center">
+
+                            <span className="text-lg">Streamlined onboarding workflows</span>
+                        </div>
+
                     </div>
 
                     <div className="text-center mb-10">
-                        <Typography.Title level={2} className="text-2xl md:text-3xl font-semibold ">{title}</Typography.Title>
-                        {subtitle && <p className="mt-2 text-neutral-500">{subtitle}</p>}
+                        <Typography.Title level={1} className="text-2xl md:text-3xl font-semibold ">{title}</Typography.Title>
+                        {subtitle && <p className="mt-2 text-neutral-400 text-sm">{subtitle}</p>}
                     </div>
 
                     {children}
 
                     <div className="mt-10 text-center text-sm text-neutral-500 md:hidden">
-                        © {new Date().getFullYear()} HRfolio. All rights reserved.
+                        © {dayjs().year()} HRfolio. All rights reserved.
                     </div>
                 </div>
             </div>

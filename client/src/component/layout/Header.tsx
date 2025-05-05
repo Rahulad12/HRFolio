@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
-import { Menu, Bell, Search } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
-import { theme as antTheme, Avatar, Dropdown, Button, Layout, Space, Badge } from 'antd';
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  Layout,
+  Space,
+  notification,
+  theme as antTheme,
+  Modal,
+} from 'antd';
 import type { MenuProps } from 'antd';
+import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
 import { logout } from '../../slices/authSlices';
-import ThemeToggle from '../common/ThemeToggle';
 import { toggleSideBarCollapsed } from '../../slices/sideBarCollapsed';
 import GlobalSearch from '../common/GlobalSearch';
+import ThemeToggle from '../common/ThemeToggle';
+import { useDeleteUserMutation } from '../../services/authServiceApi';
+import { useNavigate } from 'react-router-dom';
+import { setThemeMode } from '../../slices/themeSlices';
 
 const { Header } = Layout;
 
@@ -15,21 +27,60 @@ interface HeaderProps {
   openMobileMenu: () => void;
 }
 
-export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
+const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
+  const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { collapse: isSidebarCollapsed } = useAppSelector((state) => state.sideBar);
-  const isDarkMode = useAppSelector(state => state.theme.mode === 'dark');
+  const isDarkMode = useAppSelector((state) => state.theme.mode === 'dark');
   const { token } = antTheme.useToken();
+
+  const Id = localStorage.getItem('Id') || '';
+  const [api, contextHolder] = notification.useNotification();
+  const [deleteUser] = useDeleteUserMutation();
 
   const items: MenuProps['items'] = [
     { label: 'Sign out', key: 'logout', danger: true },
+    { label: 'Delete Account', key: 'delete', danger: true },
   ];
+
+  const handleDelete = async () => {
+    try {
+      const response = await deleteUser(Id).unwrap();
+      if (response?.success) {
+        localStorage.clear();
+        api.success({
+          message: response?.message,
+          description: 'Account Deactivated Successfully. Contact Admin to Reactivate.',
+          duration: 5,
+        });
+        navigate('/');
+      }
+    } catch (error: any) {
+      api.error({
+        message: error?.data?.message || 'Failed to delete user',
+        description: error?.data?.message,
+        duration: 5,
+      });
+    }
+  };
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'logout') {
       dispatch(logout());
+      dispatch(setThemeMode("light"));
+    } else if (e.key === 'delete') {
+      Modal.confirm({
+        title: 'Delete Account',
+        content: 'Are you sure you want to delete your account?,If you delete, you will be banned from the platform and if you want to reactivate your account contact admin.',
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk: () => {
+          handleDelete();
+        },
+      })
     }
   };
 
@@ -49,9 +100,9 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
         height: '64px',
       }}
     >
-      {/* Left Section */}
+      {contextHolder}
       <Space align="center">
-        {/* Sidebar Toggle (Desktop) */}
+        {/* Desktop Sidebar Toggle */}
         <div className="hidden md:block">
           <Button
             type="text"
@@ -61,7 +112,7 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
           />
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Toggle */}
         <div className="block md:hidden">
           <Button
             type="text"
@@ -72,31 +123,20 @@ export const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
         </div>
       </Space>
 
-      {/* Right Section */}
       <Space align="center" size="middle">
-        {/* Search Button */}
+        {/* Search */}
         <Button
           type="text"
           icon={<Search size={20} />}
           onClick={() => setShowSearch(true)}
           style={{ width: 40, height: 40 }}
         />
-
-        {/* Notification Bell */}
-        <Badge dot>
-          <Button
-            type="text"
-            icon={<Bell size={20} />}
-            style={{ width: 40, height: 40 }}
-          />
-        </Badge>
-
         {/* Theme Toggle */}
         <ThemeToggle />
 
-        {/* User Profile */}
+        {/* User Dropdown */}
         <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight">
-          <Space align="center" className="cursor-pointer">
+          <Space className="cursor-pointer">
             <Avatar src={user?.picture || ''} size="large" />
             <span className="hidden md:inline-block text-sm font-medium">
               {user?.username || 'User'}

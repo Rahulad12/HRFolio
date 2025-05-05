@@ -12,7 +12,11 @@ import {
 } from 'antd';
 import { Key, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { useCreateAssignAssessmentMutation, useGetAssignmentByIdQuery, useUpdateAssignmnetMutation } from '../../services/assessmentServiceApi';
+import {
+    useCreateAssignAssessmentMutation,
+    useGetAssignmentByIdQuery,
+    useUpdateAssignmnetMutation,
+} from '../../services/assessmentServiceApi';
 import { useAppSelector } from '../../Hooks/hook';
 import { useAssessment } from '../../action/StoreAssessment';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -22,6 +26,7 @@ import { useCandidate } from '../../action/StoreCandidate';
 import { useGetAllEmailTemplateQuery } from '../../services/emailService';
 import { AssignmentData } from '../../types';
 import { makeCapitilized } from '../../utils/TextAlter';
+
 const AssignAssessment = () => {
     const navigate = useNavigate();
     const { id } = useParams<string>();
@@ -40,20 +45,26 @@ const AssignAssessment = () => {
     const [createAssignAssessment, { isLoading: isCreating }] = useCreateAssignAssessmentMutation();
     const [updateAssignmnet, { isLoading: isUpdating }] = useUpdateAssignmnetMutation();
     const { data: emailTemplates } = useGetAllEmailTemplateQuery();
-    const { data: assignedAssessments } = useGetAssignmentByIdQuery(id, {
-        skip: !id
+    const { data: assignedAssessments } = useGetAssignmentByIdQuery(id!, {
+        skip: !id,
     });
 
     useEffect(() => {
-        if (isEditing && id) {
+        if (isEditing && assignedAssessments?.data) {
             assignForm.setFieldsValue({
-                assessment: assignedAssessments?.data?.assessment?._id,
-                dueDate: dayjs(assignedAssessments?.data?.date),
-                emailTemplate: assignedAssessments?.data?.emailTemplate,
+                assessment: assignedAssessments.data.assessment?._id,
+                dueDate: dayjs(assignedAssessments.data.date),
+                emailTemplate: assignedAssessments.data.emailTemplate,
             });
 
+            // Also set selected candidate for preview
+            setSelectedCandidates([assignedAssessments.data.candidate._id]);
         }
     }, [assignedAssessments]);
+
+    useEffect(() => {
+        handlePreview();
+    }, [assignForm, selectedCandidates]);
 
     const handlePreview = () => {
         const values = assignForm.getFieldsValue();
@@ -65,7 +76,6 @@ const AssignAssessment = () => {
             return;
         }
 
-        // Just preview for 1st selected candidate
         const candidateInfo = candidates.find(c => selectedCandidates.includes(c._id));
         if (!candidateInfo) {
             setPreview('');
@@ -75,43 +85,43 @@ const AssignAssessment = () => {
         const html = selectedTemplate.body
             .replace(/{{candidateName}}/g, candidateInfo.name)
             .replace(/{{technology}}/g, selectedAssessment.technology || '')
-            .replace(/{{duration}}/g, selectedAssessment?.duration.toString() || "")
+            .replace(/{{duration}}/g, selectedAssessment?.duration?.toString() || "")
             .replace(/{{assessmentDate}}/g, selectedAssessment.createdAt ? dayjs(selectedAssessment.createdAt).format('MMMM D, YYYY') : '')
             .replace(/{{assessmentTime}}/g, selectedAssessment.createdAt ? dayjs(selectedAssessment.createdAt).format('hh:mm A') : '')
             .replace(/{{level}}/g, selectedAssessment.level || '')
             .replace(/{{assessmentLink}}/g, selectedAssessment.assessmentLink || '');
 
         setPreview(html);
-    }
+    };
 
-    const handleTranseferChange = (targetKeys: Key[]): void => {
+    const handleTransferChange = (targetKeys: Key[]): void => {
         setSelectedCandidates(targetKeys);
     };
 
     const handleAssign = async (values: AssignmentData) => {
-        if (!id && selectedCandidates.length === 0) {
+        if (!isEditing && selectedCandidates.length === 0) {
             message.warning('Please select at least one candidate.');
             return;
         }
 
         try {
             if (isEditing) {
-                const res = await updateAssignmnet({ id: id || '', data: values }).unwrap();
+                const res = await updateAssignmnet({ id: id!, data: values }).unwrap();
                 if (res?.success && res?.data) {
                     message.success(res.message);
                     assignForm.resetFields();
                     setSelectedCandidates([]);
                     refetchAssessment();
                     refetchCandidate();
+                    navigate('/dashboard/assessments/assignments');
                 }
-            }
-            else {
+            } else {
                 const payload = {
                     assessment: values.assessment,
                     candidate: selectedCandidates,
                     dueDate: dayjs(values.dueDate).format('YYYY-MM-DD'),
                     status: 'assigned' as AssignmentData['status'],
-                    emailTemplate: values.emailTemplate
+                    emailTemplate: values.emailTemplate,
                 };
                 const res = await createAssignAssessment(payload).unwrap();
                 if (res?.success && res?.data) {
@@ -120,44 +130,38 @@ const AssignAssessment = () => {
                     setSelectedCandidates([]);
                     refetchAssessment();
                     refetchCandidate();
+                    navigate('/dashboard/assessments/assignments');
                 }
             }
-
         } catch (error: any) {
             console.error(error);
-            message.error(error.data.message);
+            message.error(error?.data?.message || 'Something went wrong');
         }
     };
 
     const transferData = candidates.map((candidate) => ({
         key: candidate._id.toString(),
-        name: candidate.name,
-        technology: candidate.technology,
-        level: candidate.level,
+        name: makeCapitilized(candidate.name || ''),
+        technology: makeCapitilized(candidate.technology || ''),
+        level: makeCapitilized(candidate.level || ''),
     }));
+
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
             <div className="mb-6 flex items-center">
                 <Button
                     type="text"
                     icon={<ArrowLeft size={18} />}
                     onClick={() => navigate('/dashboard/assessments/assignments')}
                 />
-                <Typography.Title level={2} className="ml-2 text-lg font-semibold">{
-                    isEditing ? 'Edit Assignment' : 'Assign Assessment'
-                }</Typography.Title>
-                {
-                    isEditing && (
-                        <Typography.Text className='ml-3'>
-                            ({makeCapitilized(assignedAssessments?.data?.candidate?.name || '')})
-                        </Typography.Text>
-                    )
-                }
-
+                <Typography.Title level={2} className="ml-2 text-lg font-semibold">
+                    {isEditing ? 'Edit Assignment' : 'Assign Assessment'}
+                </Typography.Title>
+                {isEditing && (
+                    <Typography.Text className="ml-3">
+                        ({makeCapitilized(assignedAssessments?.data?.candidate?.name || '')})
+                    </Typography.Text>
+                )}
             </div>
             <Row gutter={16}>
                 <Col xs={24} md={12} lg={14}>
@@ -166,7 +170,7 @@ const AssignAssessment = () => {
                             form={assignForm}
                             layout="vertical"
                             onFinish={handleAssign}
-                            onChange={handlePreview}
+                            onValuesChange={handlePreview}
                         >
                             <Row gutter={16}>
                                 <Col xs={24} md={12}>
@@ -175,30 +179,31 @@ const AssignAssessment = () => {
                                         label="Select Assessment"
                                         rules={[{ required: true, message: 'Please select an assessment' }]}
                                     >
-                                        <Select placeholder="Select assessment" allowClear >
-                                            {assessments?.map((assessment) => (
-                                                <Select.Option key={assessment._id} value={assessment._id} className="capitalize">
-                                                    {assessment.title}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
+                                        <Select placeholder="Select assessment" allowClear showSearch
+                                            options={
+                                                assessments?.map((assessment) => ({
+                                                    value: assessment._id,
+                                                    label: makeCapitilized(assessment.title),
+                                                }))
+                                            }
+                                            filterOption={(input, option) =>
+                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                            }
+                                        />
                                     </Form.Item>
                                 </Col>
-
                                 <Col xs={24} md={12}>
                                     <Form.Item
                                         name="dueDate"
                                         label="Due Date"
-                                        rules={[{ required: true, message: 'Please select a due date' },
-
-                                        {
-                                            validator: (_, value) => {
-                                                if (value && dayjs(value).isBefore(dayjs().startOf('day'))) {
-                                                    return Promise.reject(new Error('Due date cannot be in the past'));
-                                                }
-                                                return Promise.resolve();
-                                            }
-                                        }
+                                        rules={[
+                                            { required: true, message: 'Please select a due date' },
+                                            {
+                                                validator: (_, value) =>
+                                                    value && dayjs(value).isBefore(dayjs().startOf('day'))
+                                                        ? Promise.reject(new Error('Due date cannot be in the past'))
+                                                        : Promise.resolve(),
+                                            },
                                         ]}
                                     >
                                         <DatePicker style={{ width: '100%' }} />
@@ -212,36 +217,39 @@ const AssignAssessment = () => {
                                         label="Email Template"
                                         rules={[{ required: true, message: 'Please select an email template' }]}
                                     >
-                                        <Select placeholder="Select email template" allowClear >
-                                            {emailTemplates?.data?.map((template) => (
-                                                <Select.Option key={template._id} value={template._id} className="capitalize">
-                                                    {template.name}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
+                                        <Select placeholder="Select email template" allowClear
+                                            options={
+                                                emailTemplates?.data?.filter((template) => template.type === 'assessment')?.map((template) => ({
+                                                    value: template._id,
+                                                    label: makeCapitilized(template.name),
+                                                }))
+                                            }
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                            }
+                                        /
+                                        >
                                     </Form.Item>
                                 </Col>
                             </Row>
 
-                            {
-                                !id && (
-                                    <Form.Item
-                                        label="Select Candidates"
-                                        required
-                                    >
-                                        <Transfer
-                                            dataSource={transferData}
-                                            titles={['Available', 'Selected']}
-                                            targetKeys={selectedCandidates}
-                                            onChange={handleTranseferChange}
-                                            render={(item) => `${item.name} (${item.technology} - ${item.level})`}
-                                            listStyle={{ width: 300, height: 300 }}
-                                            rowKey={(item) => item.key}
-                                            showSearch
-                                        />
-                                    </Form.Item>
-                                )
-                            }
+                            {!isEditing && (
+                                <Form.Item label="Select Candidates" required>
+                                    <Transfer
+                                        dataSource={transferData}
+                                        titles={['Available', 'Selected']}
+                                        targetKeys={selectedCandidates}
+                                        onChange={handleTransferChange}
+                                        render={(item) => `${item.name} (${item.technology} - ${item.level})`}
+                                        listStyle={{ width: 300, height: 300 }}
+                                        rowKey={(item) => item.key}
+                                        showSearch
+                                        filterOption={(input, item) => item.name.toLowerCase().includes(input.toLowerCase())}
+                                    />
+                                </Form.Item>
+                            )}
+
                             <Form.Item>
                                 <Row justify="end" gutter={12}>
                                     <Col>
@@ -262,7 +270,6 @@ const AssignAssessment = () => {
                                             {isEditing ? 'Update' : 'Assign'}
                                         </Button>
                                     </Col>
-
                                 </Row>
                             </Form.Item>
                         </Form>
@@ -280,7 +287,6 @@ const AssignAssessment = () => {
                     </Card>
                 </Col>
             </Row>
-
         </motion.div>
     );
 };

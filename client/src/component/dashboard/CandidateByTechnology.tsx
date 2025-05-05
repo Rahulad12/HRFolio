@@ -8,7 +8,7 @@ const CandidateByTechnology = () => {
     // Group data: technology -> count
     const techCount: Record<string, number> = {};
     candidates.forEach(c => {
-        const tech = c.technology;
+        const tech = c.technology?.trim().toLowerCase() || '';
         techCount[tech] = (techCount[tech] || 0) + 1;
     });
 

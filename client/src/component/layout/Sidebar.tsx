@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Users, UserPlus, FileText, UserRound, LayoutDashboard, CalendarClock } from 'lucide-react';
+import { Users, UserPlus, UserRound, LayoutDashboard, CalendarClock, InboxIcon, FileSignature } from 'lucide-react';
 import Logo from '../common/Logo';
 import { Menu, Layout } from 'antd';
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
@@ -53,13 +53,13 @@ export const Sidebar = () => {
     },
     {
       key: '/dashboard/offers',
-      icon: <FileText size={20} />,
+      icon: <FileSignature size={20} />,
       label: <Link to="/dashboard/offers">Offer</Link>,
 
     },
     {
       key: '/dashboard/email-templates',
-      icon: <FileText size={20} />,
+      icon: <InboxIcon size={20} />,
       label: <Link to="/dashboard/email-templates">Email Templates</Link>,
     },
   ];

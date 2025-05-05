@@ -15,12 +15,17 @@ const CandidateLevelDistribution = () => {
     const data = Object.values(statusCounts);
 
     return (
-        <Card title="Candidate Level Distribution">
-            <PieChart
-                labels={labels}
-                data={data}
-                title="Candidate Status"
-            />
+        <Card title="Candidate Level Distribution"
+        >
+            <div className='flex justify-center items-center'>
+                <PieChart
+                    labels={labels}
+                    data={data}
+                    title="Candidate Status"
+                    size={300}
+                />
+            </div>
+
 
         </Card>
 

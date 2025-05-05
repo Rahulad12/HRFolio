@@ -214,14 +214,31 @@ const updateInterview = async (req, res) => {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
 
+        //this is to check if interview is completed or not
+        /**
+         * if interview is completed, then check if interview date is in the future or not, if it is in the future, then don't allow to mark as completed
+         * if interview date is today and interview time is in the future, then don't allow to mark as completed
+         * to passed this check , date and time should be in the past then you can update to complete
+         */
+        const now = dayjs();
+        const interviewDate = dayjs(interview.date);
+        const interviewTime = dayjs(`${interview.date}T${interview.time}`);
 
-        // Restrict "completed" status 
-        if (dayjs(interview.date).isBefore(dayjs().startOf('day')) && status === 'completed') {
-            return res.status(400).json({
-                success: false,
-                message: "Interview can only be marked completed on or after the scheduled time on the same day.",
-            });
+        if (status === 'completed') {
+            if (interviewDate.isAfter(now, 'day')) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Interview date is in the future. Cannot mark as completed.",
+                });
+            }
+            if (interviewDate.isSame(now, 'day') && interviewTime.isAfter(now)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Interview time hasn't occurred yet. Cannot mark as completed.",
+                });
+            }
         }
+
         // Detect reschedule
         let isRescheduled = false;
         if (dayjs(interview.date).format('YYYY-MM-DD') !== dayjs(date).format('YYYY-MM-DD') || dayjs(interview.time).format('HH:mm:ss') !== dayjs(time).format('HH:mm:ss')) {

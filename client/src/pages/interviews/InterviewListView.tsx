@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Popconfirm, Space, Tag, Typography, message, notification } from 'antd'
+import { Button, Card, Divider, Popconfirm, Space, Tag, Tooltip, Typography, message, notification } from 'antd'
 import { Calendar, CalendarIcon, Check, Clock, Eye, MapPin, Phone, Send, Trash2, Users, Video } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import dayjs, { Dayjs } from 'dayjs'
@@ -258,7 +258,9 @@ const InterviewListView = ({
         }
     }
 
-
+    /**
+     * Filter interviews based on search term, status, and selected date
+     */
     const filteredInterviews = useMemo(() => {
         return interviews.filter((interview) => {
 
@@ -288,21 +290,29 @@ const InterviewListView = ({
                     className="hover:shadow-md transition-shadow cursor-pointer"
                     extra={
                         <Space>
-                            <Button type="link" onClick={() => handleViewDetails(interview)} icon={<Eye size={16} color='blue' />} />
+                            <Tooltip title="View Interview">
+                                <Button type="link" onClick={() => handleViewDetails(interview)} icon={<Eye size={16} color='blue' />} />
+                            </Tooltip>
                             {
                                 interview?.status === 'scheduled' && (
-                                    <Button type="link" onClick={() => handleStatusUpdate(interview?._id, 'completed')} icon={<Check size={16} color='green' />} />
+                                    <Tooltip title="Mark as completed">
+                                        <Button type="link" onClick={() => handleStatusUpdate(interview?._id, 'completed')} icon={<Check size={16} color='green' />} />
+                                    </Tooltip>
                                 )
                             }
                             {
                                 interview?.status === 'draft' && (
-                                    <Button type="link" onClick={() => handleSendDraftedInterview(interview)} icon={<Send size={16} color='green' />} />
+                                    <Tooltip title="Mark as scheduled">
+                                        <Button type="link" onClick={() => handleSendDraftedInterview(interview)} icon={<Send size={16} color='green' />} />
+                                    </Tooltip>
                                 )
                             }
                             {/* <Button type="link" onClick={() => handleViewDetails(interview)} icon={<PencilIcon size={16} />} /> */}
-                            <Popconfirm title="Are you sure you want to delete this interview?" onConfirm={() => handleInterviewDelete(interview?._id)} okText="Yes" cancelText="No">
-                                <Button type="link" icon={<Trash2 size={16} />} danger />
-                            </Popconfirm>
+                            <Tooltip title="Delete">
+                                <Popconfirm title="Are you sure you want to delete this interview?" onConfirm={() => handleInterviewDelete(interview?._id)} okText="Yes" cancelText="No">
+                                    <Button type="link" icon={<Trash2 size={16} />} danger />
+                                </Popconfirm>
+                            </Tooltip>
                         </Space>
                     }
                 >

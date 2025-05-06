@@ -6,6 +6,7 @@ import { makeCapitilized } from '../../utils/TextAlter';
 import { Button, Card, Pagination, Row, Tag, Typography } from 'antd';
 import { Radio, RadioChangeEvent } from 'antd';
 
+const { Text } = Typography;
 interface UpcomingInterviewsProps {
   interviews: interviewData[];
   onViewAllClick?: () => void;
@@ -79,7 +80,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
             optionType="button"
             buttonStyle="solid"
           />
-          <Button type="link" onClick={onViewAllClick}>View All</Button>
+          <Button type="link" onClick={onViewAllClick}><Text>View All</Text></Button>
         </div>
       }
     >

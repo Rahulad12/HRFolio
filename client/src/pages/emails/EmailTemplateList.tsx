@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {  Search, Pencil, Trash2, Copy, Inbox } from 'lucide-react';
+import { Search, Pencil, Trash2, Inbox } from 'lucide-react';
 import { emailTemplateData } from '../../types';
 import { motion } from 'framer-motion';
 import { Button, Card, Select, Input, Tag, message, Popconfirm, Tooltip, Typography } from 'antd';
@@ -39,12 +39,6 @@ const EmailTemplateList: React.FC = () => {
       console.error('Failed to delete template', error);
       message.error(error?.data?.message);
     }
-  };
-
-  const handleDuplicateTemplate = (template: emailTemplateData) => {
-
-    // In a real app, we would duplicate the template here
-    alert(`Duplicate template: ${template._id}`);
   };
 
   const typeOptions = [
@@ -121,20 +115,6 @@ const EmailTemplateList: React.FC = () => {
           </Tooltip>
 
           <Tooltip
-            title="Duplicate"
-          >
-            <Button
-              type="text"
-              size="small"
-              className="p-1"
-              onClick={() => handleDuplicateTemplate(record)}
-              aria-label="Duplicate template"
-              icon={<Copy size={16} color='#1890ff' />}
-            />
-
-          </Tooltip>
-
-          <Tooltip
             title="Delete"
           >
             <Popconfirm
@@ -179,8 +159,6 @@ const EmailTemplateList: React.FC = () => {
           onClick={() => navigate('/dashboard/email-templates/new')}
           loading={false}
         />
-
-
       </div>
 
       <Card>

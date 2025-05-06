@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions } from 'antd';
+import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions, Skeleton, message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useRejectCandidateMutation, useChangeCandidateStageMutation } from '../../services/candidateServiceApi';
 import { candidateFormData } from '../../types/index';
-import CandidateProfileLoading from '../../component/Loding/CandidateProfileLoading';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { useAppDispatch } from '../../Hooks/hook';
 import { storeCandidate } from '../../action/StoreCandidate';
@@ -28,12 +27,12 @@ const CandidateDetails = () => {
   const { id } = useParams<string>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { data, isLoading, refetch } = useGetCandidateByIdQuery(id, {
+  const { data, isLoading: candidateLoading, refetch } = useGetCandidateByIdQuery(id, {
     skip: !id
   });
 
-  const [changeCandidateStage] = useChangeCandidateStageMutation();
-  const [rejectCandidate] = useRejectCandidateMutation();
+  const [changeCandidateStage, { isLoading: changeCandidateStageLoading }] = useChangeCandidateStageMutation();
+  const [rejectCandidate, { isLoading: rejectCandidateLoading }] = useRejectCandidateMutation();
 
   const [candidate, setCandidate] = useState<candidateFormData>({
     name: "",
@@ -119,7 +118,8 @@ const CandidateDetails = () => {
       api.error({
         message: "You cannot skip steps! Complete the current stage first.",
         placement: "topRight",
-        duration: 3000,
+        duration: 3,
+        showProgress: true
       });
       return;
     }
@@ -132,8 +132,9 @@ const CandidateDetails = () => {
         api.success({
           message: res?.message,
           placement: "topRight",
-          duration: 3000,
-          pauseOnHover: true
+          duration: 3,
+          pauseOnHover: true,
+          showProgress: true
         });
         dispatch(storeCandidate([res.data]));
       }
@@ -143,8 +144,9 @@ const CandidateDetails = () => {
       api.error({
         message: `Error updating candidate status: ${errorMessage}`,
         placement: "topRight",
-        duration: 3000,
-        pauseOnHover: true
+        duration: 3,
+        pauseOnHover: true,
+        showProgress: true
       });
     } finally {
       refetch();
@@ -159,8 +161,9 @@ const CandidateDetails = () => {
         api.success({
           message: res?.message,
           placement: "topRight",
-          duration: 3000,
-          pauseOnHover: true
+          duration: 3,
+          pauseOnHover: true,
+          showProgress: true
         });
       }
     } catch (error: any) {
@@ -168,8 +171,10 @@ const CandidateDetails = () => {
       api.error({
         message: `Error updating candidate status: ${error?.data?.message}`,
         placement: "topRight",
-        duration: 3000,
-        pauseOnHover: true
+        duration: 3,
+        pauseOnHover: true,
+        showProgress: true
+
       })
     } finally {
       if (id) {
@@ -180,7 +185,6 @@ const CandidateDetails = () => {
 
   const currentStep = StatusFlow.indexOf(candidate.status);
 
-  if (isLoading) return <CandidateProfileLoading />;
 
   const candidatesStatusOptions = StatusFlow
     .filter(step => CandidateStatusStage?.map((status) => status.value).includes(step))
@@ -190,6 +194,13 @@ const CandidateDetails = () => {
       value: step,
       disabled: !canMoveToStatus(step as candidateStatus)
     }));
+
+  if (candidateLoading || changeCandidateStageLoading) {
+    return <Skeleton active />;
+  }
+  if (rejectCandidateLoading) {
+    message.loading('Rejecting candidate...');
+  }
 
 
   return (
@@ -207,6 +218,7 @@ const CandidateDetails = () => {
             type="primary"
             onClick={() => navigate(`/dashboard/candidates/edit/${id}`)}
             icon={<Edit size={16} />}
+            disabled={changeCandidateStageLoading || rejectCandidateLoading}
           >
             Edit
           </Button>
@@ -216,7 +228,8 @@ const CandidateDetails = () => {
             onChange={updateStatus}
             options={candidatesStatusOptions}
             value={candidate?.status}
-            showSearch
+            loading={changeCandidateStageLoading}
+            disabled={changeCandidateStageLoading || rejectCandidateLoading}
           />
         </div>
 
@@ -277,7 +290,7 @@ const CandidateDetails = () => {
 
 
           <Col md={8} xs={16}>
-            <CandidateQuickAction rejectCandidateHandlers={rejectCandidateHandler} disableRejectionButton={data?.data?.status === 'hired'} />
+            <CandidateQuickAction rejectCandidateHandlers={rejectCandidateHandler} disableRejectionButton={data?.data?.status === 'hired' || rejectCandidateLoading || data?.data?.status === 'rejected'} />
           </Col>
 
         </Row>
@@ -291,6 +304,7 @@ const CandidateDetails = () => {
           responsive
           size="default"
           onChange={(current) => {
+            if (changeCandidateStageLoading || rejectCandidateLoading) return;
             const newStatus = StatusFlow[current];
             if (canMoveToStatus(newStatus)) {
               updateStatus(newStatus);

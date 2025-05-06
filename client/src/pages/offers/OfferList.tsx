@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Search,  Eye, Send, MoreVertical, } from 'lucide-react';
+import { FileText, Search, Eye, Send, MoreVertical, } from 'lucide-react';
 import { offerLetter } from '../../types';
 import PrimaryButton from '../../component/ui/button/Primary';
-import { Button, Card, Input, message, Select, Typography, Tag, Dropdown, Popconfirm } from 'antd';
+import { Button, Card, Input, message, Select, Typography, Tag, Dropdown, Popconfirm, Tooltip } from 'antd';
 import CustomTable from '../../component/common/Table';
 import { useGetOfferLetterQuery, useCreateOfferLetterMutation, useDeleteOfferLetterMutation, useUpdateOfferLetterMutation } from '../../services/offerService';
 
@@ -176,16 +176,20 @@ const OfferList: React.FC = () => {
       title: 'Actions',
       render: (_: any, offer: offerLetter) => (
         <div className="flex space-x-2">
-          <Button
-            type="text"
-            size='small'
-            onClick={() => handleViewCandidate(offer)}
-            aria-label="View candidate"
-            disabled={offerSending}
+          <Tooltip
+            title="View Candidate"
           >
-            <Eye size={16} className="text-blue-600" />
-          </Button>
+            <Button
+              type="text"
+              size='small'
+              onClick={() => handleViewCandidate(offer)}
+              aria-label="View candidate"
+              disabled={offerSending}
+              icon={<Eye size={16} />}
+            /
+            >
 
+          </Tooltip>
           {
             offer?.status === 'sent' && (
               <>

@@ -10,6 +10,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { interviewData } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { makeCapitilized } from '../../utils/TextAlter';
+import { useAppSelector } from '../../Hooks/hook';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -36,6 +37,7 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
   const [rescheduleForm] = Form.useForm();
   const [isRescheduledModalOpen, setIsRescheduledModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const {mode} = useAppSelector(state => state.theme);
 
   const getInterviewTypeIcon = (type: string | undefined) => {
     switch (type) {
@@ -107,7 +109,14 @@ const InterviewDetailsModal: React.FC<InterviewDetailsModalProps> = ({
         width={800}
         footer={null}
       >
-        <div className="space-y-6">
+        <div className="space-y-6"
+        style={{
+          maxHeight: '60vh',
+          overflowY: 'auto',
+          scrollbarWidth: 'thin',
+          scrollbarColor: mode === 'dark' ? '#D3D3D3 #0D1117' : '#0D1117 #D3D3D3'
+        }}
+        >
           <Descriptions column={2} bordered>
             <Descriptions.Item label={<div className="flex items-center"><Calendar size={14} className="mr-2" />Date</div>}>
               {dayjs(interview?.date).format('MMMM D, YYYY')}

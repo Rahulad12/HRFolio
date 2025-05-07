@@ -24,10 +24,7 @@ const statusColors: Record<string, string> = {
   hired: 'green',
   rejected: 'red',
 };
-
-
 const CandidateTable: React.FC = () => {
-
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string>("");
@@ -160,7 +157,7 @@ const CandidateTable: React.FC = () => {
         <Tag color={statusColors[status.toLowerCase()] || 'default'} style={{
           borderRadius: '6px',
         }}>
-          {makeCapitilized(status)}
+          {makeCapitilized(status)} Interview
         </Tag>
       ),
     },

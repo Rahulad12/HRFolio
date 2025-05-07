@@ -32,7 +32,7 @@ export const useAssessment = () => {
 export const useAssignedAssessment = () => {
     const dispatch = useAppDispatch();
 
-    const { data: assignedAssessment, isLoading, isError } = useGetAssignedAssessmentQuery();
+    const { data: assignedAssessment, isLoading:assignmentLoading, isError } = useGetAssignedAssessmentQuery();
 
     useEffect(() => {
         if (assignedAssessment?.success && assignedAssessment?.data) {
@@ -40,5 +40,5 @@ export const useAssignedAssessment = () => {
         }
     }, [assignedAssessment, dispatch]);
 
-    return { assignedAssessment, isLoading, isError };
+    return { assignedAssessment, assignmentLoading, isError };
 }

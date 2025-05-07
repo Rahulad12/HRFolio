@@ -1,7 +1,8 @@
 import { useAppSelector } from '../../Hooks/hook'
 import { Card, Descriptions, Tag } from 'antd'
 import { makeCapitilized } from '../../utils/TextAlter'
-const CandidateInfo = () => {
+import React from 'react'
+const CandidateInfo: React.FC = () => {
     const { candidate } = useAppSelector((state) => state.candidate)
     const profile = candidate?.[0]
     return (

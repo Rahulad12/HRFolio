@@ -1,7 +1,12 @@
-import { Card } from 'antd';
+import { Card, Skeleton } from 'antd';
 import { useAppSelector } from '../../Hooks/hook';
 import PieChart from '../Charts/PieChart';
-const CandidateLevelDistribution = () => {
+interface Props {
+    loading?: boolean
+}
+const CandidateLevelDistribution: React.FC<Props> = ({
+    loading = true
+}) => {
     const candidates = useAppSelector(state => state.candidate.candidate);
 
     const statusCounts: Record<string, number> = {};
@@ -17,13 +22,22 @@ const CandidateLevelDistribution = () => {
     return (
         <Card title="Candidate Level Distribution"
         >
+
             <div className='flex justify-center items-center'>
-                <PieChart
-                    labels={labels}
-                    data={data}
-                    title="Candidate Status"
-                    size={300}
-                />
+                {
+                    loading ? <Skeleton active
+                        paragraph={{ rows: 4 }}
+                        style={{ width: '100%' }}
+                    /> :
+                        <PieChart
+                            labels={labels}
+                            data={data}
+                            title="Candidate Status"
+                            size={300}
+                        />
+
+                }
+
             </div>
 
 

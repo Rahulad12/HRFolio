@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions, Skeleton, message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useRejectCandidateMutation, useChangeCandidateStageMutation } from '../../services/candidateServiceApi';
@@ -23,7 +23,7 @@ const CandidateStatusStage = [
   { key: 6, label: "Offered", value: "offered" },
   { key: 7, label: "Hired", value: "hired" },
 ]
-const CandidateDetails = () => {
+const CandidateDetails: React.FC = () => {
   const { id } = useParams<string>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

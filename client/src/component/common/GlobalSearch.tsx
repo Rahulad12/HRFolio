@@ -1,11 +1,15 @@
 import { Drawer, Input, List, Skeleton, Empty } from 'antd';
 import { Search } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetSearchTermsQuery } from '../../services/searchService';
 import { useDebounce } from '../../Hooks/useDebounce';
 
-const GlobalSearch = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+interface Props {
+    isOpen: boolean;
+    onClose: () => void
+}
+const GlobalSearch: React.FC<Props> = ({ isOpen, onClose }) => {
     const [query, setQuery] = useState('');
     const debouncedQuery = useDebounce(query, 500);
     const navigate = useNavigate();

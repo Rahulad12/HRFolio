@@ -185,7 +185,7 @@ const OfferList: React.FC = () => {
               onClick={() => handleViewCandidate(offer)}
               aria-label="View candidate"
               disabled={offerSending}
-              icon={<Eye size={16} />}
+              icon={<Eye size={16} color='blue'/>}
             /
             >
 

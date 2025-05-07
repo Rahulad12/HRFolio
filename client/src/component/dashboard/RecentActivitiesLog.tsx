@@ -70,7 +70,10 @@ const RecentActivityLog: React.FC = () => {
         >
             {logsLoading ? (
                 <div className="flex justify-center items-center h-32">
-                    <Skeleton active />
+                    <Skeleton active 
+                    paragraph={{ rows: 4 }}
+                    style={{ width: '100%' }}
+                    />
                 </div>
             ) : sortedLog.length === 0 ? (
                 <Empty description="No recent activities" />

@@ -10,7 +10,7 @@ interface Props {
     htmlType?: "submit" | "reset" | "button";
 }
 
-const SecondaryButton = ({ text, icon, onClick, disabled, loading, htmlType }: Props) => {
+const SecondaryButton: React.FC<Props> = ({ text, icon, onClick, disabled, loading, htmlType }) => {
     return (
         <ConfigProvider
             theme={{

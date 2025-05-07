@@ -1,10 +1,11 @@
 import { Typography } from 'antd'
 import PrimaryButton from '../ui/button/Primary'
 import { useAppSelector } from '../../Hooks/hook'
+import React from 'react'
 interface Props {
     title: string
 }
-const Hero = ({ title }: Props) => {
+const Hero: React.FC<Props> = ({ title }) => {
     const buttonAttributes = useAppSelector(state => state.buttonProps);
 
     console.log(buttonAttributes);

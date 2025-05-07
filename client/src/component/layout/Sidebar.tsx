@@ -4,10 +4,11 @@ import Logo from '../common/Logo';
 import { Menu, Layout } from 'antd';
 import { useAppDispatch, useAppSelector } from '../../Hooks/hook';
 import { toggleSideBarCollapsed } from '../../slices/sideBarCollapsed';
+import React from 'react';
 
 const { Sider } = Layout;
 
-export const Sidebar = () => {
+export const Sidebar: React.FC = () => {
   const location = useLocation();
   const naviagte = useNavigate();
   const diapatch = useAppDispatch();

@@ -1,14 +1,19 @@
 import LineChart from "../Charts/LineGraph";
 import { useAppSelector } from "../../Hooks/hook";
-import { Card } from "antd";
+import { Card, Skeleton } from "antd";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import isBetween from "dayjs/plugin/isBetween";
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
+interface Props {
+    loading?: boolean
+}
 
-const HiredandRejectedCorelation = () => {
+const HiredandRejectedCorelation: React.FC<Props> = ({
+    loading = false
+}) => {
     const { candidate } = useAppSelector((state) => state.candidate);
 
     const startOfThisWeek = dayjs().startOf("isoWeek"); // Monday
@@ -45,14 +50,20 @@ const HiredandRejectedCorelation = () => {
         <Card
             title="Hired and Rejected Correlation (Last 7 days)"
         >
-            <div className="flex justify-between items-center">
-                <LineChart
-                    labels={labels}
-                    hiredData={hiredData}
-                    rejectedData={rejectedData}
-                    size={500}
-                />
-            </div>
+            {
+                loading ? <Skeleton active
+                    paragraph={{ rows: 4 }}
+                    style={{ width: '100%' }}
+                /> : <div className="flex justify-between items-center">
+                    <LineChart
+                        labels={labels}
+                        hiredData={hiredData}
+                        rejectedData={rejectedData}
+                        size={500}
+                    />
+                </div>
+            }
+
         </Card>
     );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React,{ useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
@@ -29,17 +29,18 @@ import { offerLetter, offerLetterPostData } from '../../types';
 
 const { Title } = Typography;
 
-const OfferForm = () => {
+const OfferForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const isEditing = !!id;
 
   const [preview, setPreview] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingOffer, setIsSendingOffer] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
 
-  const [createOfferLetter, { isLoading: offerSending }] = useCreateOfferLetterMutation();
-  const [updateOfferLetter, { isLoading: offerUpdating }] = useUpdateOfferLetterMutation();
+  const [createOfferLetter] = useCreateOfferLetterMutation();
+  const [updateOfferLetter] = useUpdateOfferLetterMutation();
   const { data: offerLetterData } = useGetOfferByIdQuery(id || '', { skip: !id });
   const { data: emailTemplatesData } = useGetAllEmailTemplateQuery();
   const { data: candidatesData } = useCandidate();
@@ -65,6 +66,7 @@ const OfferForm = () => {
   });
 
   const handleSaveAsDraft = async () => {
+    setIsSavingDraft(true);
     try {
       const values = await form.validateFields();
       const payload = buildPayload(values, 'draft');
@@ -81,10 +83,13 @@ const OfferForm = () => {
     } catch (err) {
       message.error('Failed to save draft');
     }
+    finally {
+      setIsSavingDraft(false);
+    }
   };
 
   const handleOfferSend = async (values: offerLetterPostData) => {
-    setIsSubmitting(true);
+    setIsSendingOffer(true);
     const payload = buildPayload(values, 'sent');
     try {
       const res = isEditing
@@ -99,7 +104,7 @@ const OfferForm = () => {
     } catch (err: any) {
       message.error(err?.data?.message || 'Failed to send offer');
     } finally {
-      setIsSubmitting(false);
+      setIsSendingOffer(false);
     }
   };
 
@@ -224,7 +229,7 @@ const OfferForm = () => {
                 type="default"
                 icon={<X size={16} />}
                 onClick={() => navigate('/dashboard/offers')}
-                disabled={offerSending}
+                disabled={isSendingOffer || isSavingDraft}
               >
                 Cancel
               </Button>
@@ -232,16 +237,16 @@ const OfferForm = () => {
                 htmlType="button"
                 text="Save as Draft"
                 icon={<Save size={16} />}
-                loading={offerSending}
+                loading={isSavingDraft}
                 onClick={handleSaveAsDraft}
-                disabled={offerSending}
+                disabled={isSavingDraft}
               />
               <Button
                 htmlType="submit"
                 type="primary"
                 icon={<Send size={16} />}
-                loading={isSubmitting || offerSending || offerUpdating}
-                disabled={isSubmitting || offerSending || offerUpdating}
+                loading={isSendingOffer}
+                disabled={isSendingOffer}
               >
                 Send Offer
               </Button>

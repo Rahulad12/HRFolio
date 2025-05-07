@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import  React, { useEffect, useState } from 'react';
 import { useAppDispatch } from '../../Hooks/hook';
 import { setCredentials } from '../../slices/authSlices';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -6,7 +6,7 @@ import WelcomeBackPage from './WelcomeBackPage';
 import { Divider, Typography } from 'antd';
 import GoogleLoginButton from './AuthForm';
 
-const Login = () => {
+const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);

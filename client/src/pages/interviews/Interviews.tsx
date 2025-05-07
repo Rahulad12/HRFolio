@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useInterview } from '../../action/StoreInterview'
 import InterviewListView from './InterviewListView';
 import CalenderView from './CalenderView';
@@ -20,7 +20,7 @@ const statusOptions: StatusOption[] = [
     { value: 'cancelled', label: 'Cancelled' }
 ];
 
-const Interviews = () => {
+const Interviews: React.FC = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStatus, setFilteredStatus] = useState<string>('');

@@ -34,7 +34,7 @@ const createCandidate = async (req, res) => {
         technology, level, experience,
         expectedsalary, references, applieddate, resume
     } = req.body;
-    
+
     if (!name || !email || !phone || !technology || !level || !experience || !expectedsalary || !applieddate || !resume) {
         return res.status(400).json({
             success: false,
@@ -61,7 +61,7 @@ const createCandidate = async (req, res) => {
         const newCandidate = new Candidate({
             name, email, phone,
             technology, level, experience,
-            expectedsalary, applieddate, resume,references
+            expectedsalary, applieddate, resume, references
         })
 
         if (!newCandidate) {
@@ -209,46 +209,71 @@ const getAllCandidates = async (req, res) => {
  * 
  * Responds with a 404 status if the candidate is not found, or a 200 status if the candidate is deleted successfully.
  * In case of an error, it responds with a 500 status and an error message.
+ * this functio will delete all selected documents
  */
 
-const deleteCandidate = async (req, res) => {
+const deleteCandidates = async (req, res) => {
+    const { id: candidateIds } = req.body;
+    console.log(candidateIds);
     try {
-        const candidate = await Candidate.findByIdAndDelete(req.params.id);
-        if (!candidate) {
-            return res.status(404).json({ success: false, message: "Candidate not found" });
+
+        if (!Array.isArray(candidateIds)) {
+            return res.status(400).json({ message: "Invalid ID format" });
         }
 
-        await CandidateLog.create({
-            candidate: candidate._id,
-            action: 'deleted',
-            performedAt: Date.now(),
-            performedBy: req.user._id,
-        })
+        if (!candidateIds || candidateIds.length === 0) {
+            return res.status(400).json({ success: false, message: "No candidate IDs provided" });
+        }
 
-        await ActivityLog.create({
-            candidate: candidate._id,
-            userID: req.user._id,
-            action: 'deleted',
-            entityType: 'candidates',
-            relatedId: candidate._id,
-            metaData: {
-                title: candidate.name,
-                description: candidate.status
+        // Find all candidates with the given IDs and delete them
+        const candidates = await Candidate.find({
+            _id: { $in: candidateIds }
+        });
+
+
+        if (candidates.length === 0) {
+            return res.status(404).json({ success: false, message: "No candidates found with the provided IDs" });
+        }
+
+        // Loop through each candidate and perform deletion
+        for (let candidate of candidates) {
+            await Candidate.findByIdAndDelete(candidate._id);
+
+            // Create a log entry for the deleted candidate
+            await CandidateLog.create({
+                candidate: candidate._id,
+                action: 'deleted',
+                performedAt: Date.now(),
+                performedBy: req.user._id,
+            });
+
+            // Create an activity log for the deleted candidate
+            await ActivityLog.create({
+                candidate: candidate._id,
+                userID: req.user._id,
+                action: 'deleted',
+                entityType: 'candidates',
+                relatedId: candidate._id,
+                metaData: {
+                    title: candidate.name,
+                    description: candidate.status,
+                }
+            });
+
+            // Delete all related documents
+            const result = await deleteAllRelatedDocs(candidate._id);
+            if (!result?.success) {
+                return res.status(500).json({ success: false, message: result?.message });
             }
-        })
-
-        const result = await deleteAllRelatedDocs(candidate._id);
-        if (!result?.success) {
-            return res.status(500).json({ success: false, message: result?.message });
         }
 
-        return res.status(200).json({ success: true, message: "Candidate deleted successfully and related docs deleted" });
-
+        return res.status(200).json({ success: true, message: "Candidates and related docs deleted successfully" });
 
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
-}
+};
+
 
 /**
  * Updates a candidate with the given ID.
@@ -471,4 +496,4 @@ const rejectCandidate = async (req, res) => {
 }
 
 
-export { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage, rejectCandidate };
+export { createCandidate, getCandidateById, getAllCandidates, deleteCandidates, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage, rejectCandidate };

@@ -1,6 +1,7 @@
 import { CANDIDATE_URL } from "../constant";
 import { api } from "./api";
 import { candidateResponse, candidateFormData, globalResponse, candidateData, candidateFilter, candidateLogResponse } from "../types";
+import { Key } from "react";
 
 interface candidateIdResposne {
     success: boolean,
@@ -59,12 +60,13 @@ export const candidateServiceApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Candidate"],
         }),
-        deleteCandidate: builder.mutation<globalResponse, string>({
+        deleteCandidate: builder.mutation<globalResponse, { id: string | Key[] }>({
             query: (id) => ({
-                url: `${CANDIDATE_URL}/${id}`,
+                url: `${CANDIDATE_URL}`,
                 method: "DELETE",
+                body: id,
             }),
-            invalidatesTags: ["Candidate", "Assessment","Assignment", "OfferLetter", "Interview","InterviewLog", "ActivityLog", "Score", ,"EmailTemplate"],
+            invalidatesTags: ["Candidate", "Assessment", "Assignment", "OfferLetter", "Interview", "InterviewLog", "ActivityLog", "Score", , "EmailTemplate"],
         }),
         getCandidateLogsByCandidateId: builder.query<candidateLogResponse, string>({
             query: (id) => ({
@@ -73,7 +75,7 @@ export const candidateServiceApi = api.injectEndpoints({
             }),
             providesTags: ["Candidate"],
         }),
-        rejectCandidate : builder.mutation<globalResponse, string>({
+        rejectCandidate: builder.mutation<globalResponse, string>({
             query: (id) => ({
                 url: `${CANDIDATE_URL}/reject/${id}`,
                 method: "PUT",
@@ -84,12 +86,12 @@ export const candidateServiceApi = api.injectEndpoints({
     }),
 });
 
-export const { useCreateCandidateMutation, 
-    useGetCandidateQuery, 
-    useGetCandidateByIdQuery, 
-    useDeleteCandidateMutation, 
-    useUpdateCandidateMutation, 
-    useGetCandidateLogsByCandidateIdQuery, 
+export const { useCreateCandidateMutation,
+    useGetCandidateQuery,
+    useGetCandidateByIdQuery,
+    useDeleteCandidateMutation,
+    useUpdateCandidateMutation,
+    useGetCandidateLogsByCandidateIdQuery,
     useChangeCandidateStageMutation,
     useRejectCandidateMutation
 } = candidateServiceApi;

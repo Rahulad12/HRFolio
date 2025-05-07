@@ -14,6 +14,7 @@ import Predefineddata from '../../data/PredefinedData';
 import React, { useMemo, useState } from 'react';
 import ExportButton from '../../component/common/Export';
 
+
 const statusColors: Record<candidateStatus, string> = {
   shortlisted: 'blue',
   assessment: "geekblue",
@@ -24,6 +25,7 @@ const statusColors: Record<candidateStatus, string> = {
   hired: 'green',
   rejected: 'red',
 };
+
 const labelMap: Record<candidateStatus, string> = {
   shortlisted: 'Shortlisted',
   first: 'First Interview',
@@ -34,12 +36,14 @@ const labelMap: Record<candidateStatus, string> = {
   hired: 'Hired',
   rejected: 'Rejected',
 };
+
 const CandidateTable: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [deleteId, setDeleteId] = useState<string>("");
+  // const [deleteId, setDeleteId] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [deleteCandidate] = useDeleteCandidateMutation();
 
   const { candidateSearch: searchTerms } = useAppSelector((state) => state.search);
@@ -48,8 +52,7 @@ const CandidateTable: React.FC = () => {
     status: searchTerms?.status || "",
   }, {
     refetchOnMountOrArgChange: false,
-  }
-  );
+  });
 
   const sortedCandidates = useMemo(() => {
     return data?.data?.slice().sort((a, b) =>
@@ -67,28 +70,61 @@ const CandidateTable: React.FC = () => {
     );
   }, [sortedCandidates, searchText, selectedStatus]);
 
-
   const [api, contextHolder] = notification.useNotification();
 
-  const handleDelete = async (id: string) => {
-    setDeleteId(id);
+  // const handleDelete = async (id: string) => {
+  //   try {
+  //     const res = await deleteCandidate({
+  //       id,
+  //     }).unwrap();
+  //     dispatch(setCandidate([]));
+  //     api.success({
+  //       message: res.message,
+  //       placement: "topRight",
+  //       duration: 2000,
+  //     });
+  //   } catch (err: any) {
+  //     api.error({
+  //       message: err?.data?.message || "Error deleting candidate",
+  //       placement: "topRight",
+  //       duration: 2000,
+  //     });
+  //   } finally {
+  //     setDeleteId("");
+  //   }
+  // };
+
+  const handleBulkDelete = async () => {
     try {
-      const res = await deleteCandidate(id).unwrap();
+      if (selectedRowKeys.length === 0) {
+        api.warning({
+          message: 'No candidates selected',
+          placement: "topRight",
+          duration: 2000,
+        });
+        return;
+      }
+
+      const res = await deleteCandidate({
+        id: selectedRowKeys,
+      }).unwrap();
+
       dispatch(setCandidate([]));
+
       api.success({
         message: res.message,
         placement: "topRight",
-        duration: 2000,
-      })
+        duration: 3,
+      });
+
+      // Clear selected row keys after deletion
+      setSelectedRowKeys([]);
     } catch (err: any) {
       api.error({
-        message: err?.data?.message || "Error deleting candidate",
+        message: err?.data?.message || "Error deleting candidates",
         placement: "topRight",
-        duration: 2000,
-      })
-    }
-    finally {
-      setDeleteId("");
+        duration: 3,
+      });
     }
   };
 
@@ -107,7 +143,6 @@ const CandidateTable: React.FC = () => {
             <div className="text-xs text-gray-500">{record.email}</div>
           </div>
         </div>
-
       ),
     },
     {
@@ -149,9 +184,7 @@ const CandidateTable: React.FC = () => {
       dataIndex: 'expectedsalary',
       key: 'expectedsalary',
       render: (salary: number) => (
-        <span
-          className='text-gray-500 text-sm'
-        >
+        <span className='text-gray-500 text-sm'>
           ${salary?.toLocaleString('en-US') || '0'}
         </span>
       ),
@@ -184,7 +217,7 @@ const CandidateTable: React.FC = () => {
               />
             </Tooltip>
           </motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          {/* <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <Tooltip title="Delete">
               <Popconfirm
                 title="Delete this candidate?"
@@ -202,12 +235,21 @@ const CandidateTable: React.FC = () => {
                 />
               </Popconfirm>
             </Tooltip>
-          </motion.div>
+          </motion.div> */}
         </Space>
       ),
     },
   ];
-  //main content return
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   return (
     <>
       {contextHolder}
@@ -225,7 +267,6 @@ const CandidateTable: React.FC = () => {
           disabled={false}
           loading={false}
         />
-
       </div>
 
       <Card>
@@ -251,8 +292,22 @@ const CandidateTable: React.FC = () => {
           />
 
           <ExportButton data={data?.data} fileName="Candidates" />
-
-        </div >
+          <Space>
+            {selectedRowKeys.length > 0 && (
+              <Popconfirm
+                title="Are you sure to delete selected candidates?"
+                description="This action cannot be undone and will permanently delete the selected candidates."
+                onConfirm={handleBulkDelete}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button type="link" danger icon={<Trash2 className="w-4 h-4" />}>
+                  Delete Selected
+                </Button>
+              </Popconfirm>
+            )}
+          </Space>
+        </div>
 
         <CustomTable
           loading={candidateLoading}
@@ -260,11 +315,10 @@ const CandidateTable: React.FC = () => {
           columns={columns}
           pageSize={10}
           key={sortedCandidates?.map(c => c._id).join(',')}
+          rowSelection={rowSelection}
         />
       </Card>
     </>
-
-
   );
 };
 

@@ -11,7 +11,6 @@ interface AnimatedTableProps {
 }
 
 const AnimatedRow = ({ children, ...props }: any) => (
-
     <motion.tr
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -27,10 +26,10 @@ const CustomTable: React.FC<AnimatedTableProps> = ({
     loading,
     data,
     columns,
-    pageSize = 2,
+    pageSize: defaultPageSize = 2,
 }) => {
-
     const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(defaultPageSize);
 
     const startIdx = (currentPage - 1) * pageSize;
     const endIdx = startIdx + pageSize;
@@ -46,25 +45,24 @@ const CustomTable: React.FC<AnimatedTableProps> = ({
             sortDirections={['ascend', 'descend', 'ascend']}
             scroll={{ x: 'max-content' }}
             pagination={false}
-            footer={() => {
-                return (
-                    <div className="gap-2 flex justify-center items-baseline">
-                        <motion.span
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                        >
-                            Showing <b>{currentData.length}</b> of <b>{data.length}</b> results
-                        </motion.span>
-                        <Pagination
-                            current={currentPage}
-                            pageSize={pageSize}
-                            total={data.length}
-                            onChange={(page) => setCurrentPage(page)}
-                            showSizeChanger={false}
-                        />
-                    </div>
-                );
-            }}
+            footer={() => (
+                <div className="gap-2 flex justify-center items-baseline flex-wrap">
+                    <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        Showing <b>{currentData.length}</b> of <b>{data.length}</b> results
+                    </motion.span>
+                    <Pagination
+                        current={currentPage}
+                        pageSize={pageSize}
+                        total={data.length}
+                        showSizeChanger
+                        pageSizeOptions={['2', '5', '10', '20', '50']}
+                        onChange={(page, size) => {
+                            setCurrentPage(page);
+                            setPageSize(size);
+                        }}
+                    />
+                </div>
+            )}
             components={{
                 body: {
                     row: AnimatedRow,

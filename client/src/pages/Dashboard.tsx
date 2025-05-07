@@ -19,7 +19,7 @@ import { useAssignedAssessment } from '../action/StoreAssessment';
 
 
 
-const Dashboard:React.FC = () => {
+const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const { isLoading: interviewLoading } = useInterview(); // Fetch Interviews and that will store in redux
@@ -117,7 +117,7 @@ const Dashboard:React.FC = () => {
                 title="Active Assignment"
                 value={assessment?.length || 0}
                 icon={<FileCheck size={20} className="mr-2 text-orange-500" />}
-                link="/dashboard/assessments"
+                link="/dashboard/assessments/assignments"
                 loading={assignmentLoading}
 
               />

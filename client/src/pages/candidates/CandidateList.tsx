@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from '../../Hooks/hook';
 import { useDeleteCandidateMutation, useGetCandidateQuery } from '../../services/candidateServiceApi';
 import { setCandidate } from '../../slices/candidateSlices';
 import { useNavigate } from 'react-router-dom';
-import { candidateData } from '../../types';
+import { candidateData, candidateStatus } from '../../types';
 import { makeCapitilized } from '../../utils/TextAlter';
 import { motion } from 'framer-motion';
 import type { TableColumnsType } from 'antd';
@@ -14,7 +14,7 @@ import Predefineddata from '../../data/PredefinedData';
 import React, { useMemo, useState } from 'react';
 import ExportButton from '../../component/common/Export';
 
-const statusColors: Record<string, string> = {
+const statusColors: Record<candidateStatus, string> = {
   shortlisted: 'blue',
   assessment: "geekblue",
   first: 'orange',
@@ -24,13 +24,22 @@ const statusColors: Record<string, string> = {
   hired: 'green',
   rejected: 'red',
 };
+const labelMap: Record<candidateStatus, string> = {
+  shortlisted: 'Shortlisted',
+  first: 'First Interview',
+  second: 'Second Interview',
+  third: 'Third Interview',
+  assessment: 'Assessment',
+  offered: 'Offered',
+  hired: 'Hired',
+  rejected: 'Rejected',
+};
 const CandidateTable: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
-  // const filter = useAppSelector((state) => state.search);
   const [deleteCandidate] = useDeleteCandidateMutation();
 
   const { candidateSearch: searchTerms } = useAppSelector((state) => state.search);
@@ -153,11 +162,9 @@ const CandidateTable: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status: string) => (
-        <Tag color={statusColors[status.toLowerCase()] || 'default'} style={{
-          borderRadius: '6px',
-        }}>
-          {makeCapitilized(status)} Interview
+      render: (status: candidateStatus) => (
+        <Tag color={statusColors[status]}>
+          {makeCapitilized(labelMap[status])}
         </Tag>
       ),
     },

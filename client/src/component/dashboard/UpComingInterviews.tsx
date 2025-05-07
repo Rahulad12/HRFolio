@@ -23,9 +23,6 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 3;
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
 
   // 1. Add view filter state
   const [filterType, setFilterType] = useState<'today' | 'week' | 'all'>('week');
@@ -142,14 +139,18 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
         )}
       </div>
 
-      {interviews.length > PAGE_SIZE && (
+      {interviews?.length > PAGE_SIZE && (
         <Row justify="center" className="mt-4">
           <Pagination
             current={currentPage}
-            total={interviews.length}
+            total={interviews?.length}
             pageSize={PAGE_SIZE}
-            showSizeChanger={false}
-            onChange={handlePageChange}
+            onChange={
+              (page) => {
+                setCurrentPage(page);
+              }
+            }
+            align='center'
           />
         </Row>
       )}

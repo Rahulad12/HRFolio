@@ -1,6 +1,6 @@
 import { Table, Pagination } from 'antd';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 interface AnimatedTableProps {
     loading: boolean;
@@ -23,12 +23,12 @@ const AnimatedRow = ({ children, ...props }: any) => (
     </motion.tr>
 );
 
-const CustomTable = ({
+const CustomTable: React.FC<AnimatedTableProps> = ({
     loading,
     data,
     columns,
     pageSize = 2,
-}: AnimatedTableProps) => {
+}) => {
 
     const [currentPage, setCurrentPage] = useState(1);
 

@@ -7,6 +7,13 @@ import ActivityLog from "../model/ActivityLogs.js";
 import dayjs from "dayjs";
 import { updateCandidateCurrentStage } from "../utils/updateCandidateProgress.js";
 
+/**
+ * This function will create a offer 
+ * @params req.body
+ * @returns offer
+ * if email not send offer also will be saved in database
+ * return false when offer exists, not created,no send email 
+ */
 const createOffer = async (req, res) => {
     const { candidate, email, position, salary, startDate, responseDeadline, status } = req.body;
     if (!candidate || !email || !position || !salary || !startDate || !responseDeadline || !status) {
@@ -39,7 +46,7 @@ const createOffer = async (req, res) => {
 
         const existingOffer = await Offer.findOne({ candidate });
 
-        if (existingOffer && existingOffer.status === 'sent') {
+        if (existingOffer) {
             return res.status(400).json({
                 message: 'Offer has already been sent to this candidate.',
                 success: false,

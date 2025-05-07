@@ -9,6 +9,7 @@ import buttonPropsSliceReducer from "./slices/ButtonPropsSlices.ts"
 import themeReducer from './slices/themeSlices.ts';
 import sideBarCollapsedSliceReducer from "./slices/sideBarCollapsed.ts"
 import SearchTermsReducer from "./slices/searchTermsSlices.ts"
+import offerSliceReducer from "./slices/offerSlices.ts"
 
 export const store = configureStore({
     reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
         search: setSearchSlice,
         interview: interviewSliceReducer,
         assessments: assessmentSlice,
+        offer: offerSliceReducer,
         buttonProps: buttonPropsSliceReducer,
         theme: themeReducer,
         sideBar: sideBarCollapsedSliceReducer,

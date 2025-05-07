@@ -21,7 +21,7 @@ const AssessmentAssignmentList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const { isLoading: assessmentLoading } = useAssignedAssessment();
+  const { assignmentLoading } = useAssignedAssessment();
 
   const [createAssignmentScore, { isLoading: scoreLoading }] = useCreateAssignmentScoreMutation();
   const [deleteAssignment, { isLoading: deleteLoading }] = useDeleteAssignmentMutation();
@@ -231,7 +231,7 @@ const AssessmentAssignmentList: React.FC = () => {
           </div>
         </div>
 
-        <CustomTable data={filteredAssignments} columns={columns} loading={assessmentLoading || scoreLoading || deleteLoading} pageSize={10} />
+        <CustomTable data={filteredAssignments} columns={columns} loading={assignmentLoading || scoreLoading || deleteLoading} pageSize={10} />
       </Card>
 
       <Modal

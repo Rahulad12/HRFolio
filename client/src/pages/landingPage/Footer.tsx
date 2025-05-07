@@ -1,9 +1,10 @@
+import React from "react";
 import { Layout} from "antd";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 const { Footer: AntFooter } = Layout;
 
-const Footer = () => {
+const Footer:React.FC = () => {
   const navigate = useNavigate();
   return (
     <AntFooter className="!bg-[#001529] !text-gray-400" role="contentinfo">

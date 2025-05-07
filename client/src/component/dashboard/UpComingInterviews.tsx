@@ -3,7 +3,7 @@ import { Calendar } from 'lucide-react';
 import { interviewData } from '../../types';
 import dayjs from 'dayjs';
 import { makeCapitilized } from '../../utils/TextAlter';
-import { Button, Card, Pagination, Row, Tag, Typography } from 'antd';
+import { Button, Card, Empty, Pagination, Row, Tag, Typography } from 'antd';
 import { Radio, RadioChangeEvent } from 'antd';
 
 const { Text } = Typography;
@@ -138,7 +138,7 @@ export const UpcomingInterviews: React.FC<UpcomingInterviewsProps> = ({
             </Card>
           ))
         ) : (
-          <p className="text-center text-gray-500 py-4">No interviews scheduled</p>
+          <Empty description="No Upcoming Interviews" />
         )}
       </div>
 

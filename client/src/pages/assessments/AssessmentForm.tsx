@@ -13,13 +13,10 @@ const AssessmentForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [form] = Form.useForm();
   const isEditing = !!id;
-
   const [createAssessment, { isLoading }] = useCreateAssessmentMutation();
   const { data: assessmentData } = useGetAssessmentByIdQuery(id || "", {
     skip: !id
   });
-
-  console.log(assessmentData, "assessmentData");
 
   const [updateAssessment, { isLoading: updatingAssessment }] = useUpdateAssessmentMutation();
 

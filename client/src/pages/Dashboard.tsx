@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Users, Calendar, FileCheck, FileText } from 'lucide-react';
 import MetricsCard from '../component/dashboard/MetricsCard';
 import UpcomingInterviews from '../component/dashboard/UpComingInterviews';
@@ -14,23 +14,49 @@ import ListOfCandidatesWithStatus from '../component/dashboard/ListOfCandidatesW
 import CandidateByTechnology from '../component/dashboard/CandidateByTechnology';
 import CandidateLevelDistribution from '../component/dashboard/CandidateLevelDistribution';
 import HiredandRejectedCorelation from '../component/dashboard/HiredandRejectedCorelation';
+import { useOffer } from '../action/storeOffer';
+import { useAssignedAssessment } from '../action/StoreAssessment';
 
-export const Dashboard: React.FC = () => {
+
+
+const Dashboard:React.FC = () => {
   const navigate = useNavigate();
 
-  const { isLoading: interviewLoading } = useInterview();
-  const { isLoading: candidateLoading } = useCandidate(); // Fetch candidates and that will store in redux also 
+  const { isLoading: interviewLoading } = useInterview(); // Fetch Interviews and that will store in redux
+  const { isLoading: candidateLoading } = useCandidate(); // Fetch candidates and that will store in redux 
+  const { offers, offerLoading } = useOffer() // Fetch offers and that will store in redux
+  const {
+
+    assignedAssessment,
+    assignmentLoading
+
+  } = useAssignedAssessment();
+
 
   const { user } = useAppSelector((state) => state.auth);
 
   const { candidate } = useAppSelector((state) => state.candidate);
   const { interviews } = useAppSelector((state) => state.interview)
-  console.log("interviews", interviews);
 
-  const scheduledInterview = interviews.filter((item) => item.status === 'scheduled');
-  const assessment = candidate.filter((item) => item.status === 'assessment');
-  const offered = candidate.filter((item) => item.status === 'offered');
+  const scheduledInterview = useMemo(
+    () => interviews?.filter((item) => item.status === 'scheduled'),
+    [interviews]
+  );
 
+  const assessment = useMemo(
+    () => assignedAssessment?.data?.filter((item) => item.status === 'assigned'),
+    [assignedAssessment]
+  );
+
+  const offered = useMemo(
+    () => offers?.filter((item) => item.status === 'sent'),
+    [offers]
+  );
+
+
+  /**
+   * Framer motion variants 
+   */
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -88,11 +114,11 @@ export const Dashboard: React.FC = () => {
           <Col xs={24} sm={12} lg={6}>
             <motion.div variants={itemVariants}>
               <MetricsCard
-                title="Active Assessment"
-                value={assessment?.length}
+                title="Active Assignment"
+                value={assessment?.length || 0}
                 icon={<FileCheck size={20} className="mr-2 text-orange-500" />}
                 link="/dashboard/assessments"
-                loading={candidateLoading}
+                loading={assignmentLoading}
 
               />
             </motion.div>
@@ -112,10 +138,10 @@ export const Dashboard: React.FC = () => {
             <motion.div variants={itemVariants}>
               <MetricsCard
                 title="Offer Sent"
-                value={offered?.length}
+                value={offered?.length || 0}
                 icon={<FileText size={20} className="mr-2 text-green-500" />}
                 link="/dashboard/offers"
-                loading={candidateLoading}
+                loading={offerLoading}
               />
             </motion.div>
           </Col>
@@ -126,7 +152,9 @@ export const Dashboard: React.FC = () => {
       <Row gutter={[24, 24]}>
         {/* Left Side */}
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <ListOfCandidatesWithStatus />
+          <ListOfCandidatesWithStatus
+            candidateLoading={candidateLoading}
+          />
         </Space>
         <Col xs={24} lg={12}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -135,8 +163,10 @@ export const Dashboard: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              {/* <CandidateByStatus stages={pipelineStages} loading={candidateLoading} /> */}
-              <CandidateByTechnology />
+              <CandidateByTechnology
+                loading={candidateLoading}
+
+              />
             </motion.div>
           </Space>
         </Col>
@@ -169,8 +199,12 @@ export const Dashboard: React.FC = () => {
         <Col xs={24} lg={12} md={12}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
 
-            <CandidateLevelDistribution />
-            <HiredandRejectedCorelation />
+            <CandidateLevelDistribution
+              loading={candidateLoading}
+            />
+            <HiredandRejectedCorelation
+              loading={candidateLoading}
+            />
 
           </Space>
         </Col>

@@ -1,9 +1,9 @@
+import React, { useRef } from 'react';
 import { Card, Typography } from 'antd';
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
 import { Search, Users, Calendar, ClipboardCheck, BarChart, FileText } from 'lucide-react';
-
 const { Text, Title } = Typography;
+
 const features = [
   {
     icon: <Search className="w-10 h-10 text-blue-500" />,
@@ -52,7 +52,7 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6 } }
 };
 
-const Features = () => {
+const Features: React.FC = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 

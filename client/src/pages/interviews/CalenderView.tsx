@@ -1,9 +1,9 @@
 import { Badge, Calendar, Modal } from 'antd';
 import dayjs from 'dayjs';
 import { useAppSelector } from '../../Hooks/hook';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-const CalendarView = () => {
+const CalendarView: React.FC = () => {
     const { interviews } = useAppSelector((state) => state.interview);
 
     const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);

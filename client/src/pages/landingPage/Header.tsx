@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Button, Drawer, Menu, Grid } from 'antd';
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-
 const { Header: AntHeader } = Layout;
 const { useBreakpoint } = Grid;
 
-const Header = () => {
+const Header: React.FC = () => {
     const [scrolled, setScrolled] = useState(false);
     const [drawerVisible, setDrawerVisible] = useState(false);
     const screens = useBreakpoint();

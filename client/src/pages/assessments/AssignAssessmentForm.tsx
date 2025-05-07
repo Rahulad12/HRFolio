@@ -10,7 +10,7 @@ import {
     Transfer,
     Typography,
 } from 'antd';
-import { Key, useEffect, useState } from 'react';
+import React, { Key, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import {
     useCreateAssignAssessmentMutation,
@@ -27,7 +27,7 @@ import { useGetAllEmailTemplateQuery } from '../../services/emailService';
 import { AssignmentData } from '../../types';
 import { makeCapitilized } from '../../utils/TextAlter';
 
-const AssignAssessment = () => {
+const AssignAssessment:React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<string>();
     const [assignForm] = Form.useForm();

@@ -11,7 +11,7 @@ import type { TableColumnsType } from 'antd';
 import CustomTable from '../../component/common/Table';
 import PrimaryButton from '../../component/ui/button/Primary';
 import Predefineddata from '../../data/PredefinedData';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import ExportButton from '../../component/common/Export';
 
 const statusColors: Record<string, string> = {
@@ -26,7 +26,7 @@ const statusColors: Record<string, string> = {
 };
 
 
-const CandidateTable = () => {
+const CandidateTable: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

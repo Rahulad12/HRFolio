@@ -3,6 +3,7 @@ import { useAppSelector } from "../../Hooks/hook";
 import { useGetActivityLogByCandidateIdQuery } from "../../services/activityLogs";
 import { ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from "dayjs";
+import React from "react";
 
 const { Text } = Typography;
 
@@ -38,7 +39,7 @@ const getStatusColor = (status: string) => {
     }
 };
 
-const CandidateTimeLine = () => {
+const CandidateTimeLine: React.FC = () => {
     const { candidate } = useAppSelector((state) => state.candidate);
 
     const { data: candidateLogs, isLoading } = useGetActivityLogByCandidateIdQuery(candidate?.[0]?._id, {

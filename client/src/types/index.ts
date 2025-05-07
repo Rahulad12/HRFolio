@@ -198,7 +198,7 @@ export type AssignmentDataResponse = {
         updatedAt: string
     }
     date: Dayjs;
-    status: 'Assigned' | 'pending' | 'completed';
+    status: 'assigned' | 'pending' | 'completed';
     _id: string;
     __v: number;
     emailTemplate: string;

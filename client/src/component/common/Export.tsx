@@ -8,10 +8,10 @@ interface Props {
     data?: any,
     fileName?: string
 }
-const ExportButton = ({
+const ExportButton: React.FC<Props> = ({
     data,
     fileName
-}: Props) => {
+}) => {
     const exportToExcel = (data: any, fileName = "Candidates") => {
         const worksheet = XLSX.utils.json_to_sheet(data);
         const workbook = XLSX.utils.book_new();

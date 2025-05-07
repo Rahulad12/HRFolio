@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../Hooks/hook'
 import dayjs, { Dayjs } from 'dayjs'
 import InterviewDetailsModal from './InterviewDetailsModal'
 import { interviewData, interviewStatus } from '../../types'
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 const { Title, Text } = Typography
 import { useUpdateInterviewMutation, useDeleteInterviewMutation, useCreateInterviewMutation } from '../../services/interviewServiceApi';
 import { storeInterview } from '../../action/StoreInterview'
@@ -14,11 +14,11 @@ interface interviewSearchTerms {
     selectedDate?: Dayjs | null
 }
 
-const InterviewListView = ({
+const InterviewListView: React.FC<interviewSearchTerms> = ({
     searchTerm,
     interviewStatus,
     selectedDate
-}: interviewSearchTerms
+}
 ) => {
 
     const [selectedInterview, setSelectedInterview] = useState<interviewData | null>(null);

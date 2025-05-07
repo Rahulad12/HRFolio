@@ -18,12 +18,10 @@ interface TableSearchProps {
 
 }
 
-const CandidateTableSearch = ({
+const CandidateTableSearch: React.FC<TableSearchProps> = ({
     items = [],
     placeholder = "Search",
-
-
-}: TableSearchProps) => {
+}) => {
     const dispatch = useAppDispatch();
 
     const [searchText, setSearchText] = useState("");

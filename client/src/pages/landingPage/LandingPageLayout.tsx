@@ -1,10 +1,11 @@
+import React from 'react'
 import { Layout } from 'antd'
 import Header from './Header'
 import { Outlet } from 'react-router-dom'
 import Footer from './Footer'
 const { Content } = Layout
 
-const LandingPageLayout = () => {
+const LandingPageLayout: React.FC = () => {
     return (
         <Layout>
             <Header />

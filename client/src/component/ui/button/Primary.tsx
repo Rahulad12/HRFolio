@@ -9,7 +9,7 @@ interface Props {
     loading?: boolean;
 }
 
-const PrimaryButton = ({ text, icon, onClick, disabled, loading }: Props) => {
+const PrimaryButton: React.FC<Props> = ({ text, icon, onClick, disabled, loading }) => {
     return (
         <ConfigProvider
             theme={{

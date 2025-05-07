@@ -1,12 +1,13 @@
 import { Avatar, Button } from 'antd';
 import { makeCapitilized } from '../../utils/TextAlter';
+import React from 'react';
 
 interface Props {
     submitHandler: () => void;
     loading: boolean;
 }
 
-const WelcomeBackPage = ({ submitHandler, loading }: Props) => {
+const WelcomeBackPage: React.FC<Props> = ({ submitHandler, loading }) => {
 
     const image = localStorage.getItem("picture") || "";
     const name = localStorage.getItem("username") || "";

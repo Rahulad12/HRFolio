@@ -1,9 +1,9 @@
+import React from 'react';
 import { Button, Image } from 'antd';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const Hero = () => {
+const Hero: React.FC = () => {
     const navigate = useNavigate();
 
     const features = [

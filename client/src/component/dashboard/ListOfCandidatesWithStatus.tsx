@@ -1,12 +1,15 @@
-import { Badge, Card, Col, DatePicker, List, Row } from 'antd';
+import { Badge, Card, Col, DatePicker, Input, List, Row, Skeleton } from 'antd';
 import { useAppSelector } from '../../Hooks/hook';
 import { useNavigate } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
-import { useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
+import { Search } from 'lucide-react';
 
-
+interface Props {
+    candidateLoading?: boolean
+}
 const statusGroups = [
     { title: 'Shortlisted', key: 'shortlisted', color: '#2471A3' },
     { title: 'Assessment', key: 'assessment', color: '#2f54eb' },
@@ -16,10 +19,16 @@ const statusGroups = [
     { title: 'Rejected', key: 'rejected', color: '#a8071a' },
 ];
 
-const ListOfCandidatesWithStatus = () => {
+const ListOfCandidatesWithStatus: React.FC<Props> = ({
+    candidateLoading = true
+}) => {
     const navigate = useNavigate();
+    const [searchText, setSearchText] = useState<Record<string, string>>({});
 
     const { candidate } = useAppSelector((state) => state.candidate);
+    const { interviews } = useAppSelector((state) => state.interview);
+    const { offerLetters } = useAppSelector((state) => state.offer);
+    const { assignedAssessments } = useAppSelector((state) => state.assessments);
     const { mode } = useAppSelector(state => state.theme);
 
     const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
@@ -28,7 +37,8 @@ const ListOfCandidatesWithStatus = () => {
         setDateRange(dates);
     };
 
-    const filterCandidates = (statusKey: string) => {
+    const filterCandidates = useCallback((statusKey: string) => {
+        const searchValue = searchText[statusKey];
         return candidate?.filter((can) => {
 
             let isMatch = false;
@@ -42,16 +52,23 @@ const ListOfCandidatesWithStatus = () => {
 
             if (!isMatch) return false;
 
-            if (dateRange[0] && dateRange[1]) {
+            if (dateRange && dateRange[0] && dateRange[1]) {
                 const createdAt = dayjs(can.createdAt);
                 if (!createdAt.isBetween(dateRange[0].startOf('day'), dateRange[1].endOf('day'), null, '[]')) {
                     return false;
                 }
             }
 
+            if (searchValue && !(
+                can.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+                can.technology.toLowerCase().includes(searchValue.toLowerCase())
+            )) {
+                return false;
+            }
             return true;
         }) || [];
-    };
+    }
+        , [candidate, dateRange, searchText]);
 
     const getProgressBadge = (can: any, statusKey: string) => {
         const currentStatus = statusKey === 'interviewing' ? can.status : statusKey;
@@ -61,6 +78,7 @@ const ListOfCandidatesWithStatus = () => {
         if (currentStatus === 'hired') {
             return <Badge status="success" text="Hired" />;
         }
+
         const completed = can?.progress[currentStatus]?.completed;
 
         return (
@@ -70,6 +88,20 @@ const ListOfCandidatesWithStatus = () => {
             />
         );
     };
+
+    const filteredOffersByCandidate = useCallback((candidateId: string) => {
+        return offerLetters?.filter((offer) => offer?.candidate?._id === candidateId);
+    }, [offerLetters]);
+
+    const filteredInterviewsByCandidate = useCallback((candidateId: string) => {
+        return interviews?.filter((interview) => interview?.candidate?._id === candidateId);
+    }, [interviews]);
+
+    const filteredAssessmentsByCandidate = useCallback((candidateId: string) => {
+        return assignedAssessments?.filter((assessment) => assessment?.candidate?._id === candidateId);
+    }, [assignedAssessments]);
+
+
     return (
         <Card
             title="Candidates by Status"
@@ -79,50 +111,103 @@ const ListOfCandidatesWithStatus = () => {
                 {statusGroups.map((group) => {
                     const candidates = filterCandidates(group.key);
                     return (
-                        <Col xs={24} sm={12} md={8} lg={4} key={group.key}>
-                            <Card
-                                title={group.title}
-                                extra={<Badge count={candidates.length} style={{ backgroundColor: group.color }} />}
-                                style={{ minHeight: '500px' }}
-                            >
-                                <List
-                                    dataSource={candidates}
-                                    locale={{ emptyText: 'No candidates found' }}
-                                    renderItem={(item) => (
-                                        <List.Item>
-                                            <List.Item.Meta
-                                                avatar={
-                                                    <span className="bg-blue-950 text-white h-6 w-6 rounded-full flex items-center justify-center capitalize">
-                                                        {item.name.charAt(0)}
-                                                    </span>
-                                                }
-                                                title={
-                                                    <span
-                                                        onClick={() => navigate(`/dashboard/candidates/${item._id}`)}
-                                                        className="cursor-pointer capitalize"
-                                                    >
-                                                        {item.name}
-                                                    </span>
-                                                }
-                                                description={
-                                                    <>
-                                                        <span className="capitalize">{item.technology}</span>
-                                                        {group.key === 'interviewing' && (
-                                                            <span className="capitalize"> - {item.status} Interview</span>
-                                                        )}
+                        <Col xs={24} sm={12} md={8} lg={8} key={group.key}>
+                            {
+                                candidateLoading ? (
+                                    <Skeleton active
+                                        title
+                                        paragraph={{ rows: 6 }}
+                                        style={{ minHeight: '500px' }}
+                                    />
+                                ) :
+                                    <Card
+                                        title={group.title}
+                                        extra={<Badge count={candidates.length} style={{ backgroundColor: group.color }} />}
+                                        style={{ minHeight: '500px' }}
+                                    >
+                                        <Input placeholder="Search candidates by name or technology"
+                                            size='small'
+                                            prefix={<Search size={16} color='#808080' />}
+                                            style={{ marginBottom: '10px' }}
+                                            onChange={(value) => {
+                                                setSearchText({ ...searchText, [group.key]: value.target.value });
+                                            }}
+                                            allowClear
+                                        />
+                                        <List
+                                            dataSource={candidates}
+                                            locale={{ emptyText: 'No candidates found' }}
+                                            renderItem={(item) => (
+                                                <List.Item>
+                                                    <List.Item.Meta
+                                                        avatar={
+                                                            <span className="bg-blue-950 text-white h-6 w-6 rounded-full flex items-center justify-center capitalize">
+                                                                {item.name.charAt(0)}
+                                                            </span>
+                                                        }
+                                                        title={
+                                                            <span
+                                                                onClick={() => navigate(`/dashboard/candidates/${item._id}`)}
+                                                                className="cursor-pointer capitalize"
+                                                            >
+                                                                {item.name}
+                                                            </span>
+                                                        }
 
-                                                        <div>{getProgressBadge(item, group.key)}</div>
-                                                    </>
-                                                }
-                                            />
-                                        </List.Item>
-                                    )}
-                                    style={{ maxHeight: '400px', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: mode === 'dark' ? '#0000 #0000' : '#ffff #ffff' }}
-                                />
-                            </Card>
+                                                        description={
+                                                            <div
+                                                                className='flex  gap-2 flex-col'
+                                                            >
+                                                                <span className="capitalize">{item.technology}</span>
+                                                                {
+                                                                    group.key === 'assessment' && (
+                                                                        filteredAssessmentsByCandidate(item?._id).length > 0 ? (
+                                                                            filteredAssessmentsByCandidate(item?._id)?.map((assessment, index) => (
+                                                                                <span key={index} className="capitalize text-sm">  Status: {assessment.status}</span>
+                                                                            ))
+                                                                        ) : (
+                                                                            <p className="capitalize text-sm"> No Assessment Scheduled</p>
+                                                                        )
 
+                                                                    )
+                                                                }
+
+                                                                {group.key === 'interviewing' && (
+                                                                    filteredInterviewsByCandidate(item?._id).length > 0 ? (
+                                                                        filteredInterviewsByCandidate(item?._id)?.map((interview, index) => (
+                                                                            <Fragment key={index}>
+                                                                                <p className='capitalize'>Round: {interview.InterviewRound} Interview</p>
+                                                                                <span className="capitalize text-sm"> Status: {interview.status}</span>
+                                                                            </Fragment>
+
+                                                                        ))
+                                                                    ) : (
+                                                                        <p className="capitalize text-sm"> No Interview Scheduled</p>
+                                                                    )
+                                                                )
+                                                                }
+
+                                                                {group.key === 'offered' && (
+                                                                    filteredOffersByCandidate(item?._id).length > 0 ? (
+                                                                        filteredOffersByCandidate(item?._id)?.map((offer, index) => (
+                                                                            <span key={index} className="capitalize text-sm">  Status: {offer.status}</span>
+                                                                        ))
+                                                                    ) : (
+                                                                        <p className="capitalize text-sm"> No Offer Sent</p>
+                                                                    )
+                                                                )}
+
+                                                                <div>{getProgressBadge(item, group.key)}</div>
+                                                            </div>
+                                                        }
+                                                    />
+                                                </List.Item>
+                                            )}
+                                            style={{ maxHeight: '400px', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: mode === 'dark' ? '#0000 #0000' : '#ffff #ffff' }}
+                                        />
+                                    </Card>
+                            }
                         </Col>
-
                     );
                 })}
             </Row>

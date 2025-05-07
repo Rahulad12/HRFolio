@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useCandidate } from '../../action/StoreCandidate';
 import { candidateData } from '../../types';
 import { useCreateGeneralEmailMutation } from '../../services/emailService';
@@ -25,7 +25,7 @@ interface formData {
     attachment: any[];
 }
 
-const GeneralEmailForm = () => {
+const GeneralEmailForm: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<string>();
     const [emailForm] = Form.useForm();

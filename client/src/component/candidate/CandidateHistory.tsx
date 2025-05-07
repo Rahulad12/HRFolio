@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAppSelector } from '../../Hooks/hook';
 import { Clock, CheckCircle, AlertCircle, XCircle, Star } from 'lucide-react';
 import { Card, Tabs, Empty, Skeleton, Tag } from 'antd';
@@ -66,7 +66,7 @@ const getInterviewRoundTagColor = (round: string) => {
     }
 }
 
-const CandidateHistory = () => {
+const CandidateHistory: React.FC = () => {
     const [activeTab, setActiveTab] = useState('assessments');
     const { candidate } = useAppSelector((state) => state.candidate);
     console.log(candidate);

@@ -136,7 +136,7 @@ const OfferList: React.FC = () => {
     {
       title: 'Candidate',
       render: (_: any, record: offerLetter) => (
-        <div>
+        <div className='cursor-pointer flex flex-col' onClick={() => handleViewCandidate(record)}>
           <div className="font-medium capitalize">{record?.candidate?.name}</div>
           <div className="text-xs text-gray-500 capitalize">{record?.candidate?.email}</div>
         </div>
@@ -160,17 +160,6 @@ const OfferList: React.FC = () => {
     {
       title: 'Status',
       render: (offer: offerLetter) => getStatusBadge(offer?.status as offerLetter['status'])
-      // render: (offer: offerLetter) => (
-      //   <div>
-      //     <Select
-      //       value={offer?.status}
-      //       options={statusOptions}
-      //       onChange={(value) => handleStatusUpdate(offer, value)}
-      //       className='w-30'
-      //       loading={sendingOfferId === offer._id}
-      //     />
-      //   </div>
-      // )
     },
     {
       title: 'Actions',
@@ -185,7 +174,7 @@ const OfferList: React.FC = () => {
               onClick={() => handleViewCandidate(offer)}
               aria-label="View candidate"
               disabled={offerSending}
-              icon={<Eye size={16} color='blue'/>}
+              icon={<Eye size={16} color='blue' />}
             /
             >
 

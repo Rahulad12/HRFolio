@@ -69,6 +69,18 @@ const CandidateDetails: React.FC = () => {
 
   }, [data]);
 
+  const labelMap: Record<candidateStatus, string> = {
+    shortlisted: 'Shortlisted',
+    first: 'First Interview',
+    second: 'Second Interview',
+    third: 'Third Interview',
+    assessment: 'Assessment',
+    offered: 'Offered',
+    hired: 'Hired',
+    rejected: 'Rejected',
+  };
+
+
   const StatusFlow: candidateStatus[] = [
     'shortlisted',
     'assessment',
@@ -77,7 +89,6 @@ const CandidateDetails: React.FC = () => {
     'third',
     'offered',
     'hired',
-    'rejected'
   ] as const;
 
   const canMoveToStatus = (targetStatus: candidateStatus) => {
@@ -190,7 +201,7 @@ const CandidateDetails: React.FC = () => {
     .filter(step => CandidateStatusStage?.map((status) => status.value).includes(step))
     .map((step, index) => ({
       key: index,
-      label: makeCapitilized(step),
+      label: makeCapitilized(labelMap[step]),
       value: step,
       disabled: !canMoveToStatus(step as candidateStatus)
     }));
@@ -302,7 +313,8 @@ const CandidateDetails: React.FC = () => {
         <Steps
           current={currentStep}
           responsive
-          size="default"
+          labelPlacement="vertical"
+          size="small"
           onChange={(current) => {
             if (changeCandidateStageLoading || rejectCandidateLoading) return;
             const newStatus = StatusFlow[current];
@@ -322,7 +334,7 @@ const CandidateDetails: React.FC = () => {
             return (
               <Steps.Step
                 key={step}
-                title={makeCapitilized(step)}
+                title={makeCapitilized(labelMap[step])}
                 status={stepStatus}
                 disabled={!canMoveToStatus(step as candidateStatus)}
               />

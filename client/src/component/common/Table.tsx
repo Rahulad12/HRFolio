@@ -8,6 +8,7 @@ interface AnimatedTableProps {
     columns: any[];
     pageSize?: number;
     className?: string;
+    rowSelection?: any;
 }
 
 const AnimatedRow = ({ children, ...props }: any) => (
@@ -27,6 +28,7 @@ const CustomTable: React.FC<AnimatedTableProps> = ({
     data,
     columns,
     pageSize: defaultPageSize = 2,
+    rowSelection,
 }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(defaultPageSize);
@@ -45,6 +47,7 @@ const CustomTable: React.FC<AnimatedTableProps> = ({
             sortDirections={['ascend', 'descend', 'ascend']}
             scroll={{ x: 'max-content' }}
             pagination={false}
+            rowSelection={rowSelection}
             footer={() => (
                 <div className="gap-2 flex justify-center items-baseline flex-wrap">
                     <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

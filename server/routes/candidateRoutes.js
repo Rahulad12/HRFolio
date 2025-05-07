@@ -1,5 +1,5 @@
 import express from "express";
-import { createCandidate, getCandidateById, getAllCandidates, deleteCandidate, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage,rejectCandidate } from "../controllers/candidateController.js";
+import { createCandidate, getCandidateById, getAllCandidates, deleteCandidates, updateCandidate, getCandidateLogsByCandidateId, changeCandidateStage, rejectCandidate } from "../controllers/candidateController.js";
 import { authenticate, checkUserExist } from "../middleware/auhtMiddleware.js";
 
 const candidateRouter = express.Router();
@@ -14,7 +14,7 @@ candidateRouter.put("/reject/:id", authenticate, checkUserExist, rejectCandidate
 candidateRouter.get("/:id", authenticate, checkUserExist, getCandidateById);
 candidateRouter.put("/:id", authenticate, checkUserExist, updateCandidate);
 candidateRouter.put("/stage/:id", authenticate, checkUserExist, changeCandidateStage);
-candidateRouter.delete("/:id", authenticate, checkUserExist, deleteCandidate);
+candidateRouter.delete("/", authenticate, checkUserExist, deleteCandidates);
 
 
 export default candidateRouter;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Eye, CheckCircle, Clock, AlertCircle, X, Check, MoreVertical } from 'lucide-react';
 import { AssessmentDataResponse, AssignmentDataResponse, candidateData, AssignmentScoreFromData } from '../../types';
@@ -16,7 +16,7 @@ const { TextArea } = Input;
 const AssessmentAssignmentList: React.FC = () => {
   const [form] = Form.useForm();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('assigned');
   const [selectedAssignment, setSelectedAssignment] = useState<AssignmentDataResponse | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -28,16 +28,22 @@ const AssessmentAssignmentList: React.FC = () => {
 
   const { assignedAssessments } = useAppSelector((state) => state.assessments);
 
-  const filteredAssignments = assignedAssessments?.filter(assignment => {
-    const matchesSearch =
-      assignment?.candidate?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment?.assessment?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment?.assessment.type.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredAssignments = useMemo(() => {
+    return assignedAssessments
+      ?.filter((assignment) => {
+        const matchesSearch =
+          assignment?.candidate?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          assignment?.assessment?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          assignment?.assessment?.type.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === '' || assignment.status === statusFilter;
+        const matchesStatus =
+          statusFilter === '' || assignment.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
-  });
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()) || [];
+  }, [assignedAssessments, searchTerm, statusFilter]);
+
 
   const handleViewCandidate = (record: AssignmentDataResponse) => {
     setSelectedAssignment({ ...record });
@@ -239,7 +245,7 @@ const AssessmentAssignmentList: React.FC = () => {
         onCancel={() => {
           setIsModalOpen(false);
           setSelectedAssignment(null);
-          form.resetFields(); // reset here
+          form.resetFields();
         }}
         title="Evaluate Assessment"
         width={600}
@@ -259,12 +265,16 @@ const AssessmentAssignmentList: React.FC = () => {
             <p className="text-sm capitalize text-gray-400">{selectedAssignment?.assessment?.title}</p>
           </div>
 
+
           <Form
             onFinish={handleSaveFeedback}
             layout='vertical'
             form={form}
           >
-            <Form.Item label="Score" name="score" rules={[{ required: true, message: 'Please enter a score' }]}>
+            <Typography.Text strong className="mb-2 block"> Score Less then 50 is Fail</Typography.Text>
+            <Form.Item label="Score" name="score" rules={[{ required: true, message: 'Please enter a score' }]}
+            >
+
               <InputNumber
                 min={0}
                 max={100}

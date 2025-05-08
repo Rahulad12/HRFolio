@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Search, Eye, Send, MoreVertical, } from 'lucide-react';
 import { offerLetter } from '../../types';
@@ -6,7 +6,7 @@ import PrimaryButton from '../../component/ui/button/Primary';
 import { Button, Card, Input, message, Select, Typography, Tag, Dropdown, Popconfirm, Tooltip } from 'antd';
 import CustomTable from '../../component/common/Table';
 import { useGetOfferLetterQuery, useCreateOfferLetterMutation, useDeleteOfferLetterMutation, useUpdateOfferLetterMutation } from '../../services/offerService';
-
+import dayjs from 'dayjs';
 const OfferList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -19,15 +19,20 @@ const OfferList: React.FC = () => {
   const [deleteOfferLetter] = useDeleteOfferLetterMutation();
 
 
-  const filteredOffers = offerLetters?.data?.filter(offer => {
-    const matchesSearch =
-      offer?.candidate?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      offer?.position?.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredOffers = useMemo(() => {
+    return offerLetters?.data
+      ?.filter((offer) => {
+        const matchesSearch =
+          offer?.candidate?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          offer?.position?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === '' || offer.status === statusFilter;
+        const matchesStatus = statusFilter === '' || offer.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
-  });
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()) || [];
+  }, [offerLetters?.data, searchTerm, statusFilter]);
+
 
   const handleViewCandidate = (offer: offerLetter) => {
     navigate(`/dashboard/candidates/${offer?.candidate?._id}`);

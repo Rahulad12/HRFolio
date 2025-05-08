@@ -276,7 +276,9 @@ const InterviewListView: React.FC<interviewSearchTerms> = ({
             const matchesDate = !selectedDate || dayjs(interview?.date).isSame(selectedDate, 'day');
 
             return matchesSearch && matchesStatus && matchesDate;
-        });
+        }).sort((a, b) =>
+            dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
+        )
     }, [interviews, searchTerm, interviewStatus, selectedDate]);
 
 

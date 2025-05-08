@@ -55,7 +55,8 @@ const HeaderComponent: React.FC<HeaderProps> = ({ openMobileMenu }) => {
           description: 'Account Deactivated Successfully. Contact Admin to Reactivate.',
           duration: 5,
         });
-        navigate('/');
+        window.location.reload();
+        navigate('/login');
       }
     } catch (error: any) {
       api.error({

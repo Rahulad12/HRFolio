@@ -27,7 +27,7 @@ import { useGetAllEmailTemplateQuery } from '../../services/emailService';
 import { AssignmentData } from '../../types';
 import { makeCapitilized } from '../../utils/TextAlter';
 
-const AssignAssessment:React.FC = () => {
+const AssignAssessment: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<string>();
     const [assignForm] = Form.useForm();
@@ -206,7 +206,13 @@ const AssignAssessment:React.FC = () => {
                                             },
                                         ]}
                                     >
-                                        <DatePicker style={{ width: '100%' }} />
+                                        <DatePicker style={{ width: '100%' }}
+                                            disabledDate={
+                                                (current) => {
+                                                    return current && current < dayjs().startOf('day');
+                                                }
+                                            }
+                                        />
                                     </Form.Item>
                                 </Col>
                             </Row>

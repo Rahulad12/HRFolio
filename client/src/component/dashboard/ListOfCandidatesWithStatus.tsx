@@ -39,36 +39,52 @@ const ListOfCandidatesWithStatus: React.FC<Props> = ({
 
     const filterCandidates = useCallback((statusKey: string) => {
         const searchValue = searchText[statusKey];
-        return candidate?.filter((can) => {
 
-            let isMatch = false;
-            const isInterviewStage = ['first', 'second', 'third'].includes(can.status);
+        return (
+            candidate?.filter((can) => {
+                let isMatch = false;
+                const isInterviewStage = ['first', 'second', 'third'].includes(can.status);
 
-            if (statusKey === 'interviewing') {
-                isMatch = isInterviewStage;
-            } else {
-                isMatch = can.status === statusKey;
-            }
+                if (statusKey === 'interviewing') {
+                    isMatch = isInterviewStage;
+                } else {
+                    isMatch = can.status === statusKey;
+                }
 
-            if (!isMatch) return false;
+                if (!isMatch) return false;
 
-            if (dateRange && dateRange[0] && dateRange[1]) {
-                const createdAt = dayjs(can.createdAt);
-                if (!createdAt.isBetween(dateRange[0].startOf('day'), dateRange[1].endOf('day'), null, '[]')) {
+                if (dateRange && dateRange[0] && dateRange[1]) {
+                    const createdAt = dayjs(can.createdAt);
+                    if (
+                        !createdAt.isBetween(
+                            dateRange[0].startOf('day'),
+                            dateRange[1].endOf('day'),
+                            null,
+                            '[]'
+                        )
+                    ) {
+                        return false;
+                    }
+                }
+
+                if (
+                    searchValue &&
+                    !(
+                        can.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+                        can.technology.toLowerCase().includes(searchValue.toLowerCase())
+                    )
+                ) {
                     return false;
                 }
-            }
 
-            if (searchValue && !(
-                can.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-                can.technology.toLowerCase().includes(searchValue.toLowerCase())
-            )) {
-                return false;
-            }
-            return true;
-        }) || [];
-    }
-        , [candidate, dateRange, searchText]);
+                return true;
+            })
+                // Sort from most recent to oldest based on createdAt
+                ?.sort((a, b) => dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf())
+            || []
+        );
+    }, [candidate, dateRange, searchText]);
+
 
     const getProgressBadge = (can: any, statusKey: string) => {
         const currentStatus = statusKey === 'interviewing' ? can.status : statusKey;
@@ -163,7 +179,10 @@ const ListOfCandidatesWithStatus: React.FC<Props> = ({
                                                                     group.key === 'assessment' && (
                                                                         filteredAssessmentsByCandidate(item?._id).length > 0 ? (
                                                                             filteredAssessmentsByCandidate(item?._id)?.map((assessment, index) => (
-                                                                                <span key={index} className="capitalize text-sm">  Status: {assessment.status}</span>
+                                                                                <div key={index}>
+                                                                                    <span key={index} className="capitalize text-sm">  Status: {assessment.status}</span>
+                                                                                    <p className='capitalize'> {dayjs(assessment.createdAt).format('MMM D, YYYY')}, {dayjs(assessment.createdAt).format('HH:mm')}</p>
+                                                                                </div>
                                                                             ))
                                                                         ) : (
                                                                             <p className="capitalize text-sm"> No Assessment Scheduled</p>
@@ -178,6 +197,7 @@ const ListOfCandidatesWithStatus: React.FC<Props> = ({
                                                                             <Fragment key={index}>
                                                                                 <p className='capitalize'>Round: {interview.InterviewRound} Interview</p>
                                                                                 <span className="capitalize text-sm"> Status: {interview.status}</span>
+                                                                                <p className='capitalize'> {dayjs(interview.createdAt).format('MMM D, YYYY')}, {dayjs(interview.createdAt).format('HH:mm')}</p>
                                                                             </Fragment>
 
                                                                         ))
@@ -190,13 +210,23 @@ const ListOfCandidatesWithStatus: React.FC<Props> = ({
                                                                 {group.key === 'offered' && (
                                                                     filteredOffersByCandidate(item?._id).length > 0 ? (
                                                                         filteredOffersByCandidate(item?._id)?.map((offer, index) => (
-                                                                            <span key={index} className="capitalize text-sm">  Status: {offer.status}</span>
+                                                                            <Fragment key={index}>
+                                                                                <span key={index} className="capitalize text-sm">  Status: {offer.status}</span>
+                                                                                <p className='capitalize'> {dayjs(offer.createdAt).format('MMM D, YYYY')}, {dayjs(offer.createdAt).format('HH:mm')}</p>
+                                                                            </Fragment>
                                                                         ))
                                                                     ) : (
                                                                         <p className="capitalize text-sm"> No Offer Sent</p>
                                                                     )
                                                                 )}
-
+                                                                {
+                                                                    group.key === 'hired' && (
+                                                                        <p className='capitalize' key={item._id}> {dayjs(item.createdAt).format('MMM D, YYYY')}, {dayjs(item.createdAt).format('HH:mm')}</p>
+                                                                    )
+                                                                }
+                                                                {group.key === 'rejected' && (
+                                                                    <p className='capitalize' key={item._id}> {dayjs(item.createdAt).format('MMM D, YYYY')}, {dayjs(item.createdAt).format('HH:mm')}</p>
+                                                                )}
                                                                 <div>{getProgressBadge(item, group.key)}</div>
                                                             </div>
                                                         }

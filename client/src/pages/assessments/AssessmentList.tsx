@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardCheck, Search, Pencil, Trash2 } from 'lucide-react';
 import { AssessmentDataResponse } from '../../types';
@@ -11,6 +11,7 @@ import { makeCapitilized } from '../../utils/TextAlter';
 import PrimaryButton from '../../component/ui/button/Primary';
 import ExportButton from '../../component/common/Export';
 import { useDeleteAssessmentMutation } from '../../services/assessmentServiceApi';
+import dayjs from 'dayjs';
 
 const AssessmentList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,11 +23,18 @@ const AssessmentList: React.FC = () => {
   const { assessments } = useAppSelector((state) => state.assessments);
   const [deleteAssessment, { isLoading: deleteLoading }] = useDeleteAssessmentMutation();
 
-  const filteredAssessments: AssessmentDataResponse[] = assessments?.filter(assessment => {
-    const matchesSearch = assessment.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = typeFilter === '' || assessment.type === typeFilter;
-    return matchesSearch && matchesType;
-  });
+  const filteredAssessments: AssessmentDataResponse[] = useMemo(() => {
+    return (
+      assessments
+        ?.filter((assessment) => {
+          const matchesSearch = assessment?.title.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesType = typeFilter === '' || assessment?.type === typeFilter;
+          return matchesSearch && matchesType;
+        })
+        .sort((a, b) => dayjs(b?.createdAt).valueOf() - dayjs(a?.createdAt).valueOf()) || []
+    );
+  }, [assessments, searchTerm, typeFilter]);
+
 
 
   const handleEditAssessment = (id: string) => {

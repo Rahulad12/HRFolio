@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions, Skeleton, message } from 'antd';
+import { Steps, notification, Row, Col, Card, Button, Typography, Select, Descriptions, Skeleton, message, Modal } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetCandidateByIdQuery, useRejectCandidateMutation, useChangeCandidateStageMutation } from '../../services/candidateServiceApi';
 import { candidateFormData } from '../../types/index';
@@ -164,34 +164,42 @@ const CandidateDetails: React.FC = () => {
     }
   };
 
-  const rejectCandidateHandler = async () => {
-    try {
-      if (!id) return
-      const res = await rejectCandidate(id).unwrap();
-      if (res.success) {
-        api.success({
-          message: res?.message,
-          placement: "topRight",
-          duration: 3,
-          pauseOnHover: true,
-          showProgress: true
-        });
-      }
-    } catch (error: any) {
-      console.log(error);
-      api.error({
-        message: `Error updating candidate status: ${error?.data?.message}`,
-        placement: "topRight",
-        duration: 3,
-        pauseOnHover: true,
-        showProgress: true
+  const rejectCandidateHandler = () => {
+    Modal.confirm({
+      title: 'Are you sure you want to reject this candidate?',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          if (!id) return
+          const res = await rejectCandidate(id).unwrap();
+          if (res.success) {
+            api.success({
+              message: res?.message,
+              placement: "topRight",
+              duration: 3,
+              pauseOnHover: true,
+              showProgress: true
+            });
+          }
+        } catch (error: any) {
+          console.log(error);
+          api.error({
+            message: `Error updating candidate status: ${error?.data?.message}`,
+            placement: "topRight",
+            duration: 3,
+            pauseOnHover: true,
+            showProgress: true
 
-      })
-    } finally {
-      if (id) {
-        navigate(`/dashboard/candidates/${id}`);
+          })
+        } finally {
+          if (id) {
+            navigate(`/dashboard/candidates/${id}`);
+          }
+        }
       }
-    }
+    })
+
   }
 
   const currentStep = StatusFlow.indexOf(candidate.status);

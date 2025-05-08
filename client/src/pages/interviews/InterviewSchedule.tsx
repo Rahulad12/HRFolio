@@ -147,11 +147,11 @@ const InterviewSchedule: React.FC = () => {
               rules={[{ required: true, message: 'Interviewer is required' }]}
             >
               <Select placeholder="Select Interviewer" aria-label="Interviewer selection"
-              options={interviewers?.data?.map((i) => ({ value: i._id, label: i.name }))}
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
-              showSearch
+                options={interviewers?.data?.map((i) => ({ value: i._id, label: i.name }))}
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                showSearch
               >
               </Select>
             </Form.Item>
@@ -171,7 +171,13 @@ const InterviewSchedule: React.FC = () => {
                 }
               ]}
             >
-              <DatePicker className="w-full" aria-label="Select interview date" />
+              <DatePicker className="w-full" aria-label="Select interview date"
+                disabledDate={
+                  (current) => {
+                    return current && current < dayjs().startOf('day');
+                  }
+                }
+              />
             </Form.Item>
 
             <Form.Item
@@ -191,10 +197,23 @@ const InterviewSchedule: React.FC = () => {
               ]}
             >
               <TimePicker
-                format="h:mm A"
+                use12Hours
                 showNow={false}
                 className="w-full"
                 aria-label="Select interview time"
+                disabledTime={() => {
+                  const now = dayjs();
+                  return {
+                    disabledHours: () =>
+                      Array.from({ length: 24 }, (_, i) => i).filter((hour) => hour < now.hour()),
+                    disabledMinutes: (selectedHour) => {
+                      if (selectedHour === now.hour()) {
+                        return Array.from({ length: 60 }, (_, i) => i).filter((minute) => minute < now.minute());
+                      }
+                      return [];
+                    },
+                  };
+                }}
               />
             </Form.Item>
 

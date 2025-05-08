@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {  useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, MinusCircle, PlusCircle, X } from 'lucide-react';
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Form, Input, InputNumber, message, Row, Select, Typography, Upload, Card } from 'antd';
@@ -224,6 +224,7 @@ const CandidateForm: React.FC = () => {
                   size="large"
                   className="w-full"
                   placeholder="Expected salary"
+
                   formatter={(value) =>
                     `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
@@ -244,6 +245,11 @@ const CandidateForm: React.FC = () => {
                   placeholder="Applied date"
                   className="w-full"
                   style={{ width: '100%' }}
+                  disabledDate={
+                    (current) => {
+                      return current && current < dayjs().startOf('day');
+                    }
+                  }
                 />
               </Form.Item>
             </Col>

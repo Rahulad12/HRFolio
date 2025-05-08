@@ -1,4 +1,4 @@
-import React,{ useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
@@ -205,7 +205,9 @@ const OfferForm: React.FC = () => {
                     return Promise.resolve();
                   }
                 }]}>
-                  <DatePicker className="w-full" />
+                  <DatePicker className="w-full"
+                    disabledDate={(current) => current && current < dayjs().startOf('day')}
+                  />
                 </Form.Item>
               </Col>
 
@@ -219,7 +221,7 @@ const OfferForm: React.FC = () => {
                     return Promise.resolve();
                   }
                 }]}>
-                  <DatePicker className="w-full" />
+                  <DatePicker className="w-full" disabledDate={(current) => current && current < dayjs().startOf('day')} />
                 </Form.Item>
               </Col>
             </Row>

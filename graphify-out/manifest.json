@@ -27,6 +27,118 @@
     "mtime": 1780111914.9487135,
     "hash": "09a0ef429d6a398b25234b75681dc215"
   },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/offers/page.tsx": {
+    "mtime": 1780123565.2154515,
+    "hash": "8d499e5cb6130aa868bc6f7e841ff14c"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/offers/index.ts": {
+    "mtime": 1780123566.85201,
+    "hash": "1f97932415b97c6b51097345df0e4e1b"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/offers/types/offer.types.ts": {
+    "mtime": 1780123565.125014,
+    "hash": "e0993b3c17c4917b89d9dd97623b417d"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/offers/lib/api/offer.api.ts": {
+    "mtime": 1780123565.125014,
+    "hash": "60bdaf0b1c25c50542d6b2e1d8f6420f"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/offers/lib/queries/offer.queries.ts": {
+    "mtime": 1780123565.126014,
+    "hash": "77d8669e42007918fa1d91e3cbbe7695"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/offers/routes/offer.routes.tsx": {
+    "mtime": 1780123565.8820124,
+    "hash": "9b59a3d448dd647208950d0448f96e87"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/assessments/page.tsx": {
+    "mtime": 1780123555.998035,
+    "hash": "ca2f24a6289ec132de57c62014fd8ccd"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/assessments/index.ts": {
+    "mtime": 1780123557.737031,
+    "hash": "7bf2224948cf144cd9abd676df33b99e"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/assessments/types/assessment.types.ts": {
+    "mtime": 1780123554.0024886,
+    "hash": "b35d005e45dc22a023c150496e4263f4"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/assessments/lib/api/assessment.api.ts": {
+    "mtime": 1780123554.0024886,
+    "hash": "e29b913d1f286e421721d80eeb152a47"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/assessments/lib/queries/assessment.queries.ts": {
+    "mtime": 1780123555.489036,
+    "hash": "bf18ca39984aa604bcc4f244d021b91e"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/assessments/routes/assessment.routes.tsx": {
+    "mtime": 1780123556.924033,
+    "hash": "d74bb201a612fe26e4c8c4558024526a"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/dashboard/page.tsx": {
+    "mtime": 1780123583.0699728,
+    "hash": "c24457afbef1764c85205e3ac77e114d"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/dashboard/index.ts": {
+    "mtime": 1780123583.070973,
+    "hash": "0239bddda50ec69980312efbf655e1c2"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/dashboard/routes/dashboard.routes.tsx": {
+    "mtime": 1780123583.070973,
+    "hash": "026839499c63a2fd239ab8c3e334402f"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/emails/page.tsx": {
+    "mtime": 1780123574.3898337,
+    "hash": "1413a014f3a6e41d820c6903356fc9e0"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/emails/index.ts": {
+    "mtime": 1780123575.7979896,
+    "hash": "feadc345c9ad39317cc4d8e4bb92455d"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/emails/types/email.types.ts": {
+    "mtime": 1780123574.3879929,
+    "hash": "92be9c781517a99d154cc52d9ab789fd"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/emails/lib/api/email.api.ts": {
+    "mtime": 1780123574.3879929,
+    "hash": "fc1016e4f72a2fbeed3f27359c172c34"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/emails/lib/queries/email.queries.ts": {
+    "mtime": 1780123574.3895266,
+    "hash": "4f9ee1d161356bb837ac6edf141e99da"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/emails/routes/email.routes.tsx": {
+    "mtime": 1780123575.2869906,
+    "hash": "c01b696c6e963b3b42c01ce0601abd56"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/candidates/page.tsx": {
+    "mtime": 1780123535.6740818,
+    "hash": "ee28a704392a4aac736d85f4feeb29cd"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/candidates/index.ts": {
+    "mtime": 1780123535.6758304,
+    "hash": "e8c035a1af36185513c8d8c890cd6ffa"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/candidates/types/candidate.types.ts": {
+    "mtime": 1780123524.9600124,
+    "hash": "a97a4950217917d5cdb3cfbb909d741b"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/candidates/schemas/candidate.schema.ts": {
+    "mtime": 1780123524.9600124,
+    "hash": "964cfce317ee39f33f9275da96369102"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/candidates/lib/api/candidate.api.ts": {
+    "mtime": 1780123526.1511035,
+    "hash": "225e3238f839c01fa187cf90a86c1265"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/candidates/lib/queries/candidate.queries.ts": {
+    "mtime": 1780123528.4090984,
+    "hash": "d73c27d05aa9ecea952d09692507cebb"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/candidates/routes/candidate.routes.tsx": {
+    "mtime": 1780123535.6750817,
+    "hash": "6e1091472fd9567ac2244ef8b8d48d5d"
+  },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/page.tsx": {
     "mtime": 1780123451.0982761,
     "hash": "7bea9267d8d47be495134e0a8dc0f3b7"
@@ -66,6 +178,42 @@
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/routes/auth.routes.tsx": {
     "mtime": 1780123460.0852554,
     "hash": "2d2c4b669745a42c007c303ddb0d7904"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/interviews/page.tsx": {
+    "mtime": 1780123544.696061,
+    "hash": "939e6551a6ebe6d1fdbcc6eceea570da"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/interviews/index.ts": {
+    "mtime": 1780123546.2010574,
+    "hash": "ed417adc9db4b62b61ae6cc4226e0600"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/interviews/types/interview.types.ts": {
+    "mtime": 1780123542.7640655,
+    "hash": "aa54b44934cec655f50c8f55ac6cc737"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/interviews/lib/api/interview.api.ts": {
+    "mtime": 1780123542.7670655,
+    "hash": "69ae1faa40a344fa5fb91ffa6d496d17"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/interviews/lib/queries/interview.queries.ts": {
+    "mtime": 1780123544.320062,
+    "hash": "8e19acefc277d28659db3825ad7041b1"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/interviews/routes/interview.routes.tsx": {
+    "mtime": 1780123545.4650593,
+    "hash": "125e79dffe5ce4953235cbda9e15b101"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/landing/page.tsx": {
+    "mtime": 1780123583.070973,
+    "hash": "24c7fbe68fc81e8853e3cc678562aa04"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/landing/index.ts": {
+    "mtime": 1780123583.0723178,
+    "hash": "017c8edd02d9d4bf9dc07e01b0acbb48"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/landing/routes/landing.routes.tsx": {
+    "mtime": 1780123583.070973,
+    "hash": "3a21e80a54d6900fb5805c6f26ee8048"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/Hooks/useDebounce.ts": {
     "mtime": 1780111914.9466748,

@@ -1,19 +1,19 @@
 {
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/vite.config.ts": {
-    "mtime": 1780123304.2166135,
-    "hash": "e689f99abaa37f19a81c19d7e0c2a872"
+    "mtime": 1780123947.1041365,
+    "hash": "7e1406ac0045d7ee013540b9d1cf4958"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/eslint.config.js": {
     "mtime": 1780111914.9387693,
     "hash": "2683e26e70707841590ff4ad24253919"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/App.tsx": {
-    "mtime": 1780111914.9451022,
-    "hash": "74b3a50c0af5b637d83b1006b6e20388"
+    "mtime": 1780123701.3057013,
+    "hash": "f5eb526598fb5a979283389df66a7af4"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/main.tsx": {
-    "mtime": 1780111914.9488616,
-    "hash": "e33be141c2785bd9ea065b74591722ef"
+    "mtime": 1780123715.2116692,
+    "hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/vite-env.d.ts": {
     "mtime": 1780111914.9517975,
@@ -140,8 +140,8 @@
     "hash": "6e1091472fd9567ac2244ef8b8d48d5d"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/page.tsx": {
-    "mtime": 1780123451.0982761,
-    "hash": "7bea9267d8d47be495134e0a8dc0f3b7"
+    "mtime": 1780124031.8129418,
+    "hash": "3e307575b187eecdfa06c1f58ceaa7b7"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/index.ts": {
     "mtime": 1780123463.0892484,
@@ -160,24 +160,24 @@
     "hash": "94d6fec69ca0812549ec658fd1a274e0"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/lib/api/auth.api.ts": {
-    "mtime": 1780123437.3863075,
-    "hash": "c07ed4a8c134ea75eb18e9376bbbf519"
+    "mtime": 1780123760.9185643,
+    "hash": "7a2f68c48d1b1211d150b79e8b166567"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/lib/queries/auth.queries.ts": {
-    "mtime": 1780123438.509305,
-    "hash": "cb560b82ea86d51c50f231d775346021"
+    "mtime": 1780123760.9185643,
+    "hash": "b57277c186da747e249f364beb47246a"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/components/GoogleLoginButton.tsx": {
     "mtime": 1780123457.231262,
     "hash": "82e5787c61242161530298beb7a60e25"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/components/WelcomeBackCard.tsx": {
-    "mtime": 1780123459.2492573,
-    "hash": "61eba6cedc78b5bd6d7010b499c77804"
+    "mtime": 1780123800.7614727,
+    "hash": "763f0cfa78ef8a8487d996f8bef401c6"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/auth/routes/auth.routes.tsx": {
-    "mtime": 1780123460.0852554,
-    "hash": "2d2c4b669745a42c007c303ddb0d7904"
+    "mtime": 1780123828.843408,
+    "hash": "96600857da41ddfc555a9fc554e11187"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/modules/interviews/page.tsx": {
     "mtime": 1780123544.696061,
@@ -288,12 +288,12 @@
     "hash": "8d629c4f46f5dabed673b72a7847164b"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/shared/components/DashboardLayout.tsx": {
-    "mtime": 1780123622.45596,
-    "hash": "ac98e641ffb8d4977cafb6570d42bc1d"
+    "mtime": 1780123871.2363107,
+    "hash": "595d83155c6a06911191a04f4cd663ca"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/shared/components/DashboardHeader.tsx": {
-    "mtime": 1780123623.2468805,
-    "hash": "f4481cf6b066da4d8c4b5db23619bcf3"
+    "mtime": 1780123982.7200546,
+    "hash": "99a32d85e32f048232e8627c246846f6"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/shared/components/PageLoader.tsx": {
     "mtime": 1780123622.4556494,
@@ -320,8 +320,8 @@
     "hash": "d2a9c2f42bc1edb59f0a4954d9cbd12d"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/shared/hooks/useAuth.ts": {
-    "mtime": 1780123448.095283,
-    "hash": "214c9f1373b987a313e011f7cb6a4aed"
+    "mtime": 1780123787.0235043,
+    "hash": "5e0c45d14979bf3fdfdae378f13b5a1c"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/services/authServiceApi.ts": {
     "mtime": 1780111914.9513936,
@@ -650,6 +650,10 @@
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/routes/Protected.tsx": {
     "mtime": 1780111914.9512634,
     "hash": "42991b6d3190d0721a66c653cd64a841"
+  },
+  "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/routes/index.tsx": {
+    "mtime": 1780123688.1407313,
+    "hash": "c3cea311dd853e07bad734e72588e59c"
   },
   "/home/rahul-adhikari/code/own-projects/HRFolio/client/src/routes/MainRoutes.tsx": {
     "mtime": 1780111914.9511611,

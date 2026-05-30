@@ -1,13 +1,15 @@
 import { Link, useLocation, useNavigate } from 'react-router'
 import { Layout, Menu } from 'antd'
-import { Users, UserPlus, UserRound, LayoutDashboard, CalendarClock, InboxIcon, FileSignature } from 'lucide-react'
+import { Users, UserPlus, UserRound, LayoutDashboard, CalendarClock, InboxIcon, FileSignature, ShieldCheck, ClipboardList, AlertCircle } from 'lucide-react'
 import { useSidebarStore } from '@/shared/store/sidebar.store'
+import { useAuth } from '@/shared/hooks/useAuth'
 
 const { Sider } = Layout
 
 export function DashboardSidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const collapsed = useSidebarStore((s) => s.collapsed)
   const toggle = useSidebarStore((s) => s.toggle)
   const currentPath = location.pathname
@@ -58,6 +60,27 @@ export function DashboardSidebar() {
       icon: <InboxIcon size={20} />,
       label: <Link to="/dashboard/email-templates">Email Templates</Link>,
     },
+    {
+      key: '/dashboard/escalations',
+      icon: <AlertCircle size={20} />,
+      label: <Link to="/dashboard/escalations">Escalations</Link>,
+    },
+    // Admin only
+    ...(user?.role === 'Admin' ? [
+      {
+        key: '/dashboard/user-management',
+        icon: <ShieldCheck size={20} />,
+        label: <Link to="/dashboard/user-management">User Management</Link>,
+      },
+    ] : []),
+    // Admin + HR Admin
+    ...(user?.role === 'Admin' || user?.role === 'HR Admin' ? [
+      {
+        key: '/dashboard/audit-logs',
+        icon: <ClipboardList size={20} />,
+        label: <Link to="/dashboard/audit-logs">Audit Logs</Link>,
+      },
+    ] : []),
   ]
 
   return (

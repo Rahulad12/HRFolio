@@ -9,6 +9,10 @@ import { interviewRoutes } from '@/modules/interviews'
 import { assessmentRoutes } from '@/modules/assessments'
 import { offerRoutes } from '@/modules/offers'
 import { emailRoutes } from '@/modules/emails'
+import { interviewerRoutes } from '@/modules/interviewers'
+import { userManagementRoutes } from '@/modules/user-management'
+import { auditLogRoutes } from '@/modules/audit-logs'
+import { escalationRoutes } from '@/modules/escalations'
 
 const LandingPage = lazy(() => import('@/modules/landing/page').then((m) => ({ default: m.LandingPage })))
 const LoginPage = lazy(() => import('@/modules/auth/page').then((m) => ({ default: m.LoginPage })))
@@ -29,6 +33,8 @@ const dashChildren: RouteObject[] = [
   ...assessmentRoutes,
   ...offerRoutes,
   ...emailRoutes,
+  ...interviewerRoutes,
+  ...escalationRoutes,
   { path: '*', element: lazyRoute(NotFound) },
 ]
 
@@ -43,7 +49,17 @@ export const router = createBrowserRouter([
         children: [
           {
             element: <DashboardLayout />,
-            children: dashChildren,
+            children: [
+              ...dashChildren,
+              {
+                element: <ProtectedRoute allowedRoles={['Admin']} />,
+                children: [...userManagementRoutes],
+              },
+              {
+                element: <ProtectedRoute allowedRoles={['Admin', 'HR Admin']} />,
+                children: [...auditLogRoutes],
+              },
+            ],
           },
         ],
       },

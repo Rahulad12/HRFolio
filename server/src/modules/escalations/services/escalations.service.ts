@@ -11,10 +11,22 @@ export class EscalationService {
   async raiseLevel1(actor: any, dto: IEscalationRequestDTO): Promise<IEscalationResponseDTO> {
     const candidate = await Candidate.findById(dto.candidateId);
     if (!candidate) throw new Error("Candidate not found");
-    
+
     // Ownership check (only owner can raise escalation)
     if (candidate.createdBy?.toString() !== actor.id) {
       throw new Error("Only the candidate owner can raise an escalation");
+    }
+
+    // Duplicate guard: one active escalation per (candidate, targetHRAdmin) pair
+    const existing = await Escalation.findOne({
+      candidateId: dto.candidateId,
+      assignedTo: dto.targetUserId,
+      status: { $in: ['Pending', 'In Review'] },
+    });
+    if (existing) {
+      throw new Error(
+        "An active escalation already exists for this candidate with the selected HR Admin"
+      );
     }
 
     const targetUser = await User.findById(dto.targetUserId);

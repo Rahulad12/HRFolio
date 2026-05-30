@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router'
 import { Layout as AntLayout, theme as antTheme } from 'antd'
 import { useThemeStore } from '@/shared/store/theme.store'
-import { useSidebarStore } from '@/shared/store/sidebar.store'
 import { DashboardSidebar } from './DashboardSidebar'
 import { DashboardHeader } from './DashboardHeader'
 
@@ -9,7 +8,6 @@ const { Content } = AntLayout
 
 export function DashboardLayout() {
   const mode = useThemeStore((s) => s.mode)
-  const collapsed = useSidebarStore((s) => s.collapsed)
   const { token } = antTheme.useToken()
 
   return (

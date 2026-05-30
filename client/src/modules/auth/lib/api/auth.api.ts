@@ -1,5 +1,5 @@
 import { GET, POST } from '@/shared/lib/axios'
-import type { GoogleLoginPayload, AuthResponse } from '../types/auth.types'
+import type { GoogleLoginPayload, AuthResponse } from '../../types/auth.types'
 import { AUTH_URL } from '@/shared/constants/api'
 
 export async function googleLogin(payload: GoogleLoginPayload): Promise<AuthResponse> {

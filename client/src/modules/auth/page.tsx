@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/shared/hooks/useAuth'
-import GoogleLoginButton from './components/GoogleLoginButton'
-import WelcomeBackCard from './components/WelcomeBackCard'
+import { GoogleLoginButton } from './components/GoogleLoginButton'
+import { WelcomeBackCard } from './components/WelcomeBackCard'
 import { Divider, Typography } from 'antd'
+import AuthLayout from '../../component/auth/AuthLayout'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -39,38 +40,43 @@ export function LoginPage() {
   const shouldShowWelcomeBack = localStorage.getItem('googleLogin') === 'true'
 
   return (
-    <div className="w-full space-y-6">
-      <div className="space-y-4">
-        {shouldShowWelcomeBack ? (
-          <WelcomeBackCard submitHandler={submitHandler} loading={isLoading} />
-        ) : (
-          <GoogleLoginButton onClick={submitHandler} loading={isLoading} />
-        )}
+    <AuthLayout
+      title={shouldShowWelcomeBack ? 'Welcome Back' : 'Welcome'}
+      subtitle="Sign in to access your HR dashboard"
+    >
+      <div className="w-full space-y-6">
+        <div className="space-y-4">
+          {shouldShowWelcomeBack ? (
+            <WelcomeBackCard submitHandler={submitHandler} loading={isLoading} />
+          ) : (
+            <GoogleLoginButton onClick={submitHandler} loading={isLoading} />
+          )}
+        </div>
+
+        <Divider className="text-neutral-400">
+          <span className="text-xs uppercase tracking-wider">Secure Sign-In</span>
+        </Divider>
+
+        <div className="text-center text-sm text-neutral-400 space-y-4">
+          <Typography.Text>
+            By signing in, you agree to HRfolio's
+            <a href="#" className="mx-1">
+              <Typography.Text strong>Terms of Service</Typography.Text>
+            </a>
+            and
+            <a href="#" className="mx-1">
+              <Typography.Text strong>Privacy Policy</Typography.Text>
+            </a>
+          </Typography.Text>
+
+          <Typography.Text>
+            Need assistance?{' '}
+            <a href="#" className="text-primary-500 hover:text-primary-600">
+              <Typography.Text strong>Contact Support</Typography.Text>
+            </a>
+          </Typography.Text>
+        </div>
       </div>
-
-      <Divider className="text-neutral-400">
-        <span className="text-xs uppercase tracking-wider">Secure Sign-In</span>
-      </Divider>
-
-      <div className="text-center text-sm text-neutral-400 space-y-4">
-        <Typography.Text>
-          By signing in, you agree to HRfolio's
-          <a href="#" className="mx-1">
-            <Typography.Text strong>Terms of Service</Typography.Text>
-          </a>
-          and
-          <a href="#" className="mx-1">
-            <Typography.Text strong>Privacy Policy</Typography.Text>
-          </a>
-        </Typography.Text>
-
-        <Typography.Text>
-          Need assistance?{' '}
-          <a href="#" className="text-primary-500 hover:text-primary-600">
-            <Typography.Text strong>Contact Support</Typography.Text>
-          </a>
-        </Typography.Text>
-      </div>
-    </div>
+    </AuthLayout>
   )
 }

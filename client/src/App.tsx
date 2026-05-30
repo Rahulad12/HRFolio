@@ -1,27 +1,23 @@
-import MainRoutes from "./routes/MainRoutes";
-import { ConfigProvider, App as AntApp, theme } from 'antd';
-import { useAppDispatch, useAppSelector } from "./Hooks/hook";
-import { setThemeMode } from "./slices/themeSlices";
-import { useEffect } from "react";
+import { useEffect } from 'react'
+import { RouterProvider } from 'react-router'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ConfigProvider, App as AntApp, theme } from 'antd'
+import { queryClient } from '@/shared/lib/query-client'
+import { AuthProvider } from '@/modules/auth'
+import { useThemeStore } from '@/shared/store/theme.store'
+import { router } from './routes'
 
-const App = () => {
-  const dispatch = useAppDispatch();
-  const { mode } = useAppSelector(state => state.theme);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('themeMode');
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      dispatch(setThemeMode(savedTheme));
-    }
-  }, [dispatch]);
+function AppContent() {
+  const mode = useThemeStore((s) => s.mode)
 
   useEffect(() => {
     if (mode === 'dark') {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add('dark')
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('dark')
     }
-  }, [mode]);
+  }, [mode])
 
   const antTheme = {
     token: {
@@ -41,15 +37,24 @@ const App = () => {
       },
     },
     algorithm: mode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
-  };
+  }
 
   return (
     <ConfigProvider theme={antTheme}>
       <AntApp>
-        <MainRoutes />
+        <RouterProvider router={router} />
       </AntApp>
     </ConfigProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  )
+}

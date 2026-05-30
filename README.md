@@ -1,4 +1,4 @@
-# 📄 CV Manager
+# 📄 Hirgin ManagerHr
 CV Manager is a modern web application built to help organizations manage candidate CVs efficiently. It allows users to upload, view, and manage candidate information in a centralized and streamlined manner.
 
 # 🚀 Features
@@ -24,7 +24,7 @@ CV Manager is a modern web application built to help organizations manage candid
 **Developed by Rahul Adhikari**
 
 # copyright
-© 2025 Rahul Adhikari
+© 2026 Rahul Adhikari
 
 # Developer Profile 
 <a href="https://www.adhikarirahul.com.np/">My Portfolio</a>

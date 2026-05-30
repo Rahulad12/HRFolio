@@ -6,12 +6,12 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon index.js",
+    "dev": "nodemon index.js",
     "start": "node index.js",
     "data:seed": "node data/Seeder.js seed",
     "data:destroy": "node data/Seeder.js destroy"
   },
-  "author": "",
+  "author": "Rahul Adhikari",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",

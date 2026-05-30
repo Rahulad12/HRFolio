@@ -1,5 +1,5 @@
 import { Avatar, Button } from 'antd'
-import { makeCapitilized } from '../../../utils/TextAlter'
+import { makeCapitilized } from '@/shared/utils/string'
 
 interface Props {
   submitHandler: () => void

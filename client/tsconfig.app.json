@@ -26,5 +26,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "depreceate/InterviewList.tsx"]
+  "include": ["src"]
 }

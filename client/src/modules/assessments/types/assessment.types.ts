@@ -1,4 +1,4 @@
-export type AssessmentType = 'behavioural' | 'technical'
+export type AssessmentType = 'mcq' | 'coding' | 'assignment' | 'quiz'
 
 export interface Assessment {
   _id: string
@@ -56,4 +56,38 @@ export interface AssignmentFormData {
   assessment: string
   dueDate: string
   emailTemplate: string
+}
+
+export interface AssignmentScoreFormData {
+  score: number
+  note: string
+  candidate: string
+  assessment: string
+}
+
+export interface EmailTemplate {
+  _id: string
+  name: string
+  type: string
+  body: string
+}
+
+export interface EmailTemplateListResponse {
+  success: boolean
+  message: string
+  data: EmailTemplate[]
+}
+
+export interface CandidateBasic {
+  _id: string
+  name: string
+  email: string
+  technology: string
+  level: string
+}
+
+export interface CandidateBasicListResponse {
+  success: boolean
+  message: string
+  data: CandidateBasic[]
 }

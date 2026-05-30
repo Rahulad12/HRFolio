@@ -1,7 +1,7 @@
 import { Escalation } from '../model/Escalation';
 import { IEscalationRequestDTO, IEscalationResolveDTO, IEscalationResponseDTO } from '../types/escalations.types';
-import Candidate from '../../legacy/model/Candidate.js';
-import User from '../../legacy/model/User.js';
+import Candidate from '../../../legacy/model/Candidate.js';
+import User from '../../../legacy/model/User.js';
 import { auditLogService } from '../../audit-logs/index.js';
 
 export class EscalationService {

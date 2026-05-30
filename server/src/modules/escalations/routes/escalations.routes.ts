@@ -1,7 +1,7 @@
 import express from 'express';
 import { escalationController } from '../controller/escalations.controller';
-import { authenticate } from '../../legacy/middleware/auhtMiddleware.js';
-import { authorize } from '../../shared/middleware/authorize';
+import { authenticate } from '../../../legacy/middleware/auhtMiddleware.js';
+import { authorize } from '../../../shared/middleware/authorize';
 
 const router = express.Router();
 

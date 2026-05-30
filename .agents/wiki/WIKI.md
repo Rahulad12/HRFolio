@@ -1,6 +1,6 @@
 # HRFolio / CV Manager — Project Wiki
 
-**Last updated:** 2026-05-30
+**Last updated:** 2026-05-30 (updated for server/src/ restructuring)
 **Author:** Rahul Adhikari
 **Repo:** https://github.com/Rahulad12/HRFolio
 **Confidence key:** [High] = read from source, [Medium] = inferred from patterns, [Low] = guess/assumption
@@ -58,7 +58,7 @@ User accounts created via Google OAuth on first login. [High] (server/config/pas
 ┌──────────────────────────────────────────────┐
 │ Express 5 API Server                         │
 │  authenticate → checkUserExist → controller  │
-│  → model/service → MongoDB                   │
+│  → service → model → MongoDB                 │
 │  Winston Logger (daily rotate)               │
 └──────────────┬───────────────────────────────┘
                │
@@ -120,32 +120,45 @@ HRFolio/
 │   ├── package.json
 │   └── tsconfig.json
 ├── server/                      Express / Node.js backend
-│   ├── config/
-│   │   ├── db.js                MongoDB connection (mongoose.connect)
-│   │   └── passport.js          Google OAuth strategy
-│   ├── controllers/
-│   │   ├── userController.js         Auth (login, callback, ban)
-│   │   ├── candidateController.js    Candidate CRUD + stage management
-│   │   ├── InterviewController.js    Interview CRUD + scheduling
-│   │   ├── interviewerController.js  Interviewer CRUD
-│   │   ├── assessmentController.js   Assessment CRUD + assign + score
-│   │   ├── offerController.js        Offer CRUD
-│   │   ├── emailController.js        Email template CRUD
-│   │   ├── GeneralEmailController.js Send general emails
-│   │   └── globalSearch.js           Full-text search on candidates
-│   ├── middleware/
-│   │   ├── auhtMiddleware.js         JWT verify + user existence check
-│   │   └── CandidateProgress.js      Stage progression gate (factory)
-│   ├── model/                    16 Mongoose model files
-│   ├── routes/                   11 route files
-│   ├── utils/
-│   │   └── logger.js             Winston logger (daily rotate)
-│   ├── Data/
-│   │   └── Seeder.js             Seed + destroy scripts
-│   ├── uploads/                  Uploaded resume files
-│   ├── logs/                     Winston log output (gitignored)
-│   ├── index.js                  Entry point (Express app)
-│   ├── upload.js                 Multer upload configuration
+│   ├── src/
+│   │   ├── index.ts                  Entry point (TypeScript — starts server)
+│   │   ├── app.ts                    Express app (mounts legacy + new modules)
+│   │   ├── legacy/                   Legacy JS code (migrated from root)
+│   │   │   ├── config/
+│   │   │   │   ├── db.js                MongoDB connection
+│   │   │   │   └── passport.js          Google OAuth strategy
+│   │   │   ├── controllers/
+│   │   │   │   ├── userController.js         Auth (login, callback, ban)
+│   │   │   │   ├── candidateController.js    Candidate CRUD + stage mgmt
+│   │   │   │   ├── InterviewController.js    Interview CRUD + scheduling
+│   │   │   │   ├── interviewerController.js  Interviewer CRUD
+│   │   │   │   ├── assessmentController.js   Assessment CRUD + assign + score
+│   │   │   │   ├── offerController.js        Offer CRUD
+│   │   │   │   ├── emailController.js        Email template CRUD
+│   │   │   │   ├── GeneralEmailController.js Send general emails
+│   │   │   │   └── globalSearch.js           Full-text search
+│   │   │   ├── middleware/
+│   │   │   │   ├── auhtMiddleware.js         JWT verify + user check
+│   │   │   │   └── CandidateProgress.js      Stage progression gate
+│   │   │   ├── model/                    16 Mongoose model files
+│   │   │   ├── routes/                   11 route files
+│   │   │   ├── utils/
+│   │   │   │   ├── logger.js             Winston logger (daily rotate)
+│   │   │   │   ├── upload.js             Multer upload configuration
+│   │   │   │   └── ...                   email, delete helpers
+│   │   │   ├── Data/
+│   │   │   │   └── Seeder.js             Seed + destroy scripts
+│   │   │   └── index.js                  Legacy sub-app (wrapped as Express app)
+│   │   └── modules/                  NEW TypeScript modules (empty scaffold)
+│   │       └── <module-name>/
+│   │           ├── index.ts
+│   │           ├── types/
+│   │           ├── routes/
+│   │           ├── controller/
+│   │           └── services/
+│   ├── uploads/                  Uploaded resume files (runtime)
+│   ├── logs/                     Winston log output (runtime, gitignored)
+│   ├── tsconfig.json             TypeScript config
 │   └── package.json
 ├── .agents/                      Agent workspace
 │   ├── context/                  Auto-generated codebase maps
@@ -276,7 +289,7 @@ HRFolio/
 - **API:**
   - `POST /api/uploads/resume` — upload resume file [High]
   - `GET /api/uploads/resume/:filename/download` — download resume [High]
-- **Storage:** Local filesystem (`server/uploads/`) [High]
+- **Storage:** Local filesystem (`server/uploads/`) — see `server/src/legacy/upload.js` [High]
 - **Note:** ⚠️ File uploads to local filesystem don't scale horizontally. If deployed to Render, uploaded files are lost on each deploy. [Medium]
 
 ---
@@ -639,7 +652,7 @@ cd server
 cp ../cv_manager.env .env    # ⚠️ contains live secrets — use your own
 npm install
 npm run data:seed
-npm run dev                  # nodemon index.js
+npm run dev                  # tsx watch src/index.ts
 
 # Client (separate terminal)
 cd client
@@ -652,8 +665,8 @@ npm run dev                  # vite
 ### Seed & Destroy
 ```bash
 cd server
-npm run data:seed      # node data/Seeder.js seed
-npm run data:destroy   # node data/Seeder.js destroy
+npm run data:seed      # node src/legacy/Data/Seeder.js seed
+npm run data:destroy   # node src/legacy/Data/Seeder.js destroy
 ```
 [High]
 
@@ -668,9 +681,10 @@ npm run data:destroy   # node data/Seeder.js destroy
 
 ### Backend — Render
 - Auto-deploys from GitHub [Medium]
-- Start command: `npm start` (node index.js) [High]
+- Build command: `npm run build` (tsc) [High]
+- Start command: `npm start` (node dist/index.js) [High]
 - All env vars from Section 10 must be configured in Render dashboard [Medium]
-- ⚠️ Uploaded resumes stored on local filesystem — lost on redeploy. Render uses ephemeral storage. [High] (server/upload.js)
+- ⚠️ Uploaded resumes stored on local filesystem — lost on redeploy. Render uses ephemeral storage. [High] (server/src/legacy/upload.js)
 
 ---
 
@@ -798,7 +812,7 @@ npm run data:destroy   # node data/Seeder.js destroy
 | 2 | ⚠️ **Live secrets in env file committed to repo** | Critical | cv_manager.env | Contains DB URI, JWT secret, OAuth credentials [High] |
 | 3 | ⚠️ **`.catch(err => console.log(err))` patterns** | Medium | Multiple controllers | Grep shows many `.catch` blocks with only console.log [High] |
 | 4 | ⚠️ **Catch-all `*` routes returning component instead of 404** | Medium | client/src/routes/Protected.tsx, Public.tsx | `path: "*"` renders `<NotFound />` but server may still get invoked [High] |
-| 5 | ⚠️ **Server is plain JavaScript (`.js`), not TypeScript** | Medium | server/ | No TypeScript checking — `any`-style patterns throughout [High] |
+| 5 | ⚠️ **Server is plain JavaScript (`.js`), not TypeScript** | Medium | server/src/legacy/ | Legacy files are `.js` — new modules should be `.ts`. tsconfig.json + tsx added [High] |
 | 6 | ⚠️ **Filename typo: `ScoreModle.js`** | Low | server/model/ScoreModle.js | Should be `ScoreModel.js` [High] |
 | 7 | ⚠️ **Filename typo: `auhtMiddleware.js`** | Low | server/middleware/auhtMiddleware.js | Should be `authMiddleware.js` [High] |
 | 8 | ⚠️ **No request validation middleware on most endpoints** | Medium | server/controllers/ | `express-validator` is a dependency but not consistently used [Medium] |
@@ -848,3 +862,4 @@ These require human input to resolve:
 | Date | Author | Description |
 |---|---|---|
 | 2026-05-30 | Rahul Adhikari | Initial wiki — full project analysis across 17 sections |
+| 2026-05-30 | Rahul Adhikari | Restructured server/ into src/ — legacy code → src/legacy/, new TS modules → src/modules/, added app.ts + index.ts + tsconfig.json |

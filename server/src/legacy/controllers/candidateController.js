@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { sendCandidateEmail } from "../utils/sendCandidateEmailHelper.js";
 import { updateCandidateStage, canMoveToStage } from "../utils/updateCandidateStage.js";
 import deleteAllRelatedDocs from "../utils/DeleteAllRelatedDocs.js";
+import { auditLogService } from "../../modules/audit-logs/index.js";
 /**
  * Creates a new candidate and associated references.
  * Returns a 400 status code if the candidate could not be created or if the
@@ -61,7 +62,8 @@ const createCandidate = async (req, res) => {
         const newCandidate = new Candidate({
             name, email, phone,
             technology, level, experience,
-            expectedsalary, applieddate, resume, references
+            expectedsalary, applieddate, resume, references,
+            createdBy: req.user.id
         })
 
         if (!newCandidate) {
@@ -71,6 +73,13 @@ const createCandidate = async (req, res) => {
             });
         }
         const savedCandidate = await newCandidate.save();
+
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_CREATE',
+            target: { id: savedCandidate._id, type: 'candidates', name: savedCandidate.name },
+            metadata: { after: savedCandidate }
+        });
 
         // Step 2: Create references and associate with candidate
         // if (references) {
@@ -136,6 +145,11 @@ const getCandidateById = async (req, res) => {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
 
+        // Enforce ownership for HR users
+        if (req.user.role === "HR" && candidate.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden: You do not have permission to access this candidate" });
+        }
+
         res.status(200).json({
             success: true,
             message: "Candidate fetched successfully",
@@ -160,6 +174,11 @@ const getAllCandidates = async (req, res) => {
 
     try {
         const query = {};
+
+        // Enforce ownership for HR users
+        if (req.user.role === "HR") {
+            query.createdBy = req.user.id;
+        }
 
         if (searchText) {
             query.$or = [
@@ -225,19 +244,31 @@ const deleteCandidates = async (req, res) => {
             return res.status(400).json({ success: false, message: "No candidate IDs provided" });
         }
 
+        const query = { _id: { $in: candidateIds } };
+
+        // Enforce ownership for HR users
+        if (req.user.role === "HR") {
+            query.createdBy = req.user.id;
+        }
+
         // Find all candidates with the given IDs and delete them
-        const candidates = await Candidate.find({
-            _id: { $in: candidateIds }
-        });
+        const candidates = await Candidate.find(query);
 
 
         if (candidates.length === 0) {
-            return res.status(404).json({ success: false, message: "No candidates found with the provided IDs" });
+            return res.status(404).json({ success: false, message: "No eligible candidates found for deletion" });
         }
 
         // Loop through each candidate and perform deletion
         for (let candidate of candidates) {
             await Candidate.findByIdAndDelete(candidate._id);
+
+            await auditLogService.log({
+                actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+                action: 'CANDIDATE_DELETE',
+                target: { id: candidate._id, type: 'candidates', name: candidate.name },
+                metadata: { before: candidate }
+            });
 
             // Create a log entry for the deleted candidate
             await CandidateLog.create({
@@ -287,10 +318,28 @@ const deleteCandidates = async (req, res) => {
  */
 const updateCandidate = async (req, res) => {
     try {
+        const candidateToUpdate = await Candidate.findById(req.params.id);
+        if (!candidateToUpdate) {
+            return res.status(404).json({ success: false, message: "Candidate not found" });
+        }
+
+        // Enforce ownership for HR users
+        if (req.user.role === "HR" && candidateToUpdate.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden: You do not have permission to update this candidate" });
+        }
+
+        const beforeState = candidateToUpdate.toObject();
         const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
+
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: candidate._id, type: 'candidates', name: candidate.name },
+            metadata: { before: beforeState, after: candidate }
+        });
         // Send email if candidate is hired or rejected
 
         // Log the update
@@ -344,11 +393,17 @@ const changeCandidateStage = async (req, res) => {
 
         const candidate = await Candidate.findById(candidateId);
 
-        if (candidate.status === newStatus) {
-            return res.status(400).json({ success: false, message: "Cannot move to same stage" });
-        }
         if (!candidate) {
             return res.status(404).json({ success: false, message: "Candidate not found" });
+        }
+
+        // Enforce ownership for HR users
+        if (req.user.role === "HR" && candidate.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden: You do not have permission to change this candidate's stage" });
+        }
+
+        if (candidate.status === newStatus) {
+            return res.status(400).json({ success: false, message: "Cannot move to same stage" });
         }
 
         // Check if the candidate can be moved to the new stage
@@ -361,8 +416,16 @@ const changeCandidateStage = async (req, res) => {
         }
 
         // Update candidate stage
+        const beforeStatus = candidate.status;
         const updatedCandidate = await updateCandidateStage(candidateId, newStatus);
         const offer = await Offer.findOne({ candidate: candidateId });
+
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_STAGE_CHANGE',
+            target: { id: updatedCandidate._id, type: 'candidates', name: updatedCandidate.name },
+            metadata: { before: beforeStatus, after: newStatus }
+        });
 
         if (newStatus === 'hired' && process.env.NODE_ENV === 'production') {
             await sendCandidateEmail('hired', updatedCandidate, offer);
@@ -411,13 +474,24 @@ const changeCandidateStage = async (req, res) => {
  */
 const getCandidateLogsByCandidateId = async (req, res) => {
     try {
-        const candidateLogs = await CandidateLog.find({ candidate: req.params.id }).sort({ createdAt: -1 }).select(' -__v').populate({
-            path: "candidate",
-            select: "-__v"
-        });
-        if (!candidateLogs) {
-            return res.status(404).json({ success: false, message: "Candidate logs not found" });
+        const candidateLogs = await CandidateLog.find({ candidate: req.params.id })
+            .sort({ createdAt: -1 })
+            .select(' -__v')
+            .populate({
+                path: "candidate",
+                select: "-__v"
+            });
+        
+        if (!candidateLogs || candidateLogs.length === 0) {
+            return res.status(200).json({ success: true, message: "No logs found", data: [] });
         }
+
+        // Enforce ownership for HR users
+        const candidate = candidateLogs[0].candidate;
+        if (req.user.role === "HR" && candidate?.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden: You do not have permission to view logs for this candidate" });
+        }
+
         return res.status(200).json({ success: true, message: "Candidate logs fetched successfully", data: candidateLogs });
     } catch (error) {
         console.log(error);
@@ -446,6 +520,11 @@ const rejectCandidate = async (req, res) => {
             return res.status(404).json({ success: false, message: "Candidate not found" });
         }
 
+        // Enforce ownership for HR users
+        if (req.user.role === "HR" && candidate.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden: You do not have permission to reject this candidate" });
+        }
+
         if (candidate.status === "rejected") {
             return res.status(400).json({ success: false, message: "Candidate already rejected" });
         }
@@ -457,6 +536,14 @@ const rejectCandidate = async (req, res) => {
         if (!emailStatus.success) {
             return res.status(400).json({ success: false, message: "Cannot send email and reject candidate" });
         }
+
+        const beforeStatus = candidate.status;
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: candidate._id, type: 'candidates', name: candidate.name },
+            metadata: { before: beforeStatus, after: 'rejected', comment: 'Rejected candidate' }
+        });
 
         await CandidateLog.create({
             candidate: candidate._id,

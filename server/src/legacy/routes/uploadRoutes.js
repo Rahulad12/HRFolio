@@ -28,7 +28,7 @@ uploadRouter.post("/resume", upload.single("resume"), (req, res) => {
 uploadRouter.get("/resume/:filename/download", (req, res) => {
     const filename = req.params.filename;
     console.log(filename);
-    const filePath = path.join(__dirname, "../uploads", filename);
+    const filePath = path.join(__dirname, "../../uploads", filename);
     console.log(filePath);
     if (fs.existsSync(filePath)) {
         res.sendFile(filePath);

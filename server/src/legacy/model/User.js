@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
     picture: {
         type: String
     },
+    role: {
+        type: String,
+        enum: ["HR", "HR Admin", "Admin"]
+    },
     isLoggedIn: {
         type: Boolean,
         default: false

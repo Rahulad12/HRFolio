@@ -25,6 +25,7 @@ passport.use(
             email: profile.emails[0].value,
             picture: profile.photos[0].value,
             isLoggedIn: true,
+            role: "HR",
           });
         }
         return done(null, user);

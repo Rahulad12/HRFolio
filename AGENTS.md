@@ -36,7 +36,7 @@ Then read `.agents/wiki/mistakes.md`.
 cd client && npm run dev     # dev
 cd client && npm run build   # tsc -b && vite build
 cd client && npm run lint    # ESLint
-cd server && npm run dev     # nodemon
+cd server && npm run dev     # tsx watch
 cd server && npm start       # production
 cd server && npm run data:seed
 cd server && npm run data:destroy

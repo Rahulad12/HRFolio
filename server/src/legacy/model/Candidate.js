@@ -76,6 +76,10 @@ const candidateSchema = new mongoose.Schema({
     applieddate: {
         type: Date,
         required: true
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users"
     }
 }, {
     timestamps: true

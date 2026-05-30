@@ -2,9 +2,9 @@
 paths:
   - "client/src/services/**"
   - "client/src/slices/**"
-  - "server/controllers/**"
-  - "server/routes/**"
-  - "server/middleware/**"
+  - "server/src/controllers/**"
+  - "server/src/routes/**"
+  - "server/src/middleware/**"
 ---
 # API Conventions
 
@@ -13,7 +13,7 @@ paths:
 - Use fetch or axios for HTTP calls (follow existing pattern)
 - All functions return typed responses
 
-## Service layer (backend — server/)
+## Service layer (backend — server/src/)
 - Controllers call services / models — never put business logic in the route handler
 - Route files define paths and attach middleware only
 
@@ -41,6 +41,6 @@ paths:
 - Never return raw database models — always map to a response shape
 
 ## Error handling
-- Global error handler middleware on server (already exists in server/index.js)
+- Global error handler middleware on server (already exists in server/src/legacy/index.js)
 - 401 / 403 handled on frontend via auth state checks — redirect to login
 - Never access `error.response` directly in components — use Redux state

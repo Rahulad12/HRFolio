@@ -2,17 +2,24 @@
   "name": "cv_manager_backend",
   "version": "1.0.0",
   "description": "This is the backend to illustrate the cv manager ",
-  "main": "index.js",
+  "main": "src/index.ts",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "start": "node index.js",
-    "data:seed": "node data/Seeder.js seed",
-    "data:destroy": "node data/Seeder.js destroy"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "data:seed": "node src/legacy/Data/Seeder.js seed",
+    "data:destroy": "node src/legacy/Data/Seeder.js destroy"
   },
   "author": "Rahul Adhikari",
   "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.19.19",
+    "tsx": "^4.22.3",
+    "typescript": "^5.9.3"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",

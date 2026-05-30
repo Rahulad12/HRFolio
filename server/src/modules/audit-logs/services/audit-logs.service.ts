@@ -1,5 +1,6 @@
+import mongoose from 'mongoose';
 import { AuditLog } from '../model/AuditLog';
-import { IAuditLogDTO, IAuditLogQuery } from '../types/audit-logs.types';
+import { IAuditLogDTO, IAuditLogQuery, IScopedAuditLogQuery } from '../types/audit-logs.types';
 
 export class AuditLogService {
   /**
@@ -44,6 +45,44 @@ export class AuditLogService {
         .limit(limit)
         .lean(),
       AuditLog.countDocuments(mongoQuery)
+    ]);
+
+    return { logs, total };
+  }
+
+  /**
+   * Returns audit logs scoped by the caller's role:
+   *   HR Admin → all candidate + escalation logs
+   *   HR       → logs where target.id is one of their own candidates
+   */
+  async getScopedLogs(
+    userId: string,
+    role: string,
+    query: IScopedAuditLogQuery
+  ): Promise<{ logs: any[]; total: number }> {
+    const page = query.page || 1;
+    const limit = query.limit || 50;
+    const skip = (page - 1) * limit;
+
+    let mongoQuery: any = {};
+
+    if (role === 'HR Admin') {
+      mongoQuery = { 'target.type': { $in: ['candidates', 'escalations'] } };
+    } else if (role === 'HR') {
+      const Candidate = mongoose.model('candidates');
+      const ownCandidates = await Candidate.find(
+        { createdBy: new mongoose.Types.ObjectId(userId) },
+        '_id'
+      ).lean();
+      const ids = ownCandidates.map((c: any) => c._id);
+      mongoQuery = { 'target.id': { $in: ids }, 'target.type': 'candidates' };
+    } else {
+      return { logs: [], total: 0 };
+    }
+
+    const [logs, total] = await Promise.all([
+      AuditLog.find(mongoQuery).sort({ timestamp: -1 }).skip(skip).limit(limit).lean(),
+      AuditLog.countDocuments(mongoQuery),
     ]);
 
     return { logs, total };

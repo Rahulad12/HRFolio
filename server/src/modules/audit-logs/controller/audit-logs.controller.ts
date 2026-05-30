@@ -21,6 +21,20 @@ export class AuditLogController {
       res.status(500).json({ success: false, message: error.message });
     }
   }
+
+  async getScopedLogs(req: Request, res: Response): Promise<void> {
+    try {
+      const { id: userId, role } = (req as any).user;
+      const query = {
+        page: req.query.page ? parseInt(req.query.page as string) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 50,
+      };
+      const result = await auditLogService.getScopedLogs(userId, role, query);
+      res.status(200).json({ success: true, data: result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
 }
 
 export const auditLogController = new AuditLogController();

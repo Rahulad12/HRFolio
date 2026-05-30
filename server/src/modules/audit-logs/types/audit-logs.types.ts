@@ -34,3 +34,8 @@ export interface IAuditLogQuery {
   page?: number;
   limit?: number;
 }
+
+export interface IScopedAuditLogQuery {
+  page?: number;
+  limit?: number;
+}

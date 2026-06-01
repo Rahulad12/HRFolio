@@ -14,6 +14,7 @@ const typeColors: Record<EmailTemplateType, string> = {
   interview: 'blue',
   assessment: 'purple',
   rejection: 'red',
+  hired: 'cyan',
   other: 'default',
 }
 
@@ -140,7 +141,7 @@ export function EmailTemplateTable() {
               allowClear
               style={{ width: 160 }}
             >
-              {(['offer', 'interview', 'assessment', 'rejection', 'other'] as EmailTemplateType[]).map((t) => (
+              {(['offer', 'interview', 'assessment', 'rejection', 'hired', 'other'] as EmailTemplateType[]).map((t) => (
                 <Option key={t} value={t} className="capitalize">{t}</Option>
               ))}
             </Select>

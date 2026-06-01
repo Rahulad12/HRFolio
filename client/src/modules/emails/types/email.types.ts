@@ -1,4 +1,4 @@
-export type EmailTemplateType = 'offer' | 'interview' | 'assessment' | 'rejection' | 'other'
+export type EmailTemplateType = 'offer' | 'interview' | 'assessment' | 'rejection' | 'hired' | 'other'
 
 export interface EmailTemplate {
   _id: string

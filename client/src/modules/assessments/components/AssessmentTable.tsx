@@ -45,6 +45,11 @@ export function AssessmentTable() {
     }
   }
 
+  const sanitizeCsv = (v: string) => {
+    const escaped = v.replace(/"/g, '""')
+    return /^[=+\-@\t\r]/.test(escaped) ? `'${escaped}` : escaped
+  }
+
   const handleExport = () => {
     const rows = filteredData.map((item) => ({
       Title: item.title,
@@ -55,7 +60,7 @@ export function AssessmentTable() {
     }))
     const csv = [
       Object.keys(rows[0]).join(','),
-      ...rows.map((r) => Object.values(r).map((v) => `"${v}"`).join(',')),
+      ...rows.map((r) => Object.values(r).map((v) => `"${sanitizeCsv(String(v))}"`).join(',')),
     ].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
@@ -100,9 +105,10 @@ export function AssessmentTable() {
       title: 'Link',
       dataIndex: 'assessmentLink',
       key: 'assessmentLink',
-      render: (link: string) => (
-        <a href={link} target="_blank" rel="noopener noreferrer">Open</a>
-      ),
+      render: (link: string) => {
+        const safe = /^https?:\/\//i.test(link) ? link : '#'
+        return <a href={safe} target="_blank" rel="noopener noreferrer">Open</a>
+      },
     },
     {
       title: 'Actions',

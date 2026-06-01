@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { Card, Form, Input, Select, Transfer, DatePicker, Typography, Button, message, notification, Space } from 'antd'
+import { ArrowLeft } from 'lucide-react'
 import { useAssessmentList, useCreateAssignment, useCandidateBasicList, useEmailTemplateList } from '../lib/queries/assessment.queries'
 import type { CandidateBasic, EmailTemplate } from '../types/assessment.types'
-
-const { Title } = Typography
 const { TextArea } = Input
 const { Option } = Select
 
@@ -16,6 +17,7 @@ interface TransferItem {
 export function AssignAssessmentForm() {
   const [form] = Form.useForm()
   const [api, contextHolder] = notification.useNotification()
+  const navigate = useNavigate()
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
   const [previewText, setPreviewText] = useState('')
@@ -101,10 +103,19 @@ export function AssignAssessmentForm() {
   }
 
   return (
-    <div>
+    <>
       {contextHolder}
-      <Card>
-        <Title level={4}>Assign Assessment</Title>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+        <div className="mb-6 flex items-center">
+          <Button
+            type="text"
+            icon={<ArrowLeft size={18} />}
+            onClick={() => navigate('/dashboard/assessments/assignments')}
+          />
+          <Typography.Title level={3} className="!mb-0 ml-2">Assign Assessment</Typography.Title>
+        </div>
+
+        <Card>
         <Form form={form} layout="vertical" style={{ maxWidth: 800 }}>
           <Form.Item
             name="assessment"
@@ -168,7 +179,8 @@ export function AssignAssessmentForm() {
             </Space>
           </Form.Item>
         </Form>
-      </Card>
-    </div>
+        </Card>
+      </motion.div>
+    </>
   )
 }

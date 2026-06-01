@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
-import { Table, Input, Select, Space, Tag, Popconfirm, Button, message, notification, Tooltip, Modal, Form, InputNumber } from 'antd'
-import { Search, Trash2, Star } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { Table, Button, Card, Input, Select, Space, Tag, Popconfirm, message, notification, Tooltip, Modal, Form, InputNumber, Typography } from 'antd'
+import { Search, Trash2, Star, Plus } from 'lucide-react'
 import { useAssignmentList, useSubmitScore, useDeleteAssignment } from '../lib/queries/assessment.queries'
 import dayjs from 'dayjs'
 import type { Assignment } from '../types/assessment.types'
@@ -14,6 +16,7 @@ export function AssignmentTable() {
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null)
   const [form] = Form.useForm()
   const [api, contextHolder] = notification.useNotification()
+  const navigate = useNavigate()
 
   const { data, isLoading } = useAssignmentList()
   const { mutateAsync: submitScore, isPending: isSubmitting } = useSubmitScore()
@@ -133,38 +136,56 @@ export function AssignmentTable() {
   ]
 
   return (
-    <div>
+    <>
       {contextHolder}
-      <div className="mb-4 flex items-center justify-between">
-        <Space>
-          <Input
-            placeholder="Search by candidate..."
-            prefix={<Search size={16} />}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: 250 }}
-          />
-          <Select
-            placeholder="Filter by status"
-            value={statusFilter || undefined}
-            onChange={(val) => setStatusFilter(val || '')}
-            allowClear
-            style={{ width: 160 }}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <Typography.Title level={2}>Assessment Assignments</Typography.Title>
+            <Typography.Text className="mt-1 text-sm text-gray-500">
+              Manage and track candidate assessment assignments
+            </Typography.Text>
+          </div>
+          <Button
+            type="primary"
+            icon={<Plus size={16} />}
+            onClick={() => navigate('/dashboard/assessments/assign')}
           >
-            <Option value="pending">Pending</Option>
-            <Option value="completed">Completed</Option>
-            <Option value="evaluated">Evaluated</Option>
-          </Select>
-        </Space>
-      </div>
+            Assign Assessment
+          </Button>
+        </div>
 
-      <Table
-        dataSource={filteredData}
-        columns={columns}
-        rowKey="_id"
-        loading={isLoading}
-        pagination={{ pageSize: 10 }}
-      />
+        <Card>
+          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <Input
+              placeholder="Search by candidate..."
+              prefix={<Search size={16} />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: 250 }}
+            />
+            <Select
+              placeholder="Filter by status"
+              value={statusFilter || undefined}
+              onChange={(val) => setStatusFilter(val || '')}
+              allowClear
+              style={{ width: 160 }}
+            >
+              <Option value="pending">Pending</Option>
+              <Option value="completed">Completed</Option>
+              <Option value="evaluated">Evaluated</Option>
+            </Select>
+          </div>
+
+          <Table
+            dataSource={filteredData}
+            columns={columns}
+            rowKey="_id"
+            loading={isLoading}
+            pagination={{ pageSize: 10 }}
+          />
+        </Card>
+      </motion.div>
 
       <Modal
         title="Evaluate Assessment"
@@ -183,6 +204,6 @@ export function AssignmentTable() {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </>
   )
 }

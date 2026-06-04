@@ -69,7 +69,10 @@ export function MetricsCard({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 transition-all duration-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
+    <div
+      className={`rounded-xl border border-slate-200 bg-white p-4 transition-all duration-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 ${link ? 'cursor-pointer' : ''}`}
+      onClick={() => link && navigate(link)}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">

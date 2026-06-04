@@ -5,3 +5,6 @@ export const INTERVIEWER_URL = 'interviewer';
 export const ASSESSMENT_URL = 'assessment';
 export const EMAIL_TEMPLATE_URL = 'email';
 export const OFFER_URL = 'offer';
+export const AUDIT_LOG_URL = 'audit-logs';
+export const ACTIVITY_LOG_URL = 'activity-log';
+export const LOOKUP_URL = 'lookup';

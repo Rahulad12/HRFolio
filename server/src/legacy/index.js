@@ -33,6 +33,7 @@ import offerRouter from "./routes/offerRoutes.js";
 import searchRouter from './routes/searchRoutes.js';
 import activityLogRouter from './routes/activityLogRoutes.js';
 import hiredRouter from './routes/hiredRoutes.js';
+import lookupRouter from './routes/lookupRoutes.js';
 app.use('/api/auth', authRouter);
 app.use('/api/candidate', candidateRouter);
 app.use('/api/interview', interviewRouter);
@@ -45,6 +46,7 @@ app.use("/api/uploads", uploadRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/activity-log", activityLogRouter);
 app.use("/api/hired", hiredRouter);
+app.use('/api/lookup', lookupRouter);
 
 app.get('/', (req, res) => {
     logger.info("Server is running");

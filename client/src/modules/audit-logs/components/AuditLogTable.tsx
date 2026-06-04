@@ -33,8 +33,8 @@ export function AuditLogTable({ scoped = false }: AuditLogTableProps) {
   const [actionFilter, setActionFilter] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const fullQuery = useAuditLogList()
-  const scopedQuery = useScopedAuditLogList()
+  const fullQuery = useAuditLogList(undefined, { enabled: !scoped })
+  const scopedQuery = useScopedAuditLogList(undefined, { enabled: scoped })
   const { data, isLoading } = scoped ? scopedQuery : fullQuery
 
   const filteredLogs = useMemo(() => {

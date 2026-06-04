@@ -5,6 +5,7 @@ import { PageHeader } from '@/shared/components/PageHeader'
 import dayjs from 'dayjs'
 import { useCreateInterview, useInterviewerList, useEligibleCandidates } from '../lib/queries/interview.queries'
 import { makeCapitilized } from '@/shared/utils/string'
+import { useInterviewRounds } from '@/modules/lookup'
 
 const { TextArea } = Input
 
@@ -16,6 +17,7 @@ export function InterviewSchedule() {
   const { mutateAsync: createInterview, isPending: createLoading } = useCreateInterview()
   const { data: candidatesData } = useEligibleCandidates()
   const { data: interviewersData } = useInterviewerList()
+  const { data: interviewRounds = [] } = useInterviewRounds()
 
   const handleDraft = async () => {
     const payload = form.getFieldsValue()
@@ -96,11 +98,15 @@ export function InterviewSchedule() {
               label="Interview Round"
               rules={[{ required: true, message: 'Interview round is required' }]}
             >
-              <Select placeholder="Select Interview Round" allowClear showSearch>
-                <Select.Option value="first">First Interview</Select.Option>
-                <Select.Option value="second">Second Interview</Select.Option>
-                <Select.Option value="third">Third Interview</Select.Option>
-              </Select>
+              <Select
+                placeholder="Select Interview Round"
+                allowClear
+                showSearch
+                options={interviewRounds
+                  .filter(r => r.isActive)
+                  .sort((a, b) => a.order - b.order)
+                  .map(r => ({ value: r.systemName, label: r.displayName }))}
+              />
             </Form.Item>
 
             <Form.Item

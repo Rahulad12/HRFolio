@@ -7,6 +7,8 @@ import { updateCandidateCurrentStage } from "../utils/updateCandidateProgress.js
 import { sendCandidateInterviewEmail } from "../utils/sendCandidateInterviewEmail.js";
 import { sendInterviewerNotificationEmail } from "../utils/sendInterviewerNotificationEmail.js";
 import Interviewers from "../model/Interviewers.js";
+import { auditLogService } from "../../modules/audit-logs/index.js";
+import InterviewRoundModel from "../model/InterviewRound.js";
 
 
 const createInterview = async (req, res) => {
@@ -30,17 +32,17 @@ const createInterview = async (req, res) => {
         const hasCompleted = (round) =>
             interviews.some(int => int.InterviewRound === round && int.status === "completed");
 
-        const roundDependencies = {
-            second: "first",
-            third: "second"
-        };
-
-        const requiredPrevRound = roundDependencies[InterviewRound];
-        if (requiredPrevRound && !hasCompleted(requiredPrevRound)) {
-            return res.status(400).json({
-                success: false,
-                message: `${requiredPrevRound} round must be completed before scheduling ${InterviewRound} round.`
-            });
+        const rounds = await InterviewRoundModel.find({ isActive: true }).sort({ order: 1 });
+        const roundOrder = rounds.map(r => r.systemName);
+        const roundIndex = roundOrder.indexOf(InterviewRound);
+        if (roundIndex > 0) {
+            const prevRound = roundOrder[roundIndex - 1];
+            if (!hasCompleted(prevRound)) {
+                return res.status(400).json({
+                    success: false,
+                    message: `"${prevRound}" round must be completed before scheduling "${InterviewRound}" round.`
+                });
+            }
         }
 
 
@@ -68,7 +70,8 @@ const createInterview = async (req, res) => {
             notes,
             status,
             InterviewRound,
-            meetingLink
+            meetingLink,
+            createdBy: req.user.id,
         });
 
         if (!interview) {
@@ -107,6 +110,13 @@ const createInterview = async (req, res) => {
             details: { date, time, type, notes, status, interviewRound: InterviewRound },
         });
 
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: candidate, type: 'candidates', name: candidateInfo?.name },
+            metadata: { after: `Interview created - ${InterviewRound} round` }
+        });
+
         // 10. Log activity
         await ActivityLog.create({
             candidate,
@@ -137,7 +147,11 @@ const createInterview = async (req, res) => {
 
 const getAllInterviews = async (req, res) => {
     try {
-        const interviews = await Interview.find({}).populate({
+        const query = {}
+        if (req.user.role === 'HR') {
+            query.createdBy = req.user.id
+        }
+        const interviews = await Interview.find(query).populate({
             path: 'candidate',
             select: '-createdAt -updatedAt -__v'
         }).populate({
@@ -172,6 +186,9 @@ const getInterviewById = async (req, res) => {
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
+        if (req.user.role === 'HR' && interview.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
         return res.status(200).json({
             success: true,
             message: "Interview fetched successfully",
@@ -185,7 +202,11 @@ const getInterviewById = async (req, res) => {
 
 const getAllInterviewsByCandidate = async (req, res) => {
     try {
-        const interviews = await Interview.find({ candidate: req.params.id }).populate({
+        const query = { candidate: req.params.id }
+        if (req.user.role === 'HR') {
+            query.createdBy = req.user.id
+        }
+        const interviews = await Interview.find(query).populate({
             path: 'candidate',
             select: '-createdAt -updatedAt -__v'
         }).populate({
@@ -212,6 +233,9 @@ const updateInterview = async (req, res) => {
 
         if (!interview) {
             return res.status(404).json({ success: false, message: "Interview not found" });
+        }
+        if (req.user.role === 'HR' && interview.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
         }
 
         //this is to check if interview is completed or not
@@ -285,6 +309,13 @@ const updateInterview = async (req, res) => {
             },
         });
 
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: updatedInterview.candidate, type: 'candidates', name: candidateInfo?.name },
+            metadata: { after: `Interview ${isRescheduled ? 'rescheduled' : 'updated'} - ${updatedInterview.InterviewRound} round` }
+        });
+
         const existingCandidate = await Candidate.findById(updatedInterview.candidate);
         await ActivityLog.create({
             candidate: updatedInterview.candidate,
@@ -312,10 +343,14 @@ const updateInterview = async (req, res) => {
 
 const deleteInterview = async (req, res) => {
     try {
-        const deleteInterview = await Interview.findByIdAndDelete(req.params.id);
-        if (!deleteInterview) {
+        const existing = await Interview.findById(req.params.id);
+        if (!existing) {
             return res.status(404).json({ success: false, message: "Interview not found" });
         }
+        if (req.user.role === 'HR' && existing.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
+        const deleteInterview = await Interview.findByIdAndDelete(req.params.id);
 
         await InterviewLog.create({
             interviewId: deleteInterview._id,
@@ -326,6 +361,13 @@ const deleteInterview = async (req, res) => {
                 date: deleteInterview.date, time: deleteInterview.time, type: deleteInterview.type, notes: deleteInterview.notes, status: deleteInterview.status,
                 feedback: deleteInterview.feedback, rating: deleteInterview.rating, interviewRound: deleteInterview.InterviewRound
             },
+        });
+
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: deleteInterview.candidate, type: 'candidates', name: existingCandidate?.name },
+            metadata: { after: `Interview deleted - ${deleteInterview.InterviewRound} round` }
         });
 
         const existingCandidate = await Candidate.findById(deleteInterview.candidate);

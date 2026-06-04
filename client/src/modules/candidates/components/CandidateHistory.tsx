@@ -8,7 +8,7 @@ import { useOfferLogsByCandidate } from '@/modules/offers/lib/queries/offer.quer
 import type { AssessmentLog } from '@/modules/assessments/types/assessment.types'
 import type { InterviewLog } from '@/modules/interviews/types/interview.types'
 import type { OfferLog } from '@/modules/offers/types/offer.types'
-import { useInterviewRounds } from '@/modules/lookup'
+import { useInterviewRounds, useInterviewStatuses } from '@/modules/lookup'
 import { getLookupLabel, getLookupColor } from '@/shared/utils/lookup'
 
 const getColor = (status: string) => {
@@ -21,7 +21,7 @@ const getColor = (status: string) => {
       return 'text-orange-600'
     case 'assigned':
       return 'text-amber-600'
-    case 'Failed':
+    case 'failed':
       return 'text-red-600'
     case 'Passed':
       return 'text-green-600'
@@ -61,6 +61,7 @@ export function CandidateHistory({ candidateId }: Props) {
   const [activeTab, setActiveTab] = useState('assessments')
 
   const { data: interviewRounds } = useInterviewRounds()
+  const { data: interviewStatuses } = useInterviewStatuses()
 
   const { data: assessmentLogRes, isLoading: assessmentLogLoading, isError: assessmentLogError } =
     useAssessmentLogsByCandidate(candidateId || '')
@@ -189,7 +190,7 @@ export function CandidateHistory({ candidateId }: Props) {
                       <p className="mb-1">
                         <strong>Status:</strong>{' '}
                         <span className={`capitalize ${getColor(log?.details?.status)}`}>
-                          {log?.details?.status}
+                          {getLookupLabel(interviewStatuses, log?.details?.status ?? '')}
                         </span>
                       </p>
                       <p className="mb-1">

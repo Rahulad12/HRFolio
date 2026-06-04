@@ -3,12 +3,13 @@ import { Badge, Calendar, Modal } from 'antd'
 import dayjs from 'dayjs'
 import { useInterviewList } from '../lib/queries/interview.queries'
 import type { Dayjs } from 'dayjs'
-import { useInterviewRounds } from '@/modules/lookup'
-import { getLookupLabel } from '@/shared/utils/lookup'
+import { useInterviewRounds, useInterviewStatuses } from '@/modules/lookup'
+import { getLookupLabel, getLookupColor } from '@/shared/utils/lookup'
 
 export function InterviewCalendar() {
   const { data } = useInterviewList()
   const { data: interviewRounds } = useInterviewRounds()
+  const { data: interviewStatuses } = useInterviewStatuses()
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
 
@@ -92,7 +93,7 @@ export function InterviewCalendar() {
                     {dayjs(interview.time).format('HH:mm')} - {interview.candidate?.name}
                   </div>
                   <div className="text-xs capitalize text-gray-500">
-                    Status: {interview.status}
+                    Status: {getLookupLabel(interviewStatuses, interview.status)}
                   </div>
                   <div className="text-xs text-gray-500">
                     Interview Round: {getLookupLabel(interviewRounds, interview.InterviewRound)}

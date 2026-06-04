@@ -5,8 +5,11 @@ import InterviewStatus from "../model/InterviewStatus.js";
 
 const seed = async (Model, items) => {
   for (const item of items) {
-    const exists = await Model.findOne({ systemName: item.systemName });
-    if (!exists) await Model.create(item);
+    await Model.updateOne(
+      { systemName: item.systemName },
+      { $setOnInsert: item },
+      { upsert: true }
+    );
   }
 };
 

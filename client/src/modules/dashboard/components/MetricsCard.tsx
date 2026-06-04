@@ -13,7 +13,7 @@ interface MetricsCardProps {
   icon: ReactNode
   link?: string
   loading?: boolean
-  accentColor: string
+  accentColor?: string
   trend?: TrendBadge
   sparklineData?: number[]
 }
@@ -54,7 +54,7 @@ export function MetricsCard({
   icon,
   link,
   loading,
-  accentColor,
+  accentColor = '#6366f1',
   trend,
   sparklineData,
 }: MetricsCardProps) {
@@ -62,7 +62,7 @@ export function MetricsCard({
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 dark:border-slate-700 dark:bg-slate-800">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
         <Skeleton active paragraph={{ rows: 2 }} />
       </div>
     )

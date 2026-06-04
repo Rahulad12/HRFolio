@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import * as lookupApi from '../api/lookup.api'
+import type { LookupValue, CreateLookupPayload, UpdateLookupPayload, LookupEndpoint } from '../../types/lookup.types'
 
 export const LOOKUP_KEYS = {
   interviewRounds: ['lookup', 'interview-rounds'] as const,
@@ -13,6 +14,7 @@ export function useInterviewRounds() {
     queryKey: LOOKUP_KEYS.interviewRounds,
     queryFn: () => lookupApi.fetchInterviewRounds(),
     staleTime: Infinity,
+    gcTime: Infinity,
     select: (res) => res.data,
   })
 }
@@ -22,6 +24,7 @@ export function useCandidateStatuses() {
     queryKey: LOOKUP_KEYS.candidateStatuses,
     queryFn: () => lookupApi.fetchCandidateStatuses(),
     staleTime: Infinity,
+    gcTime: Infinity,
     select: (res) => res.data,
   })
 }
@@ -31,6 +34,7 @@ export function useInterviewTypes() {
     queryKey: LOOKUP_KEYS.interviewTypes,
     queryFn: () => lookupApi.fetchInterviewTypes(),
     staleTime: Infinity,
+    gcTime: Infinity,
     select: (res) => res.data,
   })
 }
@@ -40,28 +44,29 @@ export function useInterviewStatuses() {
     queryKey: LOOKUP_KEYS.interviewStatuses,
     queryFn: () => lookupApi.fetchInterviewStatuses(),
     staleTime: Infinity,
+    gcTime: Infinity,
     select: (res) => res.data,
   })
 }
 
-export function useCreateLookupValue(endpoint: string, queryKey: readonly string[]) {
+export function useCreateLookupValue(endpoint: LookupEndpoint, queryKey: readonly string[]) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: Record<string, unknown>) => lookupApi.createLookupValue(endpoint, data),
+    mutationFn: (data: CreateLookupPayload) => lookupApi.createLookupValue(endpoint, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   })
 }
 
-export function useUpdateLookupValue(endpoint: string, queryKey: readonly string[]) {
+export function useUpdateLookupValue(endpoint: LookupEndpoint, queryKey: readonly string[]) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateLookupPayload }) =>
       lookupApi.updateLookupValue(endpoint, id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   })
 }
 
-export function useDeactivateLookupValue(endpoint: string, queryKey: readonly string[]) {
+export function useDeactivateLookupValue(endpoint: LookupEndpoint, queryKey: readonly string[]) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => lookupApi.deactivateLookupValue(endpoint, id),

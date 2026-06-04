@@ -17,3 +17,18 @@ export interface LookupMutationResponse {
   message: string
   data?: LookupValue
 }
+
+export interface CreateLookupPayload {
+  systemName: string
+  displayName: string
+  order: number
+  color?: string
+}
+
+export type UpdateLookupPayload = {
+  displayName?: string
+  order?: number
+  color?: string
+}
+
+export type LookupEndpoint = 'interview-rounds' | 'candidate-statuses' | 'interview-types' | 'interview-statuses'

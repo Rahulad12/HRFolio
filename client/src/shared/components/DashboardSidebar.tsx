@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router'
 import { Layout, Menu } from 'antd'
-import { Users, UserPlus, UserRound, LayoutDashboard, CalendarClock, InboxIcon, FileSignature, ShieldCheck, ClipboardList, AlertCircle } from 'lucide-react'
+import { Users, UserPlus, UserRound, LayoutDashboard, CalendarClock, InboxIcon, FileSignature, ShieldCheck, ClipboardList, AlertCircle, Settings } from 'lucide-react'
 import { useSidebarStore } from '@/shared/store/sidebar.store'
 import { useAuth } from '@/shared/hooks/useAuth'
 
@@ -71,6 +71,11 @@ export function DashboardSidebar() {
         key: '/dashboard/user-management',
         icon: <ShieldCheck size={20} />,
         label: <Link to="/dashboard/user-management">User Management</Link>,
+      },
+      {
+        key: '/dashboard/settings/lookup-values',
+        icon: <Settings size={20} />,
+        label: <Link to="/dashboard/settings/lookup-values">Settings</Link>,
       },
     ] : []),
     // Admin + HR Admin

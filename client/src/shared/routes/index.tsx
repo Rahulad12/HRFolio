@@ -1,0 +1,72 @@
+import { createBrowserRouter, type RouteObject } from 'react-router'
+import { lazy, Suspense } from 'react'
+import { PageLoader } from '@/shared/components/PageLoader'
+import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
+import { DashboardLayout } from '@/shared/components/DashboardLayout'
+import { dashboardRoutes } from '@/modules/dashboard'
+import { candidateRoutes } from '@/modules/candidates'
+import { interviewRoutes } from '@/modules/interviews'
+import { assessmentRoutes } from '@/modules/assessments'
+import { offerRoutes } from '@/modules/offers'
+import { emailRoutes } from '@/modules/emails'
+import { interviewerRoutes } from '@/modules/interviewers'
+import { userManagementRoutes } from '@/modules/user-management'
+import { auditLogRoutes } from '@/modules/audit-logs'
+import { escalationRoutes } from '@/modules/escalations'
+import { settingsRoutes } from '@/modules/settings'
+import { publicRoutes } from './public-routes'
+import { ProtectedRoutesLoader } from '../loaders/protected-routes-loader'
+
+const NotFound = lazy(() => import('../../pages/NotFound').then((m) => ({ default: m.default })))
+
+function lazyRoute(Component: React.LazyExoticComponent<React.ComponentType>) {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Component />
+    </Suspense>
+  )
+}
+
+const dashChildren: RouteObject[] = [
+  ...dashboardRoutes,
+  ...candidateRoutes,
+  ...interviewRoutes,
+  ...assessmentRoutes,
+  ...offerRoutes,
+  ...emailRoutes,
+  ...interviewerRoutes,
+  ...escalationRoutes,
+  { path: '*', element: lazyRoute(NotFound) },
+]
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    errorElement: <NotFound />,
+    children: [
+      ...publicRoutes,
+      {
+        path: '/dashboard',
+        loader: ProtectedRoutesLoader,
+        // element: <ProtectedRoute />,
+        children: [
+          {
+            element: <DashboardLayout />,
+            children: [
+              ...dashChildren,
+              {
+                element: <ProtectedRoute allowedRoles={['Admin']} />,
+                children: [...userManagementRoutes, ...settingsRoutes],
+              },
+              {
+                element: <ProtectedRoute allowedRoles={['Admin', 'HR Admin']} />,
+                children: [...auditLogRoutes],
+              },
+            ],
+          },
+        ],
+      },
+      { path: '*', element: lazyRoute(NotFound) },
+    ],
+  },
+])

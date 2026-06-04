@@ -19,18 +19,15 @@ const interviewSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["draft", "scheduled", "cancelled", "completed", "failed"],
         required: true
     },
     type: {
         type: String,
-        enum: ["in-person", "video"],
         default: "in-person",
         required: true
     },
     InterviewRound: {
         type: String,
-        enum: ["first", "second", "third"],
         default: "first",
         required: true
     },
@@ -45,7 +42,11 @@ const interviewSchema = new mongoose.Schema({
     },
     meetingLink: {
         type: String
-    }
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+    },
 }, {
     timestamps: true
 });

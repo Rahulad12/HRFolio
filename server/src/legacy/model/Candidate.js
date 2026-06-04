@@ -70,7 +70,6 @@ const candidateSchema = new mongoose.Schema({
 
     status: {
         type: String,
-        enum: [...STAGES, "rejected"],
         default: "shortlisted"
     },
     applieddate: {

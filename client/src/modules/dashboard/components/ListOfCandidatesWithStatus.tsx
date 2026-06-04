@@ -100,7 +100,7 @@ export function ListOfCandidatesWithStatus({ candidates, loading = true }: Props
               return (
                 <div
                   key={col.key}
-                  className={`min-w-[160px] flex-1 rounded-lg border border-slate-800 bg-slate-950 p-2 dark:border-slate-800 dark:bg-slate-950 ${col.dimmed ? 'opacity-70' : ''}`}
+                  className={`min-w-[160px] flex-1 rounded-lg border border-slate-200 bg-slate-50 p-2 dark:border-slate-800 dark:bg-slate-950 ${col.dimmed ? 'opacity-70' : ''}`}
                 >
                   {/* Column header */}
                   <div className="mb-2 flex items-center justify-between">
@@ -116,17 +116,17 @@ export function ListOfCandidatesWithStatus({ candidates, loading = true }: Props
                     {visible.map((c) => (
                       <div
                         key={c._id}
-                        className="cursor-pointer rounded-md bg-slate-800 p-2 transition-colors hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                        className="cursor-pointer rounded-md bg-white p-2 shadow-sm transition-colors hover:bg-slate-50 dark:bg-slate-800 dark:shadow-none dark:hover:bg-slate-700"
                         onClick={() => navigate(`/dashboard/candidates/${c._id}`)}
                       >
-                        <p className="truncate text-xs font-semibold capitalize text-slate-100">
+                        <p className="truncate text-xs font-semibold capitalize text-slate-800 dark:text-slate-100">
                           {c.name}
                         </p>
                         <div className="mt-1.5 flex gap-1">
                           <span className={`rounded px-1.5 py-0.5 text-xs font-medium capitalize ${col.tagBg} ${col.tagText}`}>
                             {c.technology}
                           </span>
-                          <span className="rounded border border-slate-600 px-1.5 py-0.5 text-xs capitalize text-slate-400">
+                          <span className="rounded border border-slate-300 px-1.5 py-0.5 text-xs capitalize text-slate-500 dark:border-slate-600 dark:text-slate-400">
                             {c.level}
                           </span>
                         </div>
@@ -136,7 +136,7 @@ export function ListOfCandidatesWithStatus({ candidates, loading = true }: Props
                       <p className="text-center text-xs text-slate-500">+{overflow} more</p>
                     )}
                     {items.length === 0 && (
-                      <p className="py-3 text-center text-xs text-slate-600">—</p>
+                      <p className="py-3 text-center text-xs text-slate-400 dark:text-slate-600">—</p>
                     )}
                   </div>
                 </div>

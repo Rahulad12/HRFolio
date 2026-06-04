@@ -49,15 +49,15 @@ export function UpcomingInterviews({ interviews, onViewAllClick, loading = false
       title="Upcoming Interviews"
       loading={loading}
       extra={
-        <div className="flex gap-1 rounded-lg bg-slate-800 p-1">
+        <div className="flex gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
           {(['today', 'week'] as const).map((v) => (
             <button
               key={v}
               onClick={() => setFilterType(v)}
               className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                 filterType === v
-                  ? 'bg-slate-600 text-white'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-slate-800 shadow-sm dark:bg-slate-600 dark:text-white'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               {v === 'today' ? 'Today' : 'This Week'}
@@ -75,7 +75,7 @@ export function UpcomingInterviews({ interviews, onViewAllClick, loading = false
             return (
               <div
                 key={iv._id}
-                className="flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
+                className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
               >
                 <div
                   className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold ${avatarColors[level] ?? 'bg-slate-700 text-slate-200'}`}
@@ -83,10 +83,10 @@ export function UpcomingInterviews({ interviews, onViewAllClick, loading = false
                   {getInitials(iv.candidate?.name)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold capitalize text-slate-100">
+                  <p className="truncate text-sm font-semibold capitalize text-slate-800 dark:text-slate-100">
                     {iv.candidate?.name}
                   </p>
-                  <p className="truncate text-xs text-slate-400">
+                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                     with {iv.interviewer?.name}
                   </p>
                 </div>

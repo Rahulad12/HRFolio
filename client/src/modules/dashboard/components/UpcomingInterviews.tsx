@@ -10,15 +10,15 @@ interface Props {
 }
 
 const levelColors: Record<string, string> = {
-  senior: 'bg-indigo-900 text-indigo-300',
-  mid: 'bg-amber-900/60 text-amber-300',
-  junior: 'bg-emerald-900/60 text-emerald-300',
+  senior: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300',
+  mid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300',
+  junior: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300',
 }
 
 const avatarColors: Record<string, string> = {
-  senior: 'bg-indigo-900 text-indigo-300',
-  mid: 'bg-amber-900/60 text-amber-300',
-  junior: 'bg-emerald-900/60 text-emerald-400',
+  senior: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300',
+  mid: 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300',
+  junior: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-400',
 }
 
 function getInitials(name = '') {

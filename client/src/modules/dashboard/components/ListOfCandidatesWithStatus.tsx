@@ -29,14 +29,14 @@ interface KanbanColumn {
 }
 
 const COLUMNS: KanbanColumn[] = [
-  { title: 'Shortlisted', key: 'shortlisted', statusKeys: ['shortlisted'], headerColor: 'text-indigo-400', badgeBg: 'bg-indigo-900', badgeText: 'text-indigo-300', tagBg: 'bg-indigo-900', tagText: 'text-indigo-300' },
-  { title: 'Assessment', key: 'assessment', statusKeys: ['assessment'], headerColor: 'text-amber-400', badgeBg: 'bg-amber-900/60', badgeText: 'text-amber-300', tagBg: 'bg-amber-900/60', tagText: 'text-amber-300' },
-  { title: '1st Interview', key: 'first', statusKeys: ['first'], headerColor: 'text-blue-400', badgeBg: 'bg-blue-900/60', badgeText: 'text-blue-300', tagBg: 'bg-blue-900/60', tagText: 'text-blue-300' },
-  { title: '2nd Interview', key: 'second', statusKeys: ['second'], headerColor: 'text-sky-400', badgeBg: 'bg-sky-900/60', badgeText: 'text-sky-300', tagBg: 'bg-sky-900/60', tagText: 'text-sky-300' },
-  { title: '3rd Interview', key: 'third', statusKeys: ['third'], headerColor: 'text-cyan-400', badgeBg: 'bg-cyan-900/60', badgeText: 'text-cyan-300', tagBg: 'bg-cyan-900/60', tagText: 'text-cyan-300' },
-  { title: 'Offered', key: 'offered', statusKeys: ['offered'], headerColor: 'text-orange-400', badgeBg: 'bg-orange-900/60', badgeText: 'text-orange-300', tagBg: 'bg-orange-900/60', tagText: 'text-orange-300' },
-  { title: 'Hired', key: 'hired', statusKeys: ['hired'], headerColor: 'text-emerald-400', badgeBg: 'bg-emerald-900/60', badgeText: 'text-emerald-300', tagBg: 'bg-emerald-900/60', tagText: 'text-emerald-300' },
-  { title: 'Rejected', key: 'rejected', statusKeys: ['rejected'], headerColor: 'text-red-400', badgeBg: 'bg-red-900/60', badgeText: 'text-red-300', tagBg: 'bg-red-900/60', tagText: 'text-red-300', dimmed: true },
+  { title: 'Shortlisted',   key: 'shortlisted', statusKeys: ['shortlisted'], headerColor: 'text-indigo-600 dark:text-indigo-400',  badgeBg: 'bg-indigo-100 dark:bg-indigo-900',    badgeText: 'text-indigo-700 dark:text-indigo-300',  tagBg: 'bg-indigo-100 dark:bg-indigo-900',    tagText: 'text-indigo-700 dark:text-indigo-300' },
+  { title: 'Assessment',    key: 'assessment',  statusKeys: ['assessment'],  headerColor: 'text-amber-600 dark:text-amber-400',    badgeBg: 'bg-amber-100 dark:bg-amber-900/60',   badgeText: 'text-amber-700 dark:text-amber-300',    tagBg: 'bg-amber-100 dark:bg-amber-900/60',   tagText: 'text-amber-700 dark:text-amber-300' },
+  { title: '1st Interview', key: 'first',       statusKeys: ['first'],       headerColor: 'text-blue-600 dark:text-blue-400',      badgeBg: 'bg-blue-100 dark:bg-blue-900/60',     badgeText: 'text-blue-700 dark:text-blue-300',      tagBg: 'bg-blue-100 dark:bg-blue-900/60',     tagText: 'text-blue-700 dark:text-blue-300' },
+  { title: '2nd Interview', key: 'second',      statusKeys: ['second'],      headerColor: 'text-sky-600 dark:text-sky-400',        badgeBg: 'bg-sky-100 dark:bg-sky-900/60',       badgeText: 'text-sky-700 dark:text-sky-300',        tagBg: 'bg-sky-100 dark:bg-sky-900/60',       tagText: 'text-sky-700 dark:text-sky-300' },
+  { title: '3rd Interview', key: 'third',       statusKeys: ['third'],       headerColor: 'text-cyan-600 dark:text-cyan-400',      badgeBg: 'bg-cyan-100 dark:bg-cyan-900/60',     badgeText: 'text-cyan-700 dark:text-cyan-300',      tagBg: 'bg-cyan-100 dark:bg-cyan-900/60',     tagText: 'text-cyan-700 dark:text-cyan-300' },
+  { title: 'Offered',       key: 'offered',     statusKeys: ['offered'],     headerColor: 'text-orange-600 dark:text-orange-400',  badgeBg: 'bg-orange-100 dark:bg-orange-900/60', badgeText: 'text-orange-700 dark:text-orange-300',  tagBg: 'bg-orange-100 dark:bg-orange-900/60', tagText: 'text-orange-700 dark:text-orange-300' },
+  { title: 'Hired',         key: 'hired',       statusKeys: ['hired'],       headerColor: 'text-emerald-600 dark:text-emerald-400',badgeBg: 'bg-emerald-100 dark:bg-emerald-900/60',badgeText: 'text-emerald-700 dark:text-emerald-300',tagBg: 'bg-emerald-100 dark:bg-emerald-900/60',tagText: 'text-emerald-700 dark:text-emerald-300' },
+  { title: 'Rejected',      key: 'rejected',    statusKeys: ['rejected'],    headerColor: 'text-red-600 dark:text-red-400',        badgeBg: 'bg-red-100 dark:bg-red-900/60',       badgeText: 'text-red-700 dark:text-red-300',        tagBg: 'bg-red-100 dark:bg-red-900/60',       tagText: 'text-red-700 dark:text-red-300', dimmed: true },
 ]
 
 export function ListOfCandidatesWithStatus({ candidates, loading = true }: Props) {

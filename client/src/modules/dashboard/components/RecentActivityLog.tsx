@@ -23,12 +23,12 @@ function getIcon(type: string) {
 }
 
 const entityAccent: Record<string, { icon: string; text: string }> = {
-  candidates: { icon: 'bg-indigo-500/20 text-indigo-400', text: 'text-indigo-400' },
-  interviews: { icon: 'bg-blue-500/20 text-blue-400', text: 'text-blue-400' },
-  interview_completed: { icon: 'bg-blue-500/20 text-blue-400', text: 'text-blue-400' },
-  assessments: { icon: 'bg-amber-500/20 text-amber-400', text: 'text-amber-400' },
-  offers: { icon: 'bg-emerald-500/20 text-emerald-400', text: 'text-emerald-400' },
-  offer_accepted: { icon: 'bg-emerald-500/20 text-emerald-400', text: 'text-emerald-400' },
+  candidates:           { icon: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',  text: 'text-indigo-600 dark:text-indigo-400' },
+  interviews:           { icon: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',        text: 'text-blue-600 dark:text-blue-400' },
+  interview_completed:  { icon: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',        text: 'text-blue-600 dark:text-blue-400' },
+  assessments:          { icon: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',     text: 'text-amber-600 dark:text-amber-400' },
+  offers:               { icon: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400', text: 'text-emerald-600 dark:text-emerald-400' },
+  offer_accepted:       { icon: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400', text: 'text-emerald-600 dark:text-emerald-400' },
 }
 
 export function RecentActivityLog({ activityLogs, loading = false }: Props) {

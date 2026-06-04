@@ -1,4 +1,5 @@
 import Candidate from "../model/Candidate.js";
+import CandidateStatusModel from "../model/CandidateStatus.js";
 
 export const canCandidateProgress = (currentStage) => {
     return async (req, res, next) => {
@@ -8,7 +9,10 @@ export const canCandidateProgress = (currentStage) => {
             if (!candidate) {
                 return res.status(404).json({ success: false, message: "Candidate not found" });
             }
-            const pipelineStages = ["shortlisted", "assessment", "first", "second", "third", "offered", "hired"];
+            const statuses = await CandidateStatusModel
+                .find({ isActive: true, systemName: { $ne: 'rejected' } })
+                .sort({ order: 1 });
+            const pipelineStages = statuses.map(s => s.systemName);
             const currentIndex = pipelineStages.indexOf(currentStage);
             if (currentIndex === -1) {
                 return res.status(400).json({ success: false, message: "Invalid stage" });

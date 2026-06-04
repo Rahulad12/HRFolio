@@ -5,8 +5,6 @@ import { useState, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import type { CandidateData, InterviewData, OfferData, AssignmentData } from '../types/dashboard.types'
-import { useInterviewRounds } from '@/modules/lookup'
-import { getLookupLabel } from '@/shared/utils/lookup'
 
 dayjs.extend(isBetween)
 
@@ -45,7 +43,6 @@ export function ListOfCandidatesWithStatus({ candidates, loading = true }: Props
   const navigate = useNavigate()
   const [searchText, setSearchText] = useState('')
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null])
-  const { data: interviewRounds } = useInterviewRounds()
 
   const filterForColumn = useCallback(
     (col: KanbanColumn) =>

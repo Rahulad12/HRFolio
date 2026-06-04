@@ -73,3 +73,13 @@ export function useDeactivateLookupValue(endpoint: LookupEndpoint, queryKey: rea
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   })
 }
+
+export function useLookupValues(endpoint: LookupEndpoint, queryKey: readonly string[]) {
+  return useQuery({
+    queryKey: [...queryKey],
+    queryFn: () => lookupApi.fetchLookupValues(endpoint),
+    staleTime: Infinity,
+    gcTime: Infinity,
+    select: (res) => res.data,
+  })
+}

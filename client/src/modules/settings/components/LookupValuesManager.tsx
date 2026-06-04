@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { Button, Form, Input, InputNumber, Modal, Popconfirm, Table, Tag, message } from 'antd'
 import { Plus } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
-import { GET } from '@/shared/lib/axios'
-import { LOOKUP_URL } from '@/shared/constants/api'
-import { LOOKUP_KEYS, useCreateLookupValue, useDeactivateLookupValue, useUpdateLookupValue } from '@/modules/lookup'
+import { LOOKUP_KEYS, useCreateLookupValue, useDeactivateLookupValue, useUpdateLookupValue, useLookupValues } from '@/modules/lookup'
 import type { LookupValue, CreateLookupPayload, UpdateLookupPayload, LookupEndpoint } from '@/modules/lookup'
 
 interface Props {
@@ -19,13 +16,7 @@ export function LookupValuesManager({ label, endpoint, queryKey }: Props) {
   const [form] = Form.useForm()
   const [editForm] = Form.useForm()
 
-  const { data: values = [], isLoading } = useQuery({
-    queryKey: [...queryKey],
-    queryFn: () => GET<{ success: boolean; data: LookupValue[] }>(`/${LOOKUP_URL}/${endpoint}`),
-    staleTime: Infinity,
-    gcTime: Infinity,
-    select: (res) => res.data,
-  })
+  const { data: values = [], isLoading } = useLookupValues(endpoint, queryKey)
 
   const { mutateAsync: createValue, isPending: creating } = useCreateLookupValue(endpoint, queryKey)
   const { mutateAsync: updateValue, isPending: updating } = useUpdateLookupValue(endpoint, queryKey)

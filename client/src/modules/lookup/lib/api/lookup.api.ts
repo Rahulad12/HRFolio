@@ -22,3 +22,6 @@ export const updateLookupValue = (endpoint: LookupEndpoint, id: string, data: Up
 
 export const deactivateLookupValue = (endpoint: LookupEndpoint, id: string) =>
   DELETE<LookupMutationResponse>(`/${LOOKUP_URL}/${endpoint}/${id}`)
+
+export const fetchLookupValues = (endpoint: LookupEndpoint) =>
+  GET<LookupListResponse>(`/${LOOKUP_URL}/${endpoint}`)

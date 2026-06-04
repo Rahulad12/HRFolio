@@ -47,7 +47,7 @@ export function PieChart({ labels, data, backgroundColor, darkMode }: PieChartPr
         <span className={`text-lg font-bold ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
           {total}
         </span>
-        <span className="text-xs text-slate-400">total</span>
+        <span className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>total</span>
       </div>
     </div>
   )

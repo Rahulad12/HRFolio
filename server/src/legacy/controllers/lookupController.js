@@ -21,7 +21,10 @@ export const createLookupController = (Model) => {
       }
       const value = await Model.create({ systemName, displayName, order, color, isActive: true });
       res.status(201).json({ success: true, data: value, message: "Created successfully" });
-    } catch {
+    } catch (err) {
+      if (err.code === 11000) {
+        return res.status(409).json({ success: false, message: "systemName already exists" });
+      }
       res.status(500).json({ success: false, message: "Server error" });
     }
   };

@@ -33,11 +33,11 @@ const createInterview = async (req, res) => {
             interviews.some(int => int.InterviewRound === round && int.status === "completed");
 
         const rounds = await InterviewRoundModel.find({ isActive: true }).sort({ order: 1 });
-        const roundOrder = rounds.map(r => r.systemName);
-        const roundIndex = roundOrder.indexOf(InterviewRound);
         if (rounds.length === 0) {
             return res.status(500).json({ success: false, message: "Interview round configuration is missing." });
         }
+        const roundOrder = rounds.map(r => r.systemName);
+        const roundIndex = roundOrder.indexOf(InterviewRound);
         if (roundIndex === -1) {
             return res.status(400).json({ success: false, message: `Unknown interview round: ${InterviewRound}` });
         }

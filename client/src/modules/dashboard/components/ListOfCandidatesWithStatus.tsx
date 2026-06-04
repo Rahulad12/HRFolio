@@ -100,7 +100,7 @@ export function ListOfCandidatesWithStatus({ candidates, loading = true }: Props
               return (
                 <div
                   key={col.key}
-                  className={`min-w-[160px] flex-1 rounded-lg border border-slate-200 bg-slate-50 p-2 dark:border-slate-800 dark:bg-slate-950 ${col.dimmed ? 'opacity-70' : ''}`}
+                  className={`min-w-[160px] flex-1 rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-950 ${col.dimmed ? 'opacity-70' : ''}`}
                 >
                   {/* Column header */}
                   <div className="mb-2 flex items-center justify-between">

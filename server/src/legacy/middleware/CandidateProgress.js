@@ -13,6 +13,10 @@ export const canCandidateProgress = (currentStage) => {
                 .find({ isActive: true, systemName: { $ne: 'rejected' } })
                 .sort({ order: 1 });
             const pipelineStages = statuses.map(s => s.systemName);
+            if (pipelineStages.length === 0) {
+                console.error("CandidateProgress: candidate_statuses lookup table is empty");
+                return res.status(500).json({ success: false, message: "Pipeline configuration is missing." });
+            }
             const currentIndex = pipelineStages.indexOf(currentStage);
             if (currentIndex === -1) {
                 return res.status(400).json({ success: false, message: "Invalid stage" });

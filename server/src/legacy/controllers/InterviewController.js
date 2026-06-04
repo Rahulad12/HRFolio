@@ -35,6 +35,12 @@ const createInterview = async (req, res) => {
         const rounds = await InterviewRoundModel.find({ isActive: true }).sort({ order: 1 });
         const roundOrder = rounds.map(r => r.systemName);
         const roundIndex = roundOrder.indexOf(InterviewRound);
+        if (rounds.length === 0) {
+            return res.status(500).json({ success: false, message: "Interview round configuration is missing." });
+        }
+        if (roundIndex === -1) {
+            return res.status(400).json({ success: false, message: `Unknown interview round: ${InterviewRound}` });
+        }
         if (roundIndex > 0) {
             const prevRound = roundOrder[roundIndex - 1];
             if (!hasCompleted(prevRound)) {
@@ -363,14 +369,14 @@ const deleteInterview = async (req, res) => {
             },
         });
 
+        const existingCandidate = await Candidate.findById(deleteInterview.candidate);
+
         await auditLogService.log({
             actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
             action: 'CANDIDATE_UPDATE',
             target: { id: deleteInterview.candidate, type: 'candidates', name: existingCandidate?.name },
             metadata: { after: `Interview deleted - ${deleteInterview.InterviewRound} round` }
         });
-
-        const existingCandidate = await Candidate.findById(deleteInterview.candidate);
         await ActivityLog.create({
             candidate: deleteInterview.candidate,
             userID: req.user.id,

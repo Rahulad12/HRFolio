@@ -10,10 +10,11 @@ export const createLookupController = (Model) => {
 
   const create = async (req, res) => {
     try {
-      const { systemName, displayName, order, color } = req.body;
-      if (!systemName || !displayName || order == null) {
+      const { systemName: rawSystemName, displayName, order, color } = req.body;
+      if (!rawSystemName || !displayName || order == null) {
         return res.status(400).json({ success: false, message: "systemName, displayName and order are required" });
       }
+      const systemName = rawSystemName.trim().toLowerCase();
       const existing = await Model.findOne({ systemName });
       if (existing) {
         return res.status(400).json({ success: false, message: "systemName already exists" });
@@ -29,9 +30,16 @@ export const createLookupController = (Model) => {
     try {
       const { id } = req.params;
       const { displayName, order, color } = req.body;
+      const updates = {};
+      if (displayName !== undefined) updates.displayName = displayName;
+      if (order !== undefined) updates.order = order;
+      if (color !== undefined) updates.color = color;
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ success: false, message: "No updatable fields provided" });
+      }
       const value = await Model.findByIdAndUpdate(
         id,
-        { displayName, order, color },
+        { $set: updates },
         { new: true, runValidators: true }
       );
       if (!value) return res.status(404).json({ success: false, message: "Not found" });

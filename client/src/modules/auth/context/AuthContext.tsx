@@ -10,13 +10,15 @@ export const AuthContext = createContext<AuthContextValue | undefined>(undefined
 
 function loadUser(): AuthUser | null {
   const token = localStorage.getItem('token')
-  if (!token) return null
+  const role = localStorage.getItem('role') as any
+  if (!token || !role) return null
   return {
     token,
     username: localStorage.getItem('username') || '',
     email: localStorage.getItem('email') || '',
     picture: localStorage.getItem('picture') || '',
     Id: localStorage.getItem('Id') || '',
+    role,
   }
 }
 
@@ -27,6 +29,7 @@ function persistUser(user: AuthUser) {
   localStorage.setItem('picture', user.picture || '')
   localStorage.setItem('googleLogin', 'true')
   localStorage.setItem('Id', user.Id)
+  localStorage.setItem('role', user.role)
 }
 
 function clearPersistedUser() {
@@ -34,8 +37,10 @@ function clearPersistedUser() {
   localStorage.removeItem('username')
   localStorage.removeItem('email')
   localStorage.removeItem('picture')
-  localStorage.removeItem('googleLogin')
   localStorage.removeItem('Id')
+  localStorage.removeItem('role')
+  // googleLogin is intentionally kept — it marks "this browser has signed in before"
+  // so the Welcome Back card shows on next visit instead of the main login
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

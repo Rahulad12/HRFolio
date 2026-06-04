@@ -1,4 +1,4 @@
-import { Steps, notification, Card, Typography, Select } from 'antd'
+import { Steps, notification, Card, Typography, Select, Skeleton } from 'antd'
 import { useUpdateCandidateStatus } from '../lib/queries/candidate.queries'
 import type { Candidate, CandidateStatus } from '../types/candidate.types'
 import { useCandidateStatuses } from '@/modules/lookup'
@@ -11,12 +11,13 @@ interface CandidateProgressProps {
 export function CandidateProgress({ candidate }: CandidateProgressProps) {
   const [api, contextHolder] = notification.useNotification()
   const { mutateAsync: updateStatus, isPending: statusUpdating } = useUpdateCandidateStatus()
-  const { data: statusList = [] } = useCandidateStatuses()
+  const { data: statusList = [], isLoading: statusLoading } = useCandidateStatuses()
   const StatusFlow = statusList
-    .filter(s => s.systemName !== 'rejected')
+    .filter(s => s.isActive && s.systemName !== 'rejected')
+    .sort((a, b) => a.order - b.order)
     .map(s => s.systemName as CandidateStatus)
 
-  if (!candidate) return null
+  if (!candidate || statusLoading) return <Skeleton active />
 
   const currentStep = StatusFlow.indexOf(candidate.status)
 

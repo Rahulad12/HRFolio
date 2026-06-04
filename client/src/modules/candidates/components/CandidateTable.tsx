@@ -18,7 +18,9 @@ export function CandidateTable() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
   const { data: statusList = [] } = useCandidateStatuses()
-  const statusOptions = statusList.map(s => ({ value: s.systemName, label: s.displayName }))
+  const statusOptions = statusList
+    .filter(s => s.isActive)
+    .map(s => ({ value: s.systemName, label: s.displayName }))
 
   const { candidateSearch } = useSearchStore()
   const { data, isLoading } = useCandidateList({

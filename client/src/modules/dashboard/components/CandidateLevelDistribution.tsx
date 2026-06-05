@@ -42,8 +42,8 @@ export function CandidateLevelDistribution({ candidates, loading = true }: Props
                   className="h-2 w-2 flex-shrink-0 rounded-sm"
                   style={{ backgroundColor: backgroundColor[i] }}
                 />
-                <span className="text-xs capitalize text-slate-400">{label}</span>
-                <span className="ml-auto text-xs font-semibold text-slate-200 dark:text-slate-200">
+                <span className="text-xs capitalize text-slate-500 dark:text-slate-400">{label}</span>
+                <span className="ml-auto text-xs font-semibold text-slate-700 dark:text-slate-200">
                   {total > 0 ? `${Math.round((data[i] / total) * 100)}%` : '0%'}
                 </span>
               </div>

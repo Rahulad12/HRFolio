@@ -78,7 +78,7 @@ export function UpcomingInterviews({ interviews, onViewAllClick, loading = false
                 className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
               >
                 <div
-                  className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold ${avatarColors[level] ?? 'bg-slate-700 text-slate-200'}`}
+                  className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold ${avatarColors[level] ?? 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'}`}
                 >
                   {getInitials(iv.candidate?.name)}
                 </div>
@@ -91,7 +91,7 @@ export function UpcomingInterviews({ interviews, onViewAllClick, loading = false
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="text-xs font-semibold text-amber-400">
+                  <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
                     {dayjs(iv.time).format('hh:mm A')}
                   </span>
                   <span
@@ -109,7 +109,7 @@ export function UpcomingInterviews({ interviews, onViewAllClick, loading = false
         <div className="mt-3 text-right">
           <button
             onClick={onViewAllClick}
-            className="text-xs font-medium text-indigo-400 hover:text-indigo-300"
+            className="text-xs font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             View all interviews →
           </button>

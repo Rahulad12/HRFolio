@@ -46,12 +46,12 @@ export function HiredandRejectedCorelation({ candidates, loading = false }: Prop
       title="Hired vs Rejected"
       extra={
         <div className="flex gap-3">
-          <span className="flex items-center gap-1.5 text-xs text-emerald-400">
-            <span className="inline-block h-0.5 w-3 rounded bg-emerald-400" />
+          <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+            <span className="inline-block h-0.5 w-3 rounded bg-emerald-500 dark:bg-emerald-400" />
             Hired
           </span>
-          <span className="flex items-center gap-1.5 text-xs text-red-400">
-            <span className="inline-block h-0.5 w-3 rounded bg-red-400" />
+          <span className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+            <span className="inline-block h-0.5 w-3 rounded bg-red-500 dark:bg-red-400" />
             Rejected
           </span>
         </div>

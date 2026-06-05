@@ -5,8 +5,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ConfigProvider, App as AntApp, theme } from 'antd'
 import { queryClient } from '@/shared/lib/query-client'
 import { AuthProvider } from '@/modules/auth'
+import { PermissionProvider } from '@/shared/context/PermissionContext'
 import { useThemeStore } from '@/shared/store/theme.store'
-import { router } from './routes'
+import { router } from './shared/routes'
 
 function AppContent() {
   const mode = useThemeStore((s) => s.mode)
@@ -52,7 +53,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <AppContent />
+        <PermissionProvider>
+          <AppContent />
+        </PermissionProvider>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

@@ -1,37 +1,61 @@
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import User from "../model/User.js";
-import dotenv from "dotenv";
-dotenv.config();
+import passport from 'passport'
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
+import User from '../model/User.js'
+import Identity from '../model/Identity.js'
+import dotenv from 'dotenv'
+dotenv.config()
 
-const callbackURL =
-  process.env.NODE_ENV === "production"
-    ? process.env.GOOGLE_CALLBACK_URL_PROD
-    : process.env.GOOGLE_CALLBACK_URL_DEV;
+const ALLOWED_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: callbackURL,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ googleId: profile.id });
-        if (!user) {
-          user = await User.create({
-            googleId: profile.id,
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            picture: profile.photos[0].value,
-            isLoggedIn: true,
-            role: "HR",
-          });
+        const email = profile.emails[0].value
+
+        // Domain restriction — skip if env var not set (dev mode)
+        if (ALLOWED_DOMAIN && !email.endsWith(`@${ALLOWED_DOMAIN}`)) {
+          return done(null, false, { message: 'Only company emails are allowed' })
         }
-        return done(null, user);
+
+        // Returning user — look up by existing identity
+        const existingIdentity = await Identity.findOne({
+          provider: 'google',
+          externalId: profile.id,
+        }).populate('userId')
+
+        if (existingIdentity) {
+          return done(null, existingIdentity.userId)
+        }
+
+        // First-time login — find pre-created User by email (Admin must create user first)
+        const user = await User.findOne({ email })
+        if (!user) {
+          return done(null, false, { message: 'Account not found. Contact your administrator.' })
+        }
+
+        // Link this Google identity to the existing User
+        await Identity.create({
+          userId: user._id,
+          provider: 'google',
+          externalId: profile.id,
+          providerEmail: email,
+        })
+
+        if (!user.picture) {
+          user.picture = profile.photos[0]?.value || ''
+          await user.save()
+        }
+
+        return done(null, user)
       } catch (err) {
-        return done(err, null);
+        return done(err, null)
       }
     }
   )
-);
+)

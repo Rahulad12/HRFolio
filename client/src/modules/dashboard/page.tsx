@@ -98,7 +98,7 @@ export function DashboardPage() {
         </Typography.Title>
         <Typography.Text className="text-sm text-slate-400">
           Welcome back,{' '}
-          <span className="font-semibold text-slate-200">{user?.username}</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-200">{user?.username}</span>
         </Typography.Text>
       </div>
 

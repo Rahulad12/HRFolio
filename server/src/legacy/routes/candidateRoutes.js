@@ -10,20 +10,18 @@ import {
   rejectCandidate,
 } from "../controllers/candidateController.js";
 import { authenticate, checkUserExist } from "../middleware/auhtMiddleware.js";
-import { authorize } from "../../shared/middleware/authorize.ts";
+import { hasPermission } from "../../shared/middleware/hasPermission.ts";
 
 const candidateRouter = express.Router();
 
-// Read — all authenticated users can read (HR sees own via controller-level filter)
-candidateRouter.get("/", authenticate, checkUserExist, getAllCandidates);
-candidateRouter.get("/log/:id", authenticate, checkUserExist, getCandidateLogsByCandidateId);
-candidateRouter.get("/:id", authenticate, checkUserExist, getCandidateById);
+candidateRouter.get("/", authenticate, checkUserExist, hasPermission("candidates:read"), getAllCandidates);
+candidateRouter.get("/log/:id", authenticate, checkUserExist, hasPermission("candidates:read"), getCandidateLogsByCandidateId);
+candidateRouter.get("/:id", authenticate, checkUserExist, hasPermission("candidates:read"), getCandidateById);
 
-// Write — Admin is explicitly forbidden by FRS (§4.1–4.4)
-candidateRouter.post("/", authenticate, checkUserExist, authorize(["HR", "HR Admin"]), createCandidate);
-candidateRouter.put("/reject/:id", authenticate, checkUserExist, authorize(["HR", "HR Admin"]), rejectCandidate);
-candidateRouter.put("/stage/:id", authenticate, checkUserExist, authorize(["HR", "HR Admin"]), changeCandidateStage);
-candidateRouter.put("/:id", authenticate, checkUserExist, authorize(["HR", "HR Admin"]), updateCandidate);
-candidateRouter.delete("/", authenticate, checkUserExist, authorize(["HR", "HR Admin"]), deleteCandidates);
+candidateRouter.post("/", authenticate, checkUserExist, hasPermission("candidates:create"), createCandidate);
+candidateRouter.put("/reject/:id", authenticate, checkUserExist, hasPermission("candidates:update"), rejectCandidate);
+candidateRouter.put("/stage/:id", authenticate, checkUserExist, hasPermission("candidates:update"), changeCandidateStage);
+candidateRouter.put("/:id", authenticate, checkUserExist, hasPermission("candidates:update"), updateCandidate);
+candidateRouter.delete("/", authenticate, checkUserExist, hasPermission("candidates:delete"), deleteCandidates);
 
 export default candidateRouter;

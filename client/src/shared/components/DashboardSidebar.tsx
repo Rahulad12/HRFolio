@@ -2,14 +2,14 @@ import { Link, useLocation, useNavigate } from 'react-router'
 import { Layout, Menu } from 'antd'
 import { Users, UserPlus, UserRound, LayoutDashboard, CalendarClock, InboxIcon, FileSignature, ShieldCheck, ClipboardList, AlertCircle, Settings } from 'lucide-react'
 import { useSidebarStore } from '@/shared/store/sidebar.store'
-import { useAuth } from '@/shared/hooks/useAuth'
+import { usePermissions } from '@/shared/hooks/usePermissions'
 
 const { Sider } = Layout
 
 export function DashboardSidebar() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { can } = usePermissions()
   const collapsed = useSidebarStore((s) => s.collapsed)
   const toggle = useSidebarStore((s) => s.toggle)
   const currentPath = location.pathname
@@ -65,21 +65,21 @@ export function DashboardSidebar() {
       icon: <AlertCircle size={20} />,
       label: <Link to="/dashboard/escalations">Escalations</Link>,
     },
-    // Admin only
-    ...(user?.role === 'Admin' ? [
+    ...(can('users:manage') ? [
       {
         key: '/dashboard/user-management',
         icon: <ShieldCheck size={20} />,
         label: <Link to="/dashboard/user-management">User Management</Link>,
       },
+    ] : []),
+    ...(can('settings:manage') ? [
       {
         key: '/dashboard/settings/lookup-values',
         icon: <Settings size={20} />,
         label: <Link to="/dashboard/settings/lookup-values">Settings</Link>,
       },
     ] : []),
-    // Admin + HR Admin
-    ...(user?.role === 'Admin' || user?.role === 'HR Admin' ? [
+    ...(can('audit-logs:read') ? [
       {
         key: '/dashboard/audit-logs',
         icon: <ClipboardList size={20} />,

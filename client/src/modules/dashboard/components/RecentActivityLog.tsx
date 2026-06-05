@@ -46,7 +46,7 @@ export function RecentActivityLog({ activityLogs, loading = false }: Props) {
       ) : (
         <div className="flex flex-col">
           {todayLogs.map((item, index) => {
-            const accent = entityAccent[item.entityType] ?? { icon: 'bg-slate-700 text-slate-400', text: 'text-slate-400' }
+            const accent = entityAccent[item.entityType] ?? { icon: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400', text: 'text-slate-600 dark:text-slate-400' }
             const isLast = index === todayLogs.length - 1
             return (
               <div key={index} className="flex gap-3">
@@ -55,7 +55,7 @@ export function RecentActivityLog({ activityLogs, loading = false }: Props) {
                   <div className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full ${accent.icon}`}>
                     {getIcon(item.entityType)}
                   </div>
-                  {!isLast && <div className="my-1 w-px flex-1 bg-slate-200 dark:bg-slate-700" />}
+                  {!isLast && <div className="my-1 w-px flex-1 bg-slate-300 dark:bg-slate-700" />}
                 </div>
                 {/* Content */}
                 <div className={`min-w-0 flex-1 ${!isLast ? 'pb-4' : ''}`}>

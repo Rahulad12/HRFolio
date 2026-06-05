@@ -74,9 +74,13 @@ export function DashboardSidebar() {
     ] : []),
     ...(can('settings:manage') ? [
       {
-        key: '/dashboard/settings/lookup-values',
+        key: 'settings',
         icon: <Settings size={20} />,
-        label: <Link to="/dashboard/settings/lookup-values">Settings</Link>,
+        label: 'Settings',
+        children: [
+          { key: '/dashboard/settings/lookup-values', label: <Link to="/dashboard/settings/lookup-values">Lookup Values</Link> },
+          { key: '/dashboard/settings/permissions', label: <Link to="/dashboard/settings/permissions">Role Permissions</Link> },
+        ],
       },
     ] : []),
     ...(can('audit-logs:read') ? [

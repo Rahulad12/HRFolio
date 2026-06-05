@@ -43,9 +43,9 @@ function Sparkline({ data, accentColor }: { data: number[]; accentColor: string 
 }
 
 const trendStyles: Record<TrendBadge['type'], string> = {
-  up: 'text-emerald-400 bg-emerald-400/10',
-  neutral: 'text-amber-400 bg-amber-400/10',
-  down: 'text-red-400 bg-red-400/10',
+  up: 'text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-400/10',
+  neutral: 'text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-400/10',
+  down: 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-400/10',
 }
 
 export function MetricsCard({

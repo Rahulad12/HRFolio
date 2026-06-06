@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Form, Input, InputNumber, Modal, Popconfirm, Table, Tag, message } from 'antd'
 import { Plus } from 'lucide-react'
-import { LOOKUP_KEYS, useCreateLookupValue, useDeactivateLookupValue, useUpdateLookupValue, useLookupValues } from '@/modules/lookup'
+import { useCreateLookupValue, useDeactivateLookupValue, useUpdateLookupValue, useLookupValues } from '@/modules/lookup'
 import type { LookupValue, CreateLookupPayload, UpdateLookupPayload, LookupEndpoint } from '@/modules/lookup'
 
 interface Props {

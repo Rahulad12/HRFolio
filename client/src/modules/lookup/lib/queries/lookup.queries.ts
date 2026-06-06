@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import * as lookupApi from '../api/lookup.api'
-import type { LookupValue, CreateLookupPayload, UpdateLookupPayload, LookupEndpoint } from '../../types/lookup.types'
+import type { CreateLookupPayload, UpdateLookupPayload, LookupEndpoint } from '../../types/lookup.types'
 
 export const LOOKUP_KEYS = {
   interviewRounds: ['lookup', 'interview-rounds'] as const,

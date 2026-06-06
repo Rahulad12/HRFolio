@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { useInterviewList } from '../lib/queries/interview.queries'
 import type { Dayjs } from 'dayjs'
 import { useInterviewRounds, useInterviewStatuses } from '@/modules/lookup'
-import { getLookupLabel, getLookupColor } from '@/shared/utils/lookup'
+import { getLookupLabel } from '@/shared/utils/lookup'
 
 export function InterviewCalendar() {
   const { data } = useInterviewList()

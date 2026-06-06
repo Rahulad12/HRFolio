@@ -1,7 +1,6 @@
 import { Card, Empty, Skeleton } from 'antd'
 import { UserPlus, CalendarClock, FileCheck, File, Check, UserCheck } from 'lucide-react'
 import dayjs from 'dayjs'
-import { makeCapitilized } from '../utils/dashboard.utils'
 import type { ActivityLog } from '../types/dashboard.types'
 
 interface Props {

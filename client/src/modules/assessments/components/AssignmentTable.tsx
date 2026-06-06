@@ -81,7 +81,7 @@ export function AssignmentTable() {
     },
     {
       title: 'Assigned Date',
-      dataIndex: 'assignedDate',
+      dataIndex: 'createdAt',
       key: 'assignedDate',
       render: (date: string) => date ? dayjs(date).format('MMM D, YYYY') : '-',
     },
@@ -111,7 +111,7 @@ export function AssignmentTable() {
       render: (_: unknown, record: Assignment) => (
         <Space>
           <Tooltip title="Evaluate">
-            <Button type="link" icon={<Star size={16} />} onClick={() => openScoreModal(record)} />
+            <Button type="link" icon={<Star size={16} />} onClick={() => openScoreModal(record)} disabled={record.status === 'completed'} />
           </Tooltip>
           <Popconfirm
             title="Delete this assignment?"

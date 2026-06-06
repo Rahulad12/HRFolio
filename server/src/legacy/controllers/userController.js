@@ -112,8 +112,15 @@ export const bannedUser = async (req, res) => {
 
 export const updateUserRole = async (req, res) => {
   try {
+    if (!req.user || req.user.role !== 'Admin') {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
     const { id } = req.params;
     const { role } = req.body;
+
+    if (id === req.user.id) {
+      return res.status(400).json({ success: false, message: 'Cannot change your own role' });
+    }
 
     if (!['HR', 'HR Admin', 'Admin'].includes(role)) {
       return res.status(400).json({ success: false, message: "Invalid role" });
@@ -147,6 +154,9 @@ export const updateUserRole = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
+    if (!req.user || req.user.role !== 'Admin') {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
     const { name, email, role } = req.body;
     if (!name || !email || !role) {
       return res.status(400).json({ success: false, message: "Name, email, and role are required" });

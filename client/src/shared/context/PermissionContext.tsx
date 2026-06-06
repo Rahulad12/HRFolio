@@ -15,21 +15,22 @@ const PermissionContext = createContext<PermissionContextValue>({
 })
 
 export function PermissionProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const [permissions, setPermissions] = useState<string[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user?.Id) {
       setPermissions([])
       setIsLoaded(false)
       return
     }
+    setIsLoaded(false)
     fetchMyPermissions()
       .then((res) => setPermissions(res.data))
       .catch(() => setPermissions([]))
       .finally(() => setIsLoaded(true))
-  }, [isAuthenticated])
+  }, [isAuthenticated, user?.Id])
 
   const can = (key: string) => permissions.includes(key)
 

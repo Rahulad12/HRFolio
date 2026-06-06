@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import passport from 'passport';
 import session from 'express-session';
 import "./config/passport.js";
@@ -17,7 +16,6 @@ app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

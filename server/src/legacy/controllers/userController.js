@@ -18,55 +18,64 @@ export const googleCallback = (req, res, next) => {
   logger.info("Google callback");
 
   passport.authenticate("google", { session: false }, async (err, user, info) => {
-    if (err || !user) {
-      logger.error("Error or no user", err || info);
-      return res.redirect(
-        `${frontendURL}/error?error=${encodeURIComponent(
-          err?.message || "User not found"
-        )}`
+    try {
+      if (err || !user) {
+        logger.error("Google callback — no user or error", { err: err?.message, info });
+        return res.redirect(
+          `${frontendURL}/error?error=${encodeURIComponent(
+            err?.message || info?.message || "User not found"
+          )}`
+        );
+      }
+
+      if (user.status === "inactive") {
+        logger.warn("Google callback — user is banned", { email: user.email });
+        return res.redirect(
+          `${frontendURL}/error?error=${encodeURIComponent(
+            "Your account is banned"
+          )}`
+        );
+      }
+
+      const token = jwt.sign(
+        { id: user._id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
       );
-    }
 
-    if (user.status === "inactive") {
-      logger.warn("User is banned");
-      return res.redirect(
-        `${frontendURL}/error?error=${encodeURIComponent(
-          "Your account is banned"
-        )}`
+      const rawRefresh = generateRefreshToken();
+      await RefreshToken.create({
+        userId: user._id,
+        tokenHash: hashToken(rawRefresh),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      });
+      res.cookie('refreshToken', rawRefresh, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+
+      logger.info("Google callback — redirecting to frontend", { email: user.email, role: user.role });
+      res.redirect(
+        `${frontendURL}/login/?token=${token}&email=${user.email}&name=${encodeURIComponent(user.name || '')}&picture=${encodeURIComponent(user.picture || '')}&Id=${user._id}&role=${user.role}`
       );
+
+      // Centralized Audit Log
+      auditLogService.log({
+        actor: { id: user._id, name: user.name, role: user.role || 'HR' },
+        action: 'AUTH_LOGIN',
+        target: { id: user._id, type: 'users', name: user.name }
+      });
+    } catch (callbackErr) {
+      logger.error("Google callback — unexpected error", { error: callbackErr?.message });
+      if (!res.headersSent) {
+        res.redirect(
+          `${frontendURL}/error?error=${encodeURIComponent("Login failed. Please try again.")}`
+        );
+      }
     }
-
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' }
-    );
-
-    const rawRefresh = generateRefreshToken();
-    await RefreshToken.create({
-      userId: user._id,
-      tokenHash: hashToken(rawRefresh),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
-    res.cookie('refreshToken', rawRefresh, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
-    });
-
-    logger.info("Redirecting to frontend with token");
-    res.redirect(
-      `${frontendURL}/login/?token=${token}&email=${user.email}&name=${user.name}&picture=${user.picture}&loggedIn=${user.isLoggedIn}&Id=${user._id}&role=${user.role}`
-    );
-
-    // Centralized Audit Log
-    auditLogService.log({
-      actor: { id: user._id, name: user.name, role: user.role || 'HR' },
-      action: 'AUTH_LOGIN',
-      target: { id: user._id, type: 'users', name: user.name }
-    });
   })(req, res, next);
 };
 

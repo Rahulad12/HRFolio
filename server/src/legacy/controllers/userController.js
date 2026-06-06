@@ -3,20 +3,21 @@ import passport from "passport";
 import logger from "../utils/logger.js";
 import User from "../model/User.js";
 import { auditLogService } from "../../modules/audit-logs/index.js";
+import RefreshToken from '../model/RefreshToken.js';
+import { generateRefreshToken, hashToken } from '../utils/tokenUtils.js';
 
 export const googleLoginRedirect = passport.authenticate("google", {
   scope: ["profile", "email"],
 });
 
-const frontendURL =
-  process.env.NODE_ENV === "production"
-    ? process.env.FRONTEND_URL_PROD
-    : process.env.FRONTEND_URL_DEV;
+// Use only the first origin for OAuth redirects (FRONTEND_URL can be comma-separated for CORS)
+const frontendURL = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',')[0].trim();
+
 // After Google auth redirects here
 export const googleCallback = (req, res, next) => {
   logger.info("Google callback");
 
-  passport.authenticate("google", { session: false }, (err, user, info) => {
+  passport.authenticate("google", { session: false }, async (err, user, info) => {
     if (err || !user) {
       logger.error("Error or no user", err || info);
       return res.redirect(
@@ -38,8 +39,22 @@ export const googleCallback = (req, res, next) => {
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "30d" }
+      { expiresIn: '1d' }
     );
+
+    const rawRefresh = generateRefreshToken();
+    await RefreshToken.create({
+      userId: user._id,
+      tokenHash: hashToken(rawRefresh),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+    res.cookie('refreshToken', rawRefresh, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
 
     logger.info("Redirecting to frontend with token");
     res.redirect(
@@ -79,6 +94,107 @@ export const bannedUser = async (req, res) => {
       success: true,
       message: `User status updated to ${user.status}`,
       user,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!['HR', 'HR Admin', 'Admin'].includes(role)) {
+      return res.status(400).json({ success: false, message: "Invalid role" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const beforeRole = user.role;
+    user.role = role;
+    await user.save();
+
+    await auditLogService.log({
+      actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+      action: 'USER_ROLE_CHANGE',
+      target: { id: user._id, type: 'users', name: user.name },
+      metadata: { before: beforeRole, after: role }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `User role updated to ${role}`,
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const createUser = async (req, res) => {
+  try {
+    const { name, email, role } = req.body;
+    if (!name || !email || !role) {
+      return res.status(400).json({ success: false, message: "Name, email, and role are required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "User with this email already exists" });
+    }
+
+    if (!['HR', 'HR Admin', 'Admin'].includes(role)) {
+      return res.status(400).json({ success: false, message: "Invalid role" });
+    }
+
+    const user = await User.create({ name, email, role, status: 'active' });
+
+    await auditLogService.log({
+      actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+      action: 'USER_CREATE',
+      target: { id: user._id, type: 'users', name: user.name },
+      metadata: { after: { email: user.email, role: user.role } }
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      data: user,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).sort({ createdAt: -1 });
+    return res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: users,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Returns active users filtered by role — accessible to any authenticated user.
+// Used by escalation modals to list HR Admins or Admins.
+export const getTeamByRole = async (req, res) => {
+  try {
+    const { role } = req.query;
+    const query = { status: 'active' };
+    if (role) query.role = role;
+    const users = await User.find(query, 'name email role picture').sort({ name: 1 });
+    return res.status(200).json({
+      success: true,
+      message: "Team fetched successfully",
+      data: users,
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

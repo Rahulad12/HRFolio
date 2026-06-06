@@ -30,10 +30,6 @@ export function hasPermission(key: string) {
       res.status(401).json({ success: false, message: 'Unauthorized' })
       return
     }
-    if (user.role === 'Admin') {
-      next()
-      return
-    }
     const perms = await loadPermissions(user.role)
     if (!perms[key]) {
       res.status(403).json({ success: false, message: `Forbidden: missing permission '${key}'` })

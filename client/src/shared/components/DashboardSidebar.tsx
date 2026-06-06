@@ -20,51 +20,45 @@ export function DashboardSidebar() {
       icon: <LayoutDashboard size={18} />,
       label: <Link to="/dashboard">Dashboard</Link>,
     },
-    {
+    ...(can('candidates:read') ? [{
       key: '/dashboard/candidates',
       icon: <Users size={18} />,
       label: <Link to="/dashboard/candidates">Candidates</Link>,
-    },
-    {
+    }] : []),
+    ...(can('assessments:read') ? [{
       key: 'assessments',
       icon: <UserRound size={18} />,
       label: 'Assessments',
       children: [
-        {
-          key: '/dashboard/assessments',
-          label: <Link to="/dashboard/assessments">Assessments</Link>,
-        },
-        {
-          key: '/dashboard/assessments/assignments',
-          label: <Link to="/dashboard/assessments/assignments">Manage Assessment</Link>,
-        },
+        { key: '/dashboard/assessments', label: <Link to="/dashboard/assessments">Assessments</Link> },
+        { key: '/dashboard/assessments/assignments', label: <Link to="/dashboard/assessments/assignments">Manage Assessment</Link> },
       ],
-    },
-    {
+    }] : []),
+    ...(can('interviews:read') ? [{
       key: '/dashboard/interviews',
       icon: <CalendarClock size={18} />,
       label: <Link to="/dashboard/interviews">Interviews</Link>,
-    },
-    {
+    }] : []),
+    ...(can('interviewers:read') ? [{
       key: '/dashboard/interviewers',
       icon: <UserPlus size={20} />,
       label: <Link to="/dashboard/interviewers">Interviewers</Link>,
-    },
-    {
+    }] : []),
+    ...(can('offers:read') ? [{
       key: '/dashboard/offers',
       icon: <FileSignature size={20} />,
       label: <Link to="/dashboard/offers">Offer</Link>,
-    },
-    {
+    }] : []),
+    ...(can('email-templates:read') ? [{
       key: '/dashboard/email-templates',
       icon: <InboxIcon size={20} />,
       label: <Link to="/dashboard/email-templates">Email Templates</Link>,
-    },
-    {
+    }] : []),
+    ...(can('escalations:read') ? [{
       key: '/dashboard/escalations',
       icon: <AlertCircle size={20} />,
       label: <Link to="/dashboard/escalations">Escalations</Link>,
-    },
+    }] : []),
     ...(can('users:manage') ? [
       {
         key: '/dashboard/user-management',

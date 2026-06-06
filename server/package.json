@@ -1,7 +1,7 @@
 {
-  "name": "cv_manager_backend",
+  "name": "hrfolio-backend",
   "version": "1.0.0",
-  "description": "This is the backend to illustrate the cv manager ",
+  "description": "This is the backend for HRFolio - HR Management System",
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
@@ -10,26 +10,33 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "data:seed": "node src/legacy/Data/Seeder.js seed",
-    "data:destroy": "node src/legacy/Data/Seeder.js destroy"
+    "data:destroy": "node src/legacy/Data/Seeder.js destroy",
+    "migrate:roles-ownership": "node src/scripts/migrate-roles-ownership.js"
   },
   "author": "Rahul Adhikari",
   "license": "MIT",
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^22.19.19",
     "tsx": "^4.22.3",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
+    "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.2",
     "mime-types": "^3.0.1",
     "mongoose": "^8.13.2",
+    "morgan": "^1.10.1",
     "multer": "^1.4.5-lts.2",
     "nodemailer": "^6.10.1",
     "nodemon": "^3.1.9",

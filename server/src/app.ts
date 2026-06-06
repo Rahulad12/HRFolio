@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import legacyApp from './legacy/index.js';
 import { escalationRoutes } from './modules/escalations/index.js';
 import { auditLogRoutes } from './modules/audit-logs/index.js';
@@ -27,6 +28,7 @@ app.use(cors({
 
 app.use(morgan('combined'));
 app.use(express.json());
+app.use(cookieParser());
 
 //routes
 app.use('/api/escalations', escalationRoutes);

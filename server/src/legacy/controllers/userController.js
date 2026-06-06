@@ -80,7 +80,17 @@ export const bannedUser = async (req, res) => {
     }
 
     const beforeStatus = user.status;
-    user.status = user.status === "active" ? "inactive" : "active";
+    const newStatus = user.status === 'active' ? 'inactive' : 'active';
+
+    if (newStatus === 'inactive') {
+      await RefreshToken.updateMany(
+        { userId: user._id, revokedAt: null },
+        { revokedAt: new Date() }
+      );
+      logger.info(`Revoked all refresh tokens for deactivated user ${user.email}`);
+    }
+
+    user.status = newStatus;
     await user.save();
 
     await auditLogService.log({

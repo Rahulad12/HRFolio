@@ -13,8 +13,7 @@ export class ApiError extends Error {
   }
 }
 
-const client = axios.create({ baseURL: API_BASE_URL })
-
+const client = axios.create({ baseURL: API_BASE_URL + "/api/" })
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -25,7 +24,7 @@ client.interceptors.request.use((config) => {
 
 function handleError(error: unknown): never {
   if (error instanceof AxiosError) {
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    if (error.response?.status === 401) {
       localStorage.removeItem('token')
       window.location.href = '/login'
     }

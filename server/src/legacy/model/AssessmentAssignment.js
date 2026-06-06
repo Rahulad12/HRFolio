@@ -28,7 +28,10 @@ const assessmentAssignmentSchema = new mongoose.Schema({
         default: "assigned",
         required: true
     },
-
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+    },
 }, {
     timestamps: true
 });

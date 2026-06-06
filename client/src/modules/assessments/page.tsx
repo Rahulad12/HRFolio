@@ -1,7 +1,20 @@
+import { AssessmentTable } from './components/AssessmentTable'
+import { AssessmentForm } from './components/AssessmentForm'
+import { AssignmentTable } from './components/AssignmentTable'
+import { AssignAssessmentForm } from './components/AssignAssessmentForm'
+
 export function AssessmentListPage() {
-  return <div>Assessments Page</div>
+  return <AssessmentTable />
+}
+
+export function AssessmentFormPage() {
+  return <AssessmentForm />
 }
 
 export function AssignmentListPage() {
-  return <div>Assignments Page</div>
+  return <AssignmentTable />
+}
+
+export function AssignAssessmentPage() {
+  return <AssignAssessmentForm />
 }

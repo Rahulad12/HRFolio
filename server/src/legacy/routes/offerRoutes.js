@@ -1,5 +1,5 @@
 import express from "express";
-import { createOffer, getOffer, getOfferByCandidates, getOfferById, updateOffer, delteOffer, getOfferLogsByCandidate } from '../controllers/offerController.js'
+import { createOffer, getOffer, getOfferByCandidates, getOfferById, updateOffer, delteOffer, getOfferLogsByCandidate, sendOfferById } from '../controllers/offerController.js'
 import { authenticate, checkUserExist } from "../middleware/auhtMiddleware.js";
 import { canCandidateProgress } from "../middleware/CandidateProgress.js";
 const offerRouter = express.Router();
@@ -11,6 +11,7 @@ offerRouter.get("/candidate/:id", authenticate, checkUserExist, getOfferByCandid
 offerRouter.get("/log/candidate/:id", authenticate, checkUserExist, getOfferLogsByCandidate);
 
 offerRouter.get("/:id", authenticate, checkUserExist, getOfferById);
+offerRouter.post("/:id/send", authenticate, checkUserExist, sendOfferById);
 offerRouter.put("/:id", authenticate, checkUserExist, updateOffer);
 offerRouter.delete("/:id", authenticate, checkUserExist, delteOffer);
 

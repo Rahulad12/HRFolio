@@ -34,3 +34,49 @@ export interface OfferFormData {
   responseDeadline: string
   status: OfferStatus
 }
+
+export interface CandidateBasic {
+  _id: string
+  name: string
+  email: string
+}
+
+export interface EmailTemplate {
+  _id: string
+  name: string
+  type: string
+  body: string
+}
+
+export interface OfferLog {
+  _id: string
+  candidate: { _id: string; name: string; email: string }
+  offer: Offer
+  action: string
+  details: {
+    status: string
+    salary?: string
+    responseDeadline?: string
+    [key: string]: unknown
+  }
+  performedAt: string
+  createdAt: string
+}
+
+export interface OfferLogListResponse {
+  success: boolean
+  message: string
+  data: OfferLog[]
+}
+
+export interface CandidateListResponse {
+  success: boolean
+  message: string
+  data: CandidateBasic[]
+}
+
+export interface EmailTemplateListResponse {
+  success: boolean
+  message: string
+  data: EmailTemplate[]
+}

@@ -1,6 +1,6 @@
 import { GET, POST, PUT, DELETE } from '@/shared/lib/axios'
-import { CANDIDATE_URL } from '@/shared/constants/api'
-import type { CandidateListResponse, CandidateResponse, CandidateFormData } from '../../types/candidate.types'
+import { CANDIDATE_URL, ACTIVITY_LOG_URL } from '@/shared/constants/api'
+import type { CandidateListResponse, CandidateResponse, CandidateFormData, ActivityLogResponse } from '../../types/candidate.types'
 
 export async function fetchCandidates(params?: Record<string, unknown>): Promise<CandidateListResponse> {
   return GET<CandidateListResponse>(`/${CANDIDATE_URL}`, params)
@@ -23,9 +23,13 @@ export async function deleteCandidate(id: string): Promise<{ success: boolean; m
 }
 
 export async function updateCandidateStatus(id: string, status: string): Promise<CandidateResponse> {
-  return PUT<CandidateResponse>(`/${CANDIDATE_URL}/${id}/status`, { status })
+  return PUT<CandidateResponse>(`/${CANDIDATE_URL}/${id}`, { status })
+}
+
+export async function fetchCandidateActivityLogs(id: string): Promise<ActivityLogResponse> {
+  return GET<ActivityLogResponse>(`/${ACTIVITY_LOG_URL}/candidate/${id}`)
 }
 
 export async function uploadResume(file: FormData): Promise<{ success: boolean; message: string; url: string }> {
-  return POST<{ success: boolean; message: string; url: string }>('/upload', file)
+  return POST<{ success: boolean; message: string; url: string }>('/uploads/resume', file)
 }

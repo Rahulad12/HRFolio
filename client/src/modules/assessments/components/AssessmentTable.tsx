@@ -1,26 +1,23 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Table, Button, Card, Input, Select, Space, Tag, Popconfirm, message, notification, Tooltip, Typography } from 'antd'
 import { Plus, Search, Trash2, Edit3, FileDown } from 'lucide-react'
 import { useAssessmentList, useDeleteAssessment } from '../lib/queries/assessment.queries'
-import { AssessmentFormModal } from './AssessmentFormModal'
 import type { Assessment, AssessmentType } from '../types/assessment.types'
 
 const { Option } = Select
 
-const assessmentTypes: AssessmentType[] = ['mcq', 'coding', 'assignment', 'quiz']
+const assessmentTypes: AssessmentType[] = ['behavioural', 'technical']
 const assessmentTypeColors: Record<AssessmentType, string> = {
-  mcq: 'blue',
-  coding: 'purple',
-  assignment: 'orange',
-  quiz: 'cyan',
+  behavioural: 'blue',
+  technical: 'purple',
 }
 
 export function AssessmentTable() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('')
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingAssessment, setEditingAssessment] = useState<Assessment | null>(null)
   const [api, contextHolder] = notification.useNotification()
 
   const { data, isLoading } = useAssessmentList()
@@ -107,7 +104,8 @@ export function AssessmentTable() {
       key: 'assessmentLink',
       render: (link: string) => {
         const safe = /^https?:\/\//i.test(link) ? link : '#'
-        return <a href={safe} target="_blank" rel="noopener noreferrer">Open</a>
+        return (
+          <a href={safe} target="_blank" rel="noopener noreferrer" className='flex gap-2 items-center justify-items-center'><FileDown size={16} />View</a>)
       },
     },
     {
@@ -119,10 +117,7 @@ export function AssessmentTable() {
             <Button
               type="link"
               icon={<Edit3 size={16} />}
-              onClick={() => {
-                setEditingAssessment(record)
-                setFormOpen(true)
-              }}
+              onClick={() => navigate('/dashboard/assessments/edit/' + record._id)}
             />
           </Tooltip>
           <Popconfirm
@@ -154,7 +149,7 @@ export function AssessmentTable() {
           <Button
             type="primary"
             icon={<Plus size={16} />}
-            onClick={() => { setEditingAssessment(null); setFormOpen(true) }}
+            onClick={() => navigate('/dashboard/assessments/new')}
           >
             New Assessment
           </Button>
@@ -197,11 +192,6 @@ export function AssessmentTable() {
         </Card>
       </motion.div>
 
-      <AssessmentFormModal
-        open={formOpen}
-        assessment={editingAssessment}
-        onClose={() => { setFormOpen(false); setEditingAssessment(null) }}
-      />
     </>
   )
 }

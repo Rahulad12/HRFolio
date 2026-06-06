@@ -1,3 +1,4 @@
+import { PublicRoutesLoader } from '@/shared/loaders/public-routes-loader'
 import { lazy } from 'react'
 
 const LazyLoginPage = lazy(() =>
@@ -7,6 +8,7 @@ const LazyLoginPage = lazy(() =>
 export const authRoutes = [
   {
     path: 'login',
+    loader: PublicRoutesLoader,
     element: <LazyLoginPage />,
   },
 ]

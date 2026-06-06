@@ -1,8 +1,9 @@
 import { lazy } from 'react'
-import type { RouteObject } from 'react-router'
 
 const LazyInterviewList = lazy(() => import('../page').then((m) => ({ default: m.InterviewListPage })))
+const LazyInterviewSchedule = lazy(() => import('../page').then((m) => ({ default: m.InterviewSchedulePage })))
 
-export const interviewRoutes: RouteObject[] = [
+export const interviewRoutes = [
   { path: 'interviews', element: <LazyInterviewList /> },
+  { path: 'interviews/schedule', element: <LazyInterviewSchedule /> },
 ]

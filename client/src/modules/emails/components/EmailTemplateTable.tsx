@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Table, Button, Card, Input, Select, Space, Tag, Popconfirm, message, Tooltip, Typography } from 'antd'
 import { Plus, Search, Edit3, Trash2, Eye } from 'lucide-react'
 import { useEmailTemplateList, useDeleteEmailTemplate } from '../lib/queries/email.queries'
-import { EmailTemplateFormModal } from './EmailTemplateFormModal'
 import { EmailTemplatePreviewModal } from './EmailTemplatePreviewModal'
 import type { EmailTemplate, EmailTemplateType } from '../types/email.types'
 
@@ -19,10 +19,9 @@ const typeColors: Record<EmailTemplateType, string> = {
 }
 
 export function EmailTemplateTable() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('')
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
 
@@ -89,7 +88,7 @@ export function EmailTemplateTable() {
             <Button type="link" icon={<Eye size={16} />} onClick={() => { setPreviewTemplate(record); setPreviewOpen(true) }} />
           </Tooltip>
           <Tooltip title="Edit">
-            <Button type="link" icon={<Edit3 size={16} />} onClick={() => { setEditingTemplate(record); setFormOpen(true) }} />
+            <Button type="link" icon={<Edit3 size={16} />} onClick={() => navigate('/dashboard/email-templates/edit/' + record._id)} />
           </Tooltip>
           <Popconfirm
             title="Delete this template?"
@@ -119,7 +118,7 @@ export function EmailTemplateTable() {
           <Button
             type="primary"
             icon={<Plus size={16} />}
-            onClick={() => { setEditingTemplate(null); setFormOpen(true) }}
+            onClick={() => navigate('/dashboard/email-templates/new')}
           >
             New Template
           </Button>
@@ -156,12 +155,6 @@ export function EmailTemplateTable() {
           />
         </Card>
       </motion.div>
-
-      <EmailTemplateFormModal
-        open={formOpen}
-        template={editingTemplate}
-        onClose={() => { setFormOpen(false); setEditingTemplate(null) }}
-      />
 
       <EmailTemplatePreviewModal
         template={previewTemplate}

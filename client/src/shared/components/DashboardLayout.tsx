@@ -1,5 +1,6 @@
+import { Suspense } from 'react'
 import { Outlet } from 'react-router'
-import { Layout as AntLayout, theme as antTheme } from 'antd'
+import { Layout as AntLayout, theme as antTheme, Spin } from 'antd'
 import { useThemeStore } from '@/shared/store/theme.store'
 import { DashboardSidebar } from './DashboardSidebar'
 import { DashboardHeader } from './DashboardHeader'
@@ -30,7 +31,9 @@ export function DashboardLayout() {
             scrollbarWidth: 'thin',
           }}
         >
-          <Outlet />
+          <Suspense fallback={<Spin className="flex justify-center items-center h-full" size="large" />}>
+            <Outlet />
+          </Suspense>
         </Content>
       </div>
     </AntLayout>

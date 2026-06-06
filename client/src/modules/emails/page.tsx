@@ -1,3 +1,10 @@
+import { EmailTemplateTable } from './components/EmailTemplateTable'
+import { EmailTemplateForm } from './components/EmailTemplateForm'
+
 export function EmailTemplateListPage() {
-  return <div>Email Templates Page</div>
+  return <EmailTemplateTable />
+}
+
+export function EmailTemplateFormPage() {
+  return <EmailTemplateForm />
 }

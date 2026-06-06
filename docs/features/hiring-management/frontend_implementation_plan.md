@@ -1,93 +1,91 @@
-# Frontend Implementation Plan: Hiring Management Enhancements
+# Technical Frontend Implementation Plan: Hiring Management Enhancements
 
 **Target Issues:** #36 - #39
-**Status:** In Planning
-**Architecture:** Modular TypeScript (React 18 / Vite / Ant Design / Redux Toolkit)
-**Base Branch:** `feature/32-rbac-implementation` (or new feature branch)
+**Architecture:** Modular TypeScript (React 18 / Vite / Ant Design / Zustand + Context)
 
 ---
 
-## Overview
-This plan details the frontend implementation of RBAC UI enforcement, User Management, Escalation workflows, and Audit Log viewing. All new features will be implemented in `client/src/modules/` as independent, type-safe modules.
+## 1. Authentication & Role Propagation (#36)
+
+### 1.1 Type Updates
+- **File:** `client/src/modules/auth/types/auth.types.ts`
+- **Action:** Add `role: 'HR' | 'HR Admin' | 'Admin'` to `AuthUser` and `GoogleLoginPayload`.
+
+### 1.2 Context & Persistence
+- **File:** `client/src/modules/auth/context/AuthContext.tsx`
+- **Action:** 
+  - Update `loadUser()` to retrieve `role` from `localStorage`.
+  - Update `persistUser()` to save `role` to `localStorage`.
+  - Update `clearPersistedUser()` to remove `role`.
+
+### 1.3 Login Redirect Handling
+- **File:** `client/src/modules/auth/page.tsx`
+- **Action:** 
+  - Extract `role` from `searchParams`.
+  - Pass `role` to `setCredentials()`.
 
 ---
 
-## Phase 1: Authentication & Protection (#36)
-### 1.1 Shared Auth Logic
-- **Goal:** Centralize role-based access logic.
+## 2. Role-Based Access Control (UI)
+
+### 2.1 Enhanced Protected Route
+- **File:** `client/src/shared/components/ProtectedRoute.tsx`
 - **Action:**
-  - Create `client/src/shared/hooks/useAuth.ts` to expose `user`, `role`, and `isAuthenticated`.
-  - Update Redux auth slice to handle the `role` returned from the login redirect.
-- **Location:** `client/src/shared/hooks/`, `client/src/slices/`
+  - Update component to accept `allowedRoles?: string[]`.
+  - Logic:
+    ```tsx
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+      return <Navigate to="/dashboard" replace />; // Or an "Access Denied" page
+    }
+    ```
 
-### 1.2 Protected Route Component
-- **Goal:** Prevent unauthorized access to pages.
+### 2.2 Dynamic Sidebar Navigation
+- **File:** `client/src/shared/components/DashboardSidebar.tsx`
+- **Action:** 
+  - Access `user` from `useAuth()`.
+  - Filter the `links` array based on the current user's role.
+  - "User Management" and "Audit Logs" should only be visible to `Admin`.
+
+---
+
+## 3. Modular Feature Implementation
+
+### 3.1 User Management Module (#37)
+- **Scaffold:** `/scaffold user-management client`
+- **Endpoints:**
+  - `GET /api/auth/users` (Need to verify backend endpoint for listing users)
+  - `DELETE /api/auth/:id` (Toggles status)
+  - `PATCH /api/auth/:id/role` (New endpoint to be added to backend)
+- **Component:** `UserTable` using Ant Design `Table`.
+
+### 3.2 Escalation Workflow Module (#38)
+- **Scaffold:** `/scaffold escalations client`
+- **Endpoints:**
+  - `POST /api/escalations/raise`
+  - `POST /api/escalations/:id/resolve`
+  - `GET /api/escalations/my`
+- **Integration:** Add "Raise Escalation" button to `CandidateDetailPage`.
+
+### 3.3 System Audit Log Module (#39)
+- **Scaffold:** `/scaffold audit-logs client`
+- **Endpoints:**
+  - `GET /api/audit-logs`
+- **Component:** `AuditLogTable` with column rendering for `metadata` (JSON view).
+
+---
+
+## 4. Routing Registration
+- **File:** `client/src/routes/index.tsx`
 - **Action:**
-  - Implement `ProtectedRoute` in `client/src/shared/components/protected-route.tsx`.
-  - Props: `allowedRoles?: string[]`.
-  - Logic: Redirect to `/login` if unauthenticated; show "Access Denied" if role doesn't match.
-- **Verification:** Manually changing URL to `/admin/audit-logs` as an HR user should redirect/block.
+  - Import new modular routes.
+  - Wrap Admin-only routes with `<ProtectedRoute allowedRoles={['Admin']} />`.
 
 ---
 
-## Phase 2: User Management Module (#37)
-### 2.1 Module Scaffolding
-- **Action:** `/scaffold user-management client`
-- **Structure:**
-  - `lib/api/`: `getUsers`, `updateUserRole`, `toggleUserStatus`.
-  - `components/`: `UserTable`, `UserRoleModal`.
-
-### 2.2 Features (Admin Only)
-- **User List:** Ant Design `Table` showing Name, Email, Role, and Status.
-- **Role Management:** Modal to change a user's role (HR, HR Admin, Admin).
-- **Status Toggle:** Switch to activate/deactivate users.
-- **Verification:** Admin can change an HR user to HR Admin and see the change reflect.
+## 5. Technical Constraints
+- **Validation:** Use `Zod` with `Ant Design Form`.
+- **API Calls:** Use the established pattern in `lib/queries/` (likely TanStack Query based on `package.json`).
+- **Icons:** Use `lucide-react`.
 
 ---
-
-## Phase 3: Escalation Workflow Module (#38)
-### 3.1 Module Scaffolding
-- **Action:** `/scaffold escalations client`
-- **Structure:**
-  - `lib/api/`: `raiseEscalation`, `resolveEscalation`, `getMyEscalations`.
-  - `components/`: `RaiseEscalationModal`, `EscalationDashboard`.
-
-### 3.2 Features
-- **Raise Escalation:** Button on Candidate Detail page (visible only to HR owner) opening a modal to select HR Admin and add notes.
-- **Dashboard:** 
-  - **HR View:** "My Raised Requests" with status tracking.
-  - **Admin/HRA View:** "Pending Reviews" with "Resolve" action.
-- **Verification:** HR raises request -> HR Admin sees it -> HR Admin resolves -> HR sees resolution.
-
----
-
-## 4. Phase 4: System Audit Log Module (#39)
-### 4.1 Module Scaffolding
-- **Action:** `/scaffold audit-logs client`
-- **Structure:**
-  - `lib/api/`: `getAuditLogs` (with pagination and filters).
-  - `components/`: `AuditLogTable`, `AuditLogFilters`.
-
-### 4.2 Features (Admin Only)
-- **Audit Table:** Columnar view of Timestamp, Actor, Action, Target, and Metadata.
-- **Filtering:** Search by Actor ID, Action Type, or Date Range.
-- **URL State:** Use `nuqs` to keep filters/pagination in the URL.
-- **Verification:** Perform a candidate deletion and verify the log appears in the table.
-
----
-
-## Phase 5: UI/UX Refinements
-- **Navigation:** Update sidebar to conditionally render "User Management" and "Audit Logs" only for Admin roles.
-- **Candidate Actions:** Hide "Edit/Delete" buttons on the candidate list if the HR user does not own the candidate (complementing backend checks).
-- **Error Handling:** Global Ant Design `notification` for 403 Forbidden responses.
-
----
-
-## Technical Standards
-- **Validation:** All forms must use `Ant Design Form` with `Zod` schemas.
-- **Types:** Explicit interfaces for all API responses in `<module>/types/`.
-- **Barrels:** Always export through `index.ts` barrels.
-- **Styling:** Vanilla CSS or Ant Design tokens (No inline styles).
-
----
-*Plan created on 2026-05-30*
+*Updated on 2026-05-30*

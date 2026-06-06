@@ -111,6 +111,7 @@ const assignAssessment = async (req, res) => {
                     dueDate,
                     emailTemplate,
                     status,
+                    createdBy: req.user.id,
                 });
 
                 if (status === 'assigned' && process.env.NODE_ENV === 'production') {
@@ -198,7 +199,11 @@ const getAssessment = async (req, res) => {
  */
 const getAssignment = async (req, res) => {
     try {
-        const assignment = await AssessmentAssignment.find({}).select(" -__v").populate({
+        const query = {}
+        if (req.user.role === 'HR') {
+            query.createdBy = req.user.id
+        }
+        const assignment = await AssessmentAssignment.find(query).select(" -__v").populate({
             path: "candidate",
             select: "-__v"
         }).populate({
@@ -247,6 +252,13 @@ const deleteAssessment = async (req, res) => {
 
 const deleteAssignment = async (req, res) => {
     try {
+        const existing = await AssessmentAssignment.findById(req.params.id);
+        if (!existing) {
+            return res.status(404).json({ success: false, message: "Assignment not found" });
+        }
+        if (req.user.role === 'HR' && existing.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
         const assignment = await AssessmentAssignment.findByIdAndDelete(req.params.id).populate({
             path: "candidate",
             select: " -__v"
@@ -325,10 +337,14 @@ const updateAssessment = async (req, res) => {
  */
 const updateAssignmnet = async (req, res) => {
     try {
-        const assignment = await AssessmentAssignment.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!assignment) {
+        const existing = await AssessmentAssignment.findById(req.params.id);
+        if (!existing) {
             return res.status(400).json({ success: false, message: "Assignment not found" });
         }
+        if (req.user.role === 'HR' && existing.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
+        const assignment = await AssessmentAssignment.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
         await AssessmentLog.create({
             assessment: assignment?.assessment,
@@ -395,7 +411,11 @@ const getAssessmentById = async (req, res) => {
  */
 const getAssignmentByCandidateId = async (req, res) => {
     try {
-        const assignment = await AssessmentAssignment.find({ candidate: req.params.id }).select(" -__v").populate({
+        const query = { candidate: req.params.id }
+        if (req.user.role === 'HR') {
+            query.createdBy = req.user.id
+        }
+        const assignment = await AssessmentAssignment.find(query).select(" -__v").populate({
             path: "candidate",
             select: " -__v"
         }).populate({
@@ -435,6 +455,9 @@ const getAssignmentById = async (req, res) => {
         if (!assignment) {
             return res.status(404).json({ success: false, message: "Assignment not found" });
         }
+        if (req.user.role === 'HR' && assignment.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
         return res.status(200).json({ success: true, message: "Assignment fetched successfully", data: assignment });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -460,6 +483,13 @@ const createScore = async (req, res) => {
     try {
         if (score < 0 || score > 100) {
             return res.status(400).json({ success: false, message: "Score must be between 0 and 100" });
+        }
+
+        if (req.user.role === 'HR') {
+            const assignment = await AssessmentAssignment.findOne({ candidate, assessment })
+            if (!assignment || assignment.createdBy?.toString() !== req.user.id) {
+                return res.status(403).json({ success: false, message: "Forbidden" });
+            }
         }
 
         const existingScore = await Score.findOne({

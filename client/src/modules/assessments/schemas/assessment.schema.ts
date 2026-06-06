@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const assessmentSchema = z.object({
   title: z.string().min(1, 'Assessment name is required'),
-  type: z.enum(['mcq', 'coding', 'assignment', 'quiz']),
+  type: z.enum(['behavioural', 'technical']),
   technology: z.string().min(1, 'Technology is required'),
   level: z.string().min(1, 'Level is required'),
   assessmentLink: z.string().url('Enter a valid URL'),

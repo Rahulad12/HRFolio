@@ -11,7 +11,7 @@ export function LoginPage() {
   const [searchParams] = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const { setCredentials } = useAuth()
-  const googleURL = import.meta.env.VITE_API_URL
+  const googleURL = import.meta.env.VITE_API_BASE_URL
 
   useEffect(() => {
     const token = searchParams.get('token')
@@ -19,14 +19,16 @@ export function LoginPage() {
     const name = searchParams.get('name')
     const picture = searchParams.get('picture')
     const userId = searchParams.get('Id')
+    const role = searchParams.get('role') as any
 
-    if (token && email && name) {
+    if (token && email && name && role) {
       setCredentials({
         token,
         email,
         username: name,
         picture: picture || '',
         Id: userId || '',
+        role,
       })
       navigate('/dashboard')
     }
@@ -34,7 +36,7 @@ export function LoginPage() {
 
   const submitHandler = () => {
     setIsLoading(true)
-    window.location.href = `${googleURL}auth/google`
+    window.location.href = `${googleURL}/api/auth/google`
   }
 
   const shouldShowWelcomeBack = localStorage.getItem('googleLogin') === 'true'

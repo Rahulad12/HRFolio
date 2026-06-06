@@ -50,3 +50,26 @@ export function useCreateInterviewer() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: INTERVIEWERS_KEY }),
   })
 }
+
+export function useEligibleCandidates() {
+  return useQuery({
+    queryKey: [...INTERVIEWS_KEY, 'eligible-candidates'],
+    queryFn: () => interviewApi.fetchEligibleCandidates(),
+  })
+}
+
+export function useInterviewLogsByCandidate(candidateId: string) {
+  return useQuery({
+    queryKey: [...INTERVIEWS_KEY, 'logs', candidateId],
+    queryFn: () => interviewApi.fetchInterviewLogsByCandidate(candidateId),
+    enabled: !!candidateId,
+  })
+}
+
+export function useDeleteInterview() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => interviewApi.deleteInterview(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: INTERVIEWS_KEY }),
+  })
+}

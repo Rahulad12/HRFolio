@@ -6,6 +6,7 @@ import sendEmail from "../utils/sendEmail.js";
 import ActivityLog from "../model/ActivityLogs.js";
 import dayjs from "dayjs";
 import { updateCandidateCurrentStage } from "../utils/updateCandidateProgress.js";
+import { auditLogService } from "../../modules/audit-logs/index.js";
 
 /**
  * This function will create a offer 
@@ -72,6 +73,7 @@ const createOffer = async (req, res) => {
             startDate,
             responseDeadline,
             status,
+            createdBy: req.user.id,
         });
 
         if (!newOffer) {
@@ -117,6 +119,13 @@ const createOffer = async (req, res) => {
             }
         }
 
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: candidate, type: 'candidates', name: candidateInfo?.name },
+            metadata: { after: { status: 'offered', offerId: newOffer._id, salary, position } }
+        });
+
         //logs of offer
         await OfferLog.create({
             candidate: candidate,
@@ -160,7 +169,11 @@ const createOffer = async (req, res) => {
 
 const getOffer = async (req, res) => {
     try {
-        const offer = await Offer.find().select(' -__v').populate({
+        const query = {}
+        if (req.user.role === 'HR') {
+            query.createdBy = req.user.id
+        }
+        const offer = await Offer.find(query).select(' -__v').populate({
             path: "candidate",
             select: " -__v"
         })
@@ -180,6 +193,9 @@ const getOfferById = async (req, res) => {
         if (!offer) {
             return res.status(404).json({ success: false, message: "Offer not found" });
         }
+        if (req.user.role === 'HR' && offer.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
         return res.status(200).json({ success: true, message: "Offer fetched successfully", data: offer });
     } catch (error) {
         console.log(error);
@@ -189,7 +205,11 @@ const getOfferById = async (req, res) => {
 
 const getOfferByCandidates = async (req, res) => {
     try {
-        const offer = await Offer.find({ candidate: req.params.id }).select(' -__v');
+        const query = { candidate: req.params.id }
+        if (req.user.role === 'HR') {
+            query.createdBy = req.user.id
+        }
+        const offer = await Offer.find(query).select(' -__v');
         if (offer.length === 0) {
             return res.status(404).json({ success: false, message: "Offer not found" });
         }
@@ -208,14 +228,26 @@ const updateOffer = async (req, res) => {
     }
 
     try {
+        const existing = await Offer.findById(req.params.id);
+        if (!existing) {
+            return res.status(404).json({ success: false, message: "Offer not found" });
+        }
+        if (req.user.role === 'HR' && existing.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
 
         if (status === "accepted") {
             await updateCandidateCurrentStage(candidate, 'offered', 'updated');
         }
         const offer = await Offer.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!offer) {
-            return res.status(404).json({ success: false, message: "Offer not found" });
-        }
+
+        const candidateInfoForLog = await Candidate.findById(candidate);
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: candidate, type: 'candidates', name: candidateInfoForLog?.name },
+            metadata: { after: { status: offer?.status } }
+        });
 
         //logs of offer
         await OfferLog.create({
@@ -254,10 +286,22 @@ const updateOffer = async (req, res) => {
 
 const delteOffer = async (req, res) => {
     try {
-        const offer = await Offer.findByIdAndDelete(req.params.id);
-        if (!offer) {
+        const existing = await Offer.findById(req.params.id);
+        if (!existing) {
             return res.status(404).json({ success: false, message: "Offer not found" });
         }
+        if (req.user.role === 'HR' && existing.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Forbidden" });
+        }
+        const offer = await Offer.findByIdAndDelete(req.params.id);
+
+        const offerCandidate = await Candidate.findById(offer?.candidate);
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: offer?.candidate, type: 'candidates', name: offerCandidate?.name },
+            metadata: { after: 'Offer deleted' }
+        });
 
         //offer logs
         await OfferLog.create({
@@ -317,5 +361,66 @@ const getOfferLogsByCandidate = async (req, res) => {
     }
 }
 
-export { createOffer, getOffer, getOfferByCandidates, getOfferById, updateOffer, delteOffer, getOfferLogsByCandidate }
+const sendOfferById = async (req, res) => {
+    try {
+        const offer = await Offer.findById(req.params.id);
+        if (!offer) {
+            return res.status(404).json({ success: false, message: 'Offer not found' });
+        }
+        if (req.user.role === 'HR' && offer.createdBy?.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Forbidden' });
+        }
+        if (offer.status !== 'draft') {
+            return res.status(400).json({ success: false, message: `Offer has already been ${offer.status}` });
+        }
+
+        const candidate = await Candidate.findById(offer.candidate);
+        if (!candidate) {
+            return res.status(404).json({ success: false, message: 'Candidate not found' });
+        }
+
+        const emailTemplate = await EmailTemplate.findById(offer.email);
+        if (emailTemplate) {
+            const html = emailTemplate.body
+                .replace(/{{candidateName}}/g, candidate.name)
+                .replace(/{{position}}/g, offer.position)
+                .replace(/{{salary}}/g, offer.salary)
+                .replace(/{{startDate}}/g, offer.startDate)
+                .replace(/{{responseDeadline}}/g, offer.responseDeadline)
+                .replace(/{{offerDate}}/g, dayjs().format('MMMM D, YYYY'))
+                .replace(/{{offerTime}}/g, dayjs().format('hh:mm A'));
+            const subject = emailTemplate.subject.replace(/{{position}}/g, offer.position);
+            await sendEmail({ to: candidate.email, subject, html });
+        }
+
+        offer.status = 'sent';
+        await offer.save();
+
+        candidate.status = 'offered';
+        await candidate.save();
+
+        await auditLogService.log({
+            actor: { id: req.user.id, name: req.user.name || 'Unknown', role: req.user.role },
+            action: 'CANDIDATE_UPDATE',
+            target: { id: candidate._id, type: 'candidates', name: candidate.name },
+            metadata: { after: { status: 'offered', offerId: offer._id } }
+        });
+
+        await ActivityLog.create({
+            candidate: offer.candidate,
+            userID: req.user._id,
+            action: 'offer_sent',
+            entityType: 'offers',
+            relatedId: offer._id,
+            metaData: { title: candidate.name, status: 'sent' }
+        });
+
+        return res.status(200).json({ success: true, message: 'Offer sent successfully', data: offer });
+    } catch (error) {
+        console.error('sendOfferById error:', error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export { createOffer, getOffer, getOfferByCandidates, getOfferById, updateOffer, delteOffer, getOfferLogsByCandidate, sendOfferById }
 

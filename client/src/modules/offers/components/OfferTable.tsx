@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Table, Button, Card, Input, Select, Space, Tag, Popconfirm, message, notification, Tooltip, Typography } from 'antd'
 import { Plus, Search, Trash2, Edit3, Send, Eye, FileDown } from 'lucide-react'
 import { useOfferList, useSendOffer, useDeleteOffer } from '../lib/queries/offer.queries'
-import { OfferFormModal } from './OfferFormModal'
 import { OfferDetailModal } from './OfferDetailModal'
 import type { Offer, OfferStatus } from '../types/offer.types'
 
@@ -17,10 +17,9 @@ const statusColors: Record<OfferStatus, string> = {
 }
 
 export function OfferTable() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingOffer, setEditingOffer] = useState<Offer | null>(null)
   const [detailOffer, setDetailOffer] = useState<Offer | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [api, contextHolder] = notification.useNotification()
@@ -117,7 +116,7 @@ export function OfferTable() {
           {record.status === 'draft' && (
             <>
               <Tooltip title="Edit">
-                <Button type="link" icon={<Edit3 size={16} />} onClick={() => { setEditingOffer(record); setFormOpen(true) }} />
+                <Button type="link" icon={<Edit3 size={16} />} onClick={() => navigate('/dashboard/offers/edit/' + record._id)} />
               </Tooltip>
               <Tooltip title="Send Offer">
                 <Popconfirm title="Send this offer?" onConfirm={() => handleSend(record._id)} okText="Yes" cancelText="No">
@@ -162,7 +161,7 @@ export function OfferTable() {
           <Button
             type="primary"
             icon={<Plus size={16} />}
-            onClick={() => { setEditingOffer(null); setFormOpen(true) }}
+            onClick={() => navigate('/dashboard/offers/new')}
           >
             New Offer
           </Button>
@@ -205,12 +204,6 @@ export function OfferTable() {
           />
         </Card>
       </motion.div>
-
-      <OfferFormModal
-        open={formOpen}
-        offer={editingOffer}
-        onClose={() => { setFormOpen(false); setEditingOffer(null) }}
-      />
 
       <OfferDetailModal
         offer={detailOffer}

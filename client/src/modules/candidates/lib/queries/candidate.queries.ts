@@ -52,3 +52,17 @@ export function useUpdateCandidateStatus() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: CANDIDATES_KEY }),
   })
 }
+
+export function useCandidateActivityLogs(candidateId: string) {
+  return useQuery({
+    queryKey: [...CANDIDATES_KEY, 'activityLogs', candidateId],
+    queryFn: () => candidateApi.fetchCandidateActivityLogs(candidateId),
+    enabled: !!candidateId,
+  })
+}
+
+export function useUploadResume() {
+  return useMutation({
+    mutationFn: (file: FormData) => candidateApi.uploadResume(file),
+  })
+}

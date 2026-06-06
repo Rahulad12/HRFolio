@@ -66,6 +66,23 @@ export interface CandidateFilter {
   status: string
 }
 
+export interface ActivityLog {
+  _id: string
+  entityType: string
+  action: string
+  metaData: {
+    title: string
+    description: string
+    [key: string]: unknown
+  }
+  createdAt: string
+}
+
+export interface ActivityLogResponse {
+  success: boolean
+  data: ActivityLog[]
+}
+
 export interface CandidateFormData {
   name: string
   email: string

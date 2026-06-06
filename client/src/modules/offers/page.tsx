@@ -1,3 +1,10 @@
+import { OfferTable } from './components/OfferTable'
+import { OfferForm } from './components/OfferForm'
+
 export function OfferListPage() {
-  return <div>Offers Page</div>
+  return <OfferTable />
+}
+
+export function OfferFormPage() {
+  return <OfferForm />
 }

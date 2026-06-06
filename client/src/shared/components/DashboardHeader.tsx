@@ -1,6 +1,6 @@
 import { Avatar, Button, Dropdown, Layout, Space } from 'antd'
 import type { MenuProps } from 'antd'
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import { MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { useThemeStore } from '@/shared/store/theme.store'
@@ -13,6 +13,7 @@ export function DashboardHeader() {
   const { user, logout } = useAuth()
   const mode = useThemeStore((s) => s.mode)
   const setThemeMode = useThemeStore((s) => s.setThemeMode)
+  const toggleThemeMode = useThemeStore((s) => s.toggleThemeMode)
   const collapsed = useSidebarStore((s) => s.collapsed)
   const toggle = useSidebarStore((s) => s.toggle)
 
@@ -52,6 +53,12 @@ export function DashboardHeader() {
       </Space>
 
       <Space align="center" size="middle">
+        <Button
+          type="text"
+          icon={mode === 'dark' ? <SunOutlined /> : <MoonOutlined />}
+          onClick={toggleThemeMode}
+          style={{ fontSize: '18px', width: 48, height: 48 }}
+        />
         <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['click']} placement="bottomRight">
           <Space className="cursor-pointer">
             <Avatar src={user?.picture || ''} size="large" />

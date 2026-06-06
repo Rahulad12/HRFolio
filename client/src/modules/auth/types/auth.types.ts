@@ -4,6 +4,7 @@ export interface AuthUser {
   email: string
   picture: string
   Id: string
+  role: 'HR' | 'HR Admin' | 'Admin'
 }
 
 export interface GoogleLoginPayload {
@@ -13,6 +14,7 @@ export interface GoogleLoginPayload {
   picture: string
   loggedIn: string
   Id: string
+  role: 'HR' | 'HR Admin' | 'Admin'
 }
 
 export interface AuthResponse {

@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-/**
- * Middleware to authorize users based on their roles.
- * Expects req.user to be populated by the authentication middleware.
- */
 export const authorize = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const user = (req as any).user;
@@ -26,3 +22,9 @@ export const authorize = (roles: string[]) => {
     next();
   };
 };
+
+export function addOwnershipFilter(query: Record<string, unknown>, reqUser: { id: string; role: string }, ownerField = 'createdBy') {
+  if (reqUser.role === 'HR') {
+    query[ownerField] = reqUser.id
+  }
+}

@@ -31,6 +31,10 @@ const offerSchema = new mongoose.Schema({
         enum: ['draft', 'sent', 'accepted', 'rejected'],
         required: true,
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+    },
 }, {
     timestamps: true,
 });

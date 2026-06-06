@@ -391,47 +391,68 @@ const routes = [
 > Framework: Express 5
 > Database / ORM: MongoDB / Mongoose 8
 
-### Existing structure (legacy — maintained as-is)
+### Existing structure (legacy — maintained as-is, migrated to `src/legacy/`)
+
+> Legacy JS code was migrated from `server/` root into `server/src/legacy/` during repo standardization.
+> New features must NOT add files to legacy folders — always use the target module structure below.
 
 ```
 server/
-├── config/          ← DB connection, Passport config
-├── controllers/     ← Request handlers
-├── Data/            ← Seed data
-├── logs/            ← Winston log files
-├── middleware/      ← Express middleware
-├── model/           ← Mongoose models
-├── routes/          ← Route definitions
-├── uploads/         ← File uploads
-├── utils/           ← Logger, helpers
-├── index.js         ← Entry point
-└── upload.js        ← Upload handler
+├── src/
+│   └── legacy/      ← migrated legacy JS code
+│       ├── config/
+│       ├── controllers/
+│       ├── Data/
+│       ├── middleware/
+│       ├── model/
+│       ├── routes/
+│       ├── utils/
+│       ├── index.js
+│       └── upload.js
+├── uploads/         ← File uploads (runtime data — stays at root)
+├── logs/            ← Winston log files (runtime data — stays at root)
+├── package.json
+└── tsconfig.json
 ```
 
 ### Target structure for NEW features
 
 ```
 server/
-└── modules/
-    └── <module-name>/
-        ├── index.ts                    ← routes + exports
-        ├── types/
-        │   └── <module>.types.ts
-        ├── routes/
-        │   └── <module>.routes.ts
-        ├── controller/
-        │   └── <module>.controller.ts
-        └── services/
-            └── <module>.service.ts
+└── src/
+    ├── index.ts              ← entry point — starts server
+    ├── app.ts                ← Express app — mounts legacy + new routes
+    └── modules/              ← NEW TypeScript modules only
+        └── <module-name>/
+            ├── index.ts                    ← registers routes + re-exports public types
+            ├── types/
+            │   └── <module>.types.ts       ← request DTOs, response types, domain interfaces
+            ├── routes/
+            │   └── <module>.routes.ts      ← route definitions only — no logic
+            ├── controller/
+            │   └── <module>.controller.ts  ← parse req, call service, return response
+            └── services/
+                └── <module>.service.ts     ← all business logic + DB/ORM calls
 ```
 
-Layer responsibilities:
+Layer responsibilities (strictly enforced):
 
 | Layer | Allowed | Forbidden |
 |---|---|---|
 | `routes` | Register paths, attach middleware | Any logic, DB access |
 | `controller` | Parse req, call service, send res | Business logic, DB access |
 | `services` | All business logic, DB/ORM calls | HTTP concerns, req/res objects |
+
+TypeScript rules per layer:
+- Controllers typed with `Request<Params, ResBody, ReqBody, Query>` from express (or equivalent)
+- Service functions: explicit return type `Promise<ResponseDTO>` — never `Promise<any>`
+- DTOs in `types/` — request shapes validated by schema (zod/joi) **before** reaching the controller
+- `index.ts` is the module's public contract: mounts routes and re-exports types needed by other modules
+
+### Route registration
+
+New modules register themselves via the app entry point at `server/src/index.ts`.
+The app entry imports module routers and mounts them — each module's `index.ts` exports its router.
 
 ---
 

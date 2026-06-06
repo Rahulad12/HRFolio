@@ -1,6 +1,6 @@
 # HRFolio — Agent Instructions
 
-**Stack:** React 18 / TypeScript / Vite / Ant Design / Tailwind / Redux Toolkit | Node.js / Express 5 / MongoDB / Mongoose / JWT / Passport
+**Stack:** React 18 / TypeScript / Vite / Ant Design / Tailwind / TanStack React Query / Zustand / Zod | Node.js / Express 5 / MongoDB / Mongoose / JWT / Passport
 **Repo:** two-package (client/ + server/) | fullstack
 
 ---
@@ -36,7 +36,7 @@ Then read `.agents/wiki/mistakes.md`.
 cd client && npm run dev     # dev
 cd client && npm run build   # tsc -b && vite build
 cd client && npm run lint    # ESLint
-cd server && npm run dev     # nodemon
+cd server && npm run dev     # tsx watch
 cd server && npm start       # production
 cd server && npm run data:seed
 cd server && npm run data:destroy
@@ -73,11 +73,13 @@ cd server && npm run data:destroy
 
 | File | Package | Purpose |
 |---|---|---|
-| client/src/routes/ | client | Route definitions |
-| client/src/pages/ | client | Pages |
-| client/src/services/ | client | API layer |
-| client/src/slices/ | client | Redux state |
-| client/src/types/ | client | TS types |
+| client/src/routes/ | client | Route definitions (createBrowserRouter) |
+| client/src/modules/ | client | Feature modules (types, schemas, api, queries, components) |
+| client/src/shared/ | client | Shared lib, hooks, store, components, constants |
+| client/src/shared/lib/axios.ts | client | Axios HTTP wrapper |
+| client/src/shared/lib/query-client.ts | client | React Query client config |
+| client/src/shared/store/ | client | Zustand UI stores |
+| client/src/shared/hooks/useAuth.ts | client | Auth hook (React Context) |
 | client/src/constant.ts | client | Constants |
 | server/routes/ | server | API routes |
 | server/controllers/ | server | Request handlers |

@@ -18,3 +18,5 @@ See `ADR-000-template.md`.
 | ADR | Title | Status | Date |
 |---|---|---|---|
 | ADR-000 | Template | template | 2026-05-30 |
+| ADR-001 | Server Folder Structure | accepted | 2026-05-30 |
+| ADR-002 | Frontend Module Structure | proposed | 2026-05-30 |
